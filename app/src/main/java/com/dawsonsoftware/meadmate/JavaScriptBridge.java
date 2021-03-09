@@ -1,0 +1,146 @@
+package com.dawsonsoftware.meadmate;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
+import android.webkit.JavascriptInterface;
+
+import com.dawsonsoftware.meadmate.models.Mead;
+import com.dawsonsoftware.meadmate.models.Reading;
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import static java.lang.Integer.parseInt;
+
+public class JavaScriptBridge {
+    private Activity activity;
+    private MeadMateData data;
+
+    public JavaScriptBridge(Activity activity) {
+        this.activity = activity;
+        data = new MeadMateData(activity);
+    }
+
+    @JavascriptInterface
+    public String fetchMeads(){
+
+        Log.i("JavaScriptBridge", "Fetching mead data.");
+
+        List<Mead> meads = data.getMeads();
+
+        Log.i("JavaScriptBridge", "Fetched " + meads.size() + " records.");
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(meads);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
+    public String fetchReadings(String meadId){
+
+        Log.i("JavaScriptBridge", "Fetching readings data for mead " + meadId + ".");
+
+        List<Reading> readings = data.getReadings(parseInt(meadId));
+
+        Log.i("JavaScriptBridge", "Fetched " + readings.size() + " records.");
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(readings);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
+    public String fetchMead(String id)
+    {
+        Log.i("JavaScriptBridge", "Fetching mead data by ID: " + id);
+
+        Mead mead = data.getMead(parseInt(id));
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(mead);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
+    public void addMead(String name, String startDate, String originalGravity, String description) throws ParseException {
+
+        Log.d("JavaScriptBridge", "Adding mead record for: " + name);
+
+        Mead mead = new Mead();
+
+        mead.setName(name);
+        mead.setStartDate(startDate);
+        mead.setDescription(description);
+        mead.setOriginalGravity(originalGravity);
+
+        data.addMead(mead);
+    }
+
+    @JavascriptInterface
+    public void addReading(String brewId, String date, String specificGravity) throws ParseException {
+
+        Log.d("JavaScriptBridge", "Adding reading record for: " + brewId);
+
+        Reading reading = new Reading();
+
+        reading.setBrewId(parseInt(brewId));
+        reading.setDate(date);
+        reading.setSpecificGravity(specificGravity);
+
+        data.addReading(reading);
+    }
+
+    @JavascriptInterface
+    public void deleteMead(String id)
+    {
+        Log.i("JavaScriptBridge", "Deleting mead by id: " + id);
+
+        data.deleteMead(parseInt(id));
+    }
+
+    @JavascriptInterface
+    public void deleteReading(String id)
+    {
+        Log.i("JavaScriptBridge", "Deleting reading by id: " + id);
+
+        data.deleteReading(parseInt(id));
+    }
+
+    @JavascriptInterface
+    public void logError(String tag, String message)
+    {
+        Log.e(tag, message);
+    }
+
+    @JavascriptInterface
+    public void logDebug(String tag, String message)
+    {
+        Log.d(tag, message);
+    }
+
+    @JavascriptInterface
+    public void logInfo(String tag, String message)
+    {
+        Log.i(tag, message);
+    }
+}

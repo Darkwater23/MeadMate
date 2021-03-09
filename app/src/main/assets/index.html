@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>Mead Mate</title>
+	<link rel="stylesheet" href="dist/honey.min.css" />
+  	<link rel="stylesheet" href="dist/jquery.mobile.icons.min.css" />
+  	<link rel="stylesheet" href="dist/jquery.mobile.structure-1.4.5.min.css" />
+	<link rel="stylesheet" href="dist/jquery-confirm.min.css" />
+
+	<link rel="stylesheet" href="main.css">
+</head>
+<body>
+<div id="home" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<h1>Mead Mate</h1>
+	</div>
+	<div data-role="content">
+		<ul id="mainMenu" data-role="listview">
+			<li><a href="#my-meads">My Meads</a></li>
+			<li><a href="#abv">ABV Calculator</a></li>
+			<li><a href="#mead-types">Types of Mead</a></li>
+		</ul>
+	</div>
+</div>
+
+<div id="my-meads" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<h1>Mead Mate</h1>
+		<a href="#new-mead" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+	</div>
+	<div data-role="content">
+		<ul id="mead-list" data-role="listview">
+		</ul>
+	</div>
+</div>
+
+<div id="events" data-role="page">
+	<div data-role="header" data-position="fixed" data-add-back-btn="true">
+		<h1>Mead Mate</h1>
+		<a href="#new-event" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+	</div>
+	<div data-role="content">
+		<h2 class="content-title">Events</h2>
+		<p id="event-list-title"></p>
+		<ul id="event-list" data-role="listview">
+		</ul>
+	</div>
+</div>
+
+<div id="readings" data-role="page">
+	<div data-role="header" data-position="fixed" data-add-back-btn="true">
+		<h1>Mead Mate</h1>
+		<a href="#new-reading" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+	</div>
+	<div data-role="content">
+		<h2 class="content-title">Readings</h2>
+		<p id="reading-list-title"></p>
+		<table id="reading-list" data-role="table">
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Reading</th>
+					<th>ABV</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+</div>
+
+<div id="mead-view" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">My Meads</a>
+		<h1>Mead Mate</h1>
+		<a href="#my-meads" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete" id="deleteMeadButton">Delete</a>
+	</div>
+	<div data-role="content">
+		<h2 class="content-title">My Meads</h2>
+		<dl>
+			<dt>ID</dt>
+			<dd id="mead-id"></dd>
+			<dt>Name</dt>
+			<dd id="mead-name"></dd>
+			<dt>Start Date</dt>
+			<dd id="mead-start-date"></dd>
+			<dt>Original Gravity</dt>
+			<dd id="mead-original-gravity"></dd>
+		</dl>
+		<p><strong>Description:</strong><br/>
+			<span id="mead-description"></span>
+		</p>
+		<p class="button-container">
+			<a id="eventsButton" href="#events" class="ui-btn ui-btn-inline ui-icon-calendar ui-btn-icon-right">Events</a>
+			<a id="readingsButton" href="#readings" class="ui-btn ui-btn-inline ui-icon-edit ui-btn-icon-right">Readings</a>
+		</p>
+	</div>
+</div>
+
+<div id="new-mead" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">My Meads</a>
+		<h1>Mead Mate</h1>
+	</div>
+	<div data-role="content">
+		<h2 class="content-title">Add New Mead</h2>
+		<p id="new-mead-savemsg"></p>
+		<form id="new-mead-form">
+			<ul id="messageList"></ul>
+			<label for="newMeadName">Mead Name:</label>
+			<input type="text" name="newMeadName" id="newMeadName" value="">
+
+			<label for="newMeadStartDate">Start Date:</label>
+			<input type="date" name="newMeadStartDate" id="newMeadStartDate" value="">
+
+			<label for="newMeadOriginalGravity">Original Specific Gravity:</label>
+			<input type="number" name="newMeadOriginalGravity" pattern="[0-1]+\.[0-9]{3}" id="newMeadOriginalGravity" value="1.000">
+
+			<label for="newMeadDescription">Description:</label>
+			<textarea name="newMeadDescription" id="newMeadDescription"></textarea>
+
+			<input type="button" value="Save" name="new-mead-save" id="new-mead-save">
+		</form>
+	</div>
+</div>
+
+<div id="abv" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<h1>Mead Mate</h1>
+	</div>
+	<div data-role="content">
+		<h2 class="content-title">Calculate ABV</h2>
+		<p>
+			<label class="abvForm" for="initialGravity">Initial Specific Gravity:</label>
+			<input class="abvForm" type="text" inputmode="numeric" name="initialGravity" value="" id="initialGravity" />
+		</p>
+		<p>
+			<label class="abvForm" for="newGravity">New Specific Gravity:</label>
+			<input class="abvForm" type="text" inputmode="numeric" name="newGravity" value="" id="newGravity" />
+		</p>
+		<a id="calcButton" href="#popupBasic" data-rel="popup" class="ui-btn" data-transition="pop">Calculate</a>
+		<div data-role="popup" id="popupBasic">
+			<p id="abvResult"></p>
+		</div>
+	</div>
+</div>
+
+<div id="mead-types" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<h1>Mead Mate</h1>
+	</div>
+	<div data-role="content">
+		<h2 class="content-title">Types of Mead</h2>
+		<p>Traditional mead is a relatively simple alcoholic beverage made from honey, water and yeast. There are numerous named variations of mead from all over the world. Here's a partial list of the various kinds of mead:</p>
+		<dl>
+			<dt>Acerglyn</dt>
+			<dd>Made with honey and maple syrup</dd>
+			<dt>Bilbemel</dt>
+			<dd>Made with honey and blueberries or blueberry juice</dd>
+			<dt>Black Mead</dt>
+			<dd>Mead made from honey and blackcurrants</dd>
+			<dt>Bochet</dt>
+			<dd>Mead made from caramelized honey</dd>
+			<dt>Bochetomel</dt>
+			<dd>Mead made from caramelized honey and fruits like elderberries, raspberries and/or blackberries</dd>
+			<dt>Braggot</dt>
+			<dd>Mead made from honey, hops and/or malt</dd>
+			<dt>Capsicumel</dt>
+			<dd>Mead made from honey and peppers (mild or hot)</dd>
+			<dt>Coffeemel</dt>
+			<dd>Made with honey and cold-brewed coffee</dd>
+			<dt>Cyser</dt>
+			<dd>Made with honey and apple juice</dd>
+			<dt>Hydromel</dt>
+			<dd>Light or low-alcohol mead</dd>
+			<dt>Melomel</dt>
+			<dd>Made with honey and fruit</dd>
+			<dt>Metheglin</dt>
+			<dd>Mead made from honey with herbs or spices added, like nutmeg, coriander, cinnamon, cloves or vanilla</dd>
+			<dt>Morat</dt>
+			<dd>Mead made from honey and mulberries</dd>
+			<dt>Mulled Mead</dt>
+			<dd>Made with honey and spices like ginger, cloves and/or cinnamon and served warm</dd>
+			<dt>Oxymel</dt>
+			<dd>Blend of honey and wine vinegar</dd>
+			<dt>Pyment</dt>
+			<dd>Made from honey and a blend of grapes</dd>
+			<dt>Rhodomel</dt>
+			<dd>Made with honey, rose hips, rose petal or rose attar</dd>
+		</dl>
+
+		<p>Mead is an ancient beverage that has been part of the culture of various societies around the world for thousands of years. Use the link below to learn more about mead at Wikipedia.</p>
+		<p><a href="https://en.wikipedia.org/wiki/Mead" rel="external">Mead</a></p>
+		<p>&nbsp;</p>
+	</div>
+</div>
+
+<script src="dist/jquery-1.11.1.min.js"></script>
+<script src="dist/jquery.validate.min.js"></script>
+<script src="dist/jquery.mobile-1.4.5.min.js"></script>
+<script src="dist/decimal.min.js"></script>
+<script src="dist/jquery-confirm.min.js"></script>
+<script src="app.js"></script>
+<script>
+
+	$(document).on("pagebeforeshow","#readings",function() {
+		$("reading-list-title").val('Not set yet');
+
+		if(window.Android)
+		{
+			window.Android.logInfo('MainActivity', 'Fetching Readings by meadID: ' + meadId + ' : ' + meadName);
+
+			// Set content title
+			$("#reading-list-title").val(meadName);
+
+			// Initialize and clear list
+			$('#reading-list').table();
+			$("#reading-list").empty();
+
+			// Fetch data from database
+			var meadData = window.Android.fetchMead(meadId);
+			var jsonMead = JSON.parse(meadData);
+
+			var readingsData = window.Android.fetchReadings(meadId);
+			var jsonData = JSON.parse(readingsData);
+
+			window.Android.logDebug('MainActivity', 'Fetched Mead JSON: ' + meadData);
+			window.Android.logDebug('MainActivity', 'Fetched Readings JSON: ' + readingsData);
+
+			var og = jsonMead.originalGravity;
+
+			// Append original gravity reading to list
+			$("#reading-list tbody").append('<tr><td>' + jsonMead.startDate + '</td><td>' + og + '</td><td>--</td></tr>');
+
+			// Append to list
+			for (var i = 0; i < jsonData.length; i++) {
+
+				var sg = jsonData[i].specificGravity;
+
+				var result = calculateAbv(og,sg);
+
+				$("#reading-list tbody").append('<tr><td>' + jsonData[i].date + '</td><td>' + sg + '</td><td>' + result + '</td></tr>');
+			}
+
+			$("#reading-list").table("refresh");
+
+			window.Android.logInfo('MainActivity','Readings list loaded and refreshed.');
+		}
+	});
+
+	$(document).on("pagebeforeshow","#my-meads",function() {
+    	if(window.Android)
+		{
+			window.Android.logInfo('MainActivity','JS Bridge available. Starting data fetch for mead list.');
+
+			// Clear list
+			$("#mead-list").empty();
+
+			// Fetch data from database
+			var results = window.Android.fetchMeads();
+			var jsonData = JSON.parse(results);
+
+			window.Android.logDebug('MainActivity', 'Fetched JSON: ' + results);
+
+			// Append to list
+			for (var i = 0; i < jsonData.length; i++) {
+				
+				$("#mead-list").append('<li><a href="javascript:view(' + jsonData[i].id + ');" data-ajax="false">' + jsonData[i].name + '</a></li>');
+			}
+
+			$("#mead-list").listview("refresh");
+
+			window.Android.logInfo('MainActivity','Mead list loaded and refreshed.');
+		}
+		else
+		{
+			// Insert mock item for layout testing
+			$("#mead-list").empty();
+			$("#mead-list").append('<li><a href="javascript:view(0);" data-ajax="false">My First Mead</a></li>');
+			$("#mead-list").listview("refresh");
+		}
+    });
+
+    $(document).on("pagebeforeshow","#new-mead",function() {
+
+		// Clear form values
+		$("#newMeadName").val('');
+		$("#newMeadStartDate").val('');
+		$("#newMeadOriginalGravity").val('');
+		$("#newMeadDescription").val('');
+
+		$("#new-mead-savemsg").hide(0);
+    });
+	
+	$("#calcButton").on("tap", function(event) {
+	 	var ig = $('#initialGravity').val();
+		var ng = $('#newGravity').val();
+
+		var result = calculateAbv(ig,ng);
+
+		$('#abvResult').text(result);
+	});
+
+	$("#new-mead-form").validate({
+		errorLabelContainer: "#messageList",
+  		wrapper: "li",
+		rules: {
+			newMeadName: {
+				required: true
+			},
+			newMeadStartDate: {
+				required: true
+			},
+			newMeadOriginalGravity: {
+				required: true
+			}
+		},
+		messages: {
+			newMeadName: "Mead Name is required.",
+			newMeadStartDate: "Start Date is required.",
+			newMeadOriginalGravity: "Specific Gravity is required."
+		}
+	});
+
+	 $("#new-mead-save").on("tap", function(event){
+
+		if(window.Android)
+		{
+			if($("#new-mead-form").valid()){
+
+				// Persist data
+				var mName = $("#newMeadName").val();
+				var mDate = $("#newMeadStartDate").val();
+				var mGravity = $("#newMeadOriginalGravity").val();
+				var mDesc = $("#newMeadDescription").val();
+
+				window.Android.addMead(mName, mDate, mGravity, mDesc);
+
+				window.Android.logInfo('MainActivity', 'New mead saved!');
+
+				// Set result message and alert user
+				$("#new-mead-savemsg").text("Saved!");
+				$("#new-mead-savemsg").show();
+
+				setTimeout(function() {
+					$("#new-mead-savemsg").hide(1500);
+				}, 2000);
+			}
+		}
+		else
+		{
+			alert('Save not available outside Android environment.');
+		}
+
+	 });
+
+	 function view(id)
+	 {
+		if(window.Android && id > 0)
+		{
+			window.Android.logInfo('MainActivity', 'Fetching Mead by ID: ' + id);
+
+			// Fetch data from database
+			var results = window.Android.fetchMead(id);
+			var jsonData = JSON.parse(results);
+
+			window.Android.logInfo('MainActivity', results);
+
+			//$("#mead-description").text(results);
+
+			// Populate fields
+			$("#mead-id").text(jsonData.id);
+			$("#mead-name").text(jsonData.name);
+			$("#mead-start-date").text(jsonData.startDate);
+			$("#mead-description").text(jsonData.description);
+			$("#mead-original-gravity").text(jsonData.originalGravity);
+
+			// add event handlers for buttons
+			$("#deleteMeadButton").off("tap"); // clear existing event handlers
+			$("#readingsButton").off("tap"); // clear existing event handlers
+
+			$("#deleteMeadButton").on("tap", { value: id }, function(event) {
+				event.preventDefault();
+
+				var id = event.data.value;
+
+				$.confirm({
+					title: 'Delete Mead Entry',
+					content: 'Are you sure?',
+					buttons: {
+						confirm: function () {
+							window.Android.deleteMead(id);
+
+							$(":mobile-pagecontainer").pagecontainer("change", "#my-meads");
+						},
+						cancel: function () {
+							// do nothing
+						}
+					}
+				});
+			});
+
+			$("#readingsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadOriginalGravity: jsonData.originalGravity }, function(event) {
+				event.preventDefault();
+
+				$(":mobile-pagecontainer").pagecontainer("change", "#readings", { meadId: event.data.id, meadName: event.data.name, meadOriginalGravity: event.data.originalGravity });
+			});
+		}
+		else
+		{
+			// Populate sample data
+			$("#mead-id").text("0");
+			$("#mead-name").text("My First Mead");
+			$("#mead-start-date").text("01/01/2021");
+			$("#mead-description").text("Sample data");
+			$("#mead-original-gravity").text("1.000");
+		}
+		
+		$(":mobile-pagecontainer").pagecontainer("change", "#mead-view");
+	 }
+
+</script>
+</body>
+</html>

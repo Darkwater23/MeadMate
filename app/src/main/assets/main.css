@@ -1,0 +1,57 @@
+body
+{
+	font-family: Verdana, Geneva, sans-serif;
+}
+
+.content-title
+{
+    font-size: 1.25em;
+    margin: 0 0 1em 0;
+    line-height: 1.25em;
+    text-align: center;
+
+}
+
+dl{
+    border: 2px solid #333;
+    padding: 0.5em;
+}
+
+dt {
+    float: left;
+    clear: left;
+    width: 130px;
+    text-align: right;
+    font-weight: bold;
+}
+
+dt::after {
+    content: ":";
+}
+
+dd {
+    margin: 0 0 0 140px;
+    padding: 0 0 0.5em 0;
+}
+
+#abvResult {
+    font-weight: bold;
+    font-size: 2em;
+}
+
+label.error {
+    color: #C00;
+    font-weight: bold;
+}
+
+#new-mead-savemsg
+{
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #000;
+}
+
+p.button-container
+{
+    text-align: right;
+}
