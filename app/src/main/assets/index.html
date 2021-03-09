@@ -207,51 +207,6 @@
 <script src="app.js"></script>
 <script>
 
-	$(document).on("pagebeforeshow","#readings",function() {
-		$("reading-list-title").val('Not set yet');
-
-		if(window.Android)
-		{
-			window.Android.logInfo('MainActivity', 'Fetching Readings by meadID: ' + meadId + ' : ' + meadName);
-
-			// Set content title
-			$("#reading-list-title").val(meadName);
-
-			// Initialize and clear list
-			$('#reading-list').table();
-			$("#reading-list").empty();
-
-			// Fetch data from database
-			var meadData = window.Android.fetchMead(meadId);
-			var jsonMead = JSON.parse(meadData);
-
-			var readingsData = window.Android.fetchReadings(meadId);
-			var jsonData = JSON.parse(readingsData);
-
-			window.Android.logDebug('MainActivity', 'Fetched Mead JSON: ' + meadData);
-			window.Android.logDebug('MainActivity', 'Fetched Readings JSON: ' + readingsData);
-
-			var og = jsonMead.originalGravity;
-
-			// Append original gravity reading to list
-			$("#reading-list tbody").append('<tr><td>' + jsonMead.startDate + '</td><td>' + og + '</td><td>--</td></tr>');
-
-			// Append to list
-			for (var i = 0; i < jsonData.length; i++) {
-
-				var sg = jsonData[i].specificGravity;
-
-				var result = calculateAbv(og,sg);
-
-				$("#reading-list tbody").append('<tr><td>' + jsonData[i].date + '</td><td>' + sg + '</td><td>' + result + '</td></tr>');
-			}
-
-			$("#reading-list").table("refresh");
-
-			window.Android.logInfo('MainActivity','Readings list loaded and refreshed.');
-		}
-	});
-
 	$(document).on("pagebeforeshow","#my-meads",function() {
     	if(window.Android)
 		{
@@ -269,7 +224,7 @@
 			// Append to list
 			for (var i = 0; i < jsonData.length; i++) {
 				
-				$("#mead-list").append('<li><a href="javascript:view(' + jsonData[i].id + ');" data-ajax="false">' + jsonData[i].name + '</a></li>');
+				$("#mead-list").append('<li><a href="javascript:viewMead(' + jsonData[i].id + ');" data-ajax="false">' + jsonData[i].name + '</a></li>');
 			}
 
 			$("#mead-list").listview("refresh");
@@ -280,7 +235,7 @@
 		{
 			// Insert mock item for layout testing
 			$("#mead-list").empty();
-			$("#mead-list").append('<li><a href="javascript:view(0);" data-ajax="false">My First Mead</a></li>');
+			$("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
 			$("#mead-list").listview("refresh");
 		}
     });
@@ -353,12 +308,40 @@
 		}
 		else
 		{
-			alert('Save not available outside Android environment.');
+			$("#new-mead-savemsg").text("Save not available outside Android environment.");
+			$("#new-mead-savemsg").show();
+
+			setTimeout(function() {
+				$("#new-mead-savemsg").hide(1500);
+			}, 2000);
 		}
 
 	 });
 
-	 function view(id)
+	 function viewReadings(meadId, meadName, meadOriginalGravity)
+	 {
+	 	if(window.Android && meadId > 0)
+	 	{
+	 		window.Android.logDebug('MainActivity','MeadId: ' + meadId);
+	 		window.Android.logDebug('MainActivity','MeadName: ' + meadName);
+	 		window.Android.logDebug('MainActivity','MeadOriginalGravity: ' + meadOriginalGravity);
+	 		window.Android.logInfo('MainActivity', "Fetching Readings for mead '" + meadName + "'");
+
+			// Fetch data from database
+			var results = window.Android.fetchReadings(meadId);
+			var jsonData = JSON.parse(results);
+
+			window.Android.logInfo('MainActivity', results);
+	 	}
+	 	else
+		{
+			// Populate sample data
+		}
+
+		$(":mobile-pagecontainer").pagecontainer("change", "#readings");
+	 }
+
+	 function viewMead(id)
 	 {
 		if(window.Android && id > 0)
 		{
@@ -369,8 +352,6 @@
 			var jsonData = JSON.parse(results);
 
 			window.Android.logInfo('MainActivity', results);
-
-			//$("#mead-description").text(results);
 
 			// Populate fields
 			$("#mead-id").text(jsonData.id);
@@ -395,7 +376,7 @@
 						confirm: function () {
 							window.Android.deleteMead(id);
 
-							$(":mobile-pagecontainer").pagecontainer("change", "#my-meads");
+							$.mobile.navigate("#my-meads");
 						},
 						cancel: function () {
 							// do nothing
@@ -407,7 +388,7 @@
 			$("#readingsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadOriginalGravity: jsonData.originalGravity }, function(event) {
 				event.preventDefault();
 
-				$(":mobile-pagecontainer").pagecontainer("change", "#readings", { meadId: event.data.id, meadName: event.data.name, meadOriginalGravity: event.data.originalGravity });
+				viewReadings(event.data.meadId, event.data.meadName, event.data.meadOriginalGravity);
 			});
 		}
 		else
