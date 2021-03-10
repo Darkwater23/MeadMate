@@ -55,3 +55,24 @@ p.button-container
 {
     text-align: right;
 }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+thead
+{
+    background-color: #B5651D;
+}
+
+tbody
+{
+    background-color: #F3CD05;
+}
+
+td, th {
+  border: 1px solid #333;
+  padding: 0.5rem;
+  text-align: left;
+}

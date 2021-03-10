@@ -53,12 +53,12 @@
 <div id="readings" data-role="page">
 	<div data-role="header" data-position="fixed" data-add-back-btn="true">
 		<h1>Mead Mate</h1>
-		<a href="#new-reading" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+		<a id="newReadingButton" href="#new-reading" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
 	<div data-role="content">
 		<h2 class="content-title">Readings</h2>
 		<p id="reading-list-title"></p>
-		<table id="reading-list" data-role="table">
+		<table id="reading-list">
 			<thead>
 				<tr>
 					<th>Date</th>
@@ -68,6 +68,28 @@
 			</thead>
 			<tbody></tbody>
 		</table>
+	</div>
+</div>
+
+<div id="new-reading" data-role="page">
+	<div data-role="header" data-position="fixed" data-add-back-btn="true">
+		<h1>Mead Mate</h1>
+	</div>
+	<div data-role="content">
+		<h2 class="content-title">New Reading</h2>
+		<p id="new-reading-savemsg"></p>
+		<form id="new-reading-form">
+			<ul id="newReadingMessageList"></ul>
+			<input type="hidden" name="newReadingMeadId" id="newReadingMeadId" value="">
+
+			<label for="newReadingDate">Reading Date:</label>
+			<input type="date" name="newReadingDate" id="newReadingDate" value="">
+
+			<label for="newReadingGravity">Specific Gravity:</label>
+			<input type="number" name="newReadingGravity" pattern="[0-1]+\.[0-9]{3}" id="newReadingGravity" value="1.000">
+
+			<input type="button" value="Save" name="saveReadingButton" id="saveReadingButton">
+		</form>
 	</div>
 </div>
 
@@ -250,6 +272,20 @@
 
 		$("#new-mead-savemsg").hide(0);
     });
+
+    $(document).on("pagebeforeshow","#readings",function() {
+
+		// Refresh table?
+
+    });
+
+    $(document).on("pagebeforeshow","#new-reading",function() {
+
+		// Clear form
+		$("#newReadingDate").val('');
+		$("#newReadingGravity").val('');
+
+    });
 	
 	$("#calcButton").on("tap", function(event) {
 	 	var ig = $('#initialGravity').val();
@@ -278,6 +314,23 @@
 			newMeadName: "Mead Name is required.",
 			newMeadStartDate: "Start Date is required.",
 			newMeadOriginalGravity: "Specific Gravity is required."
+		}
+	});
+
+	$("#new-reading-form").validate({
+		errorLabelContainer: "#newReadingMessageList",
+  		wrapper: "li",
+		rules: {
+			newReadingDate: {
+				required: true
+			},
+			newReadingGravity: {
+				required: true
+			}
+		},
+		messages: {
+			newReadingDate: "Reading Date is required.",
+			newReadingGravity: "Specific Gravity is required."
 		}
 	});
 
@@ -318,7 +371,44 @@
 
 	 });
 
-	 function viewReadings(meadId, meadName, meadOriginalGravity)
+	 $("#saveReadingButton").on("tap", function(event){
+
+		if(window.Android)
+		{
+			if($("#new-reading-form").valid()){
+
+				// Persist data
+				var meadId = $("#newReadingMeadId").val();
+				var date = $("#newReadingDate").val();
+				var gravity = $("#newReadingGravity").val();
+
+				window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
+				window.Android.logDebug('MainActivity', 'Date: ' + date);
+				window.Android.logDebug('MainActivity', 'Gravity: ' + gravity);
+
+				window.Android.addReading(meadId, date, gravity);
+
+				window.Android.logInfo('MainActivity', 'New mead reading saved!');
+
+				$.alert({
+					content: 'New Reading Saved!',
+					buttons: {
+						ok: function () {
+							// Navigate back
+							$.mobile.back();
+						}
+					}
+				});
+			}
+		}
+		else
+		{
+			$.alert('Android Javascript bridge is not available');
+		}
+
+	 });
+
+	 function viewReadings(meadId, meadName, meadStartDate, meadOriginalGravity)
 	 {
 	 	if(window.Android && meadId > 0)
 	 	{
@@ -332,6 +422,43 @@
 			var jsonData = JSON.parse(results);
 
 			window.Android.logInfo('MainActivity', results);
+
+			// Clear existing rows from table
+			// Clear list
+			$("#reading-list tbody").empty();
+
+			// Append original gravity reading to list
+			$("#reading-list tbody").append('<tr><td>' + meadStartDate + '</td><td>' + meadOriginalGravity + '</td><td>--</td></tr>');
+
+			// Fetch readings for this mead
+			var readingsData = window.Android.fetchReadings(meadId);
+			var jsonData = JSON.parse(readingsData);
+
+			// Holding variable for original or previous gravity
+			var og = meadOriginalGravity;
+
+			// Append to list
+			for (var i = 0; i < jsonData.length; i++) {
+
+				var sg = jsonData[i].specificGravity;
+
+				var result = calculateAbv(og,sg);
+
+				$("#reading-list tbody").append('<tr><td>' + jsonData[i].date + '</td><td>' + sg + '</td><td>' + result + '</td></tr>');
+			}
+
+			$("#newReadingButton").off("tap"); // clear existing event handlers
+
+			$("#newReadingButton").on("tap", { meadId: meadId }, function(event) {
+				event.preventDefault();
+
+				window.Android.logDebug('MainActivity', 'New Reading Button pressed. Mead ID: ' + event.data.meadId);
+
+				// set value of hidden form
+				$("#newReadingMeadId").val(event.data.meadId);
+
+				$(":mobile-pagecontainer").pagecontainer("change", "#new-reading");
+			});
 	 	}
 	 	else
 		{
@@ -385,10 +512,10 @@
 				});
 			});
 
-			$("#readingsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadOriginalGravity: jsonData.originalGravity }, function(event) {
+			$("#readingsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadStartDate: jsonData.startDate, meadOriginalGravity: jsonData.originalGravity }, function(event) {
 				event.preventDefault();
 
-				viewReadings(event.data.meadId, event.data.meadName, event.data.meadOriginalGravity);
+				viewReadings(event.data.meadId, event.data.meadName, event.data.meadStartDate, event.data.meadOriginalGravity);
 			});
 		}
 		else
