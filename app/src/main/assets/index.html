@@ -64,6 +64,7 @@
 					<th>Date</th>
 					<th>Reading</th>
 					<th>ABV</th>
+					<th>&nbsp;</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
@@ -286,6 +287,10 @@
 		$("#newReadingGravity").val('');
 
     });
+
+	$(document).on("pagehide", "#new-reading", function() {
+
+	});
 	
 	$("#calcButton").on("tap", function(event) {
 	 	var ig = $('#initialGravity').val();
@@ -391,11 +396,16 @@
 				window.Android.logInfo('MainActivity', 'New mead reading saved!');
 
 				$.alert({
+					title: '',
 					content: 'New Reading Saved!',
 					buttons: {
 						ok: function () {
-							// Navigate back
-							$.mobile.back();
+							// Navigate back doesn't refresh table
+							//$.mobile.back();
+							var index = $.mobile.navigate.history.stack.length - 2;
+							$.mobile.navigate.history.stack.splice(index, 1);
+
+							viewReadings(meadId);
 						}
 					}
 				});
@@ -408,43 +418,40 @@
 
 	 });
 
-	 function viewReadings(meadId, meadName, meadStartDate, meadOriginalGravity)
+	 function viewReadings(meadId)
 	 {
 	 	if(window.Android && meadId > 0)
 	 	{
-	 		window.Android.logDebug('MainActivity','MeadId: ' + meadId);
-	 		window.Android.logDebug('MainActivity','MeadName: ' + meadName);
-	 		window.Android.logDebug('MainActivity','MeadOriginalGravity: ' + meadOriginalGravity);
-	 		window.Android.logInfo('MainActivity', "Fetching Readings for mead '" + meadName + "'");
+	 		window.Android.logInfo('MainActivity', 'Fetching Readings for mead ID ' + meadId);
 
 			// Fetch data from database
-			var results = window.Android.fetchReadings(meadId);
-			var jsonData = JSON.parse(results);
+			var meadJson = window.Android.fetchMead(meadId);
+			var meadData = JSON.parse(meadJson);
 
-			window.Android.logInfo('MainActivity', results);
+			var readingsJson = window.Android.fetchReadings(meadId);
+			var readingsData = JSON.parse(readingsJson);
+
+			window.Android.logDebug('MainActivity', meadJson);
+			window.Android.logDebug('MainActivity', readingsJson);
 
 			// Clear existing rows from table
 			// Clear list
 			$("#reading-list tbody").empty();
 
 			// Append original gravity reading to list
-			$("#reading-list tbody").append('<tr><td>' + meadStartDate + '</td><td>' + meadOriginalGravity + '</td><td>--</td></tr>');
-
-			// Fetch readings for this mead
-			var readingsData = window.Android.fetchReadings(meadId);
-			var jsonData = JSON.parse(readingsData);
+			$("#reading-list tbody").append('<tr><td>' + meadData.startDate + '</td><td>' + meadData.originalGravity + '</td><td>N/A</td><td>&nbsp;</td></tr>');
 
 			// Holding variable for original or previous gravity
-			var og = meadOriginalGravity;
+			var og = meadData.originalGravity;
 
 			// Append to list
-			for (var i = 0; i < jsonData.length; i++) {
+			for (var i = 0; i < readingsData.length; i++) {
 
-				var sg = jsonData[i].specificGravity;
+				var sg = readingsData[i].specificGravity;
 
 				var result = calculateAbv(og,sg);
 
-				$("#reading-list tbody").append('<tr><td>' + jsonData[i].date + '</td><td>' + sg + '</td><td>' + result + '</td></tr>');
+				$("#reading-list tbody").append('<tr><td>' + readingsData[i].date + '</td><td>' + sg + '</td><td>' + result + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
 			}
 
 			$("#newReadingButton").off("tap"); // clear existing event handlers
@@ -457,7 +464,7 @@
 				// set value of hidden form
 				$("#newReadingMeadId").val(event.data.meadId);
 
-				$(":mobile-pagecontainer").pagecontainer("change", "#new-reading");
+				$(":mobile-pagecontainer").pagecontainer("change", "#new-reading",{changeHash:false});
 			});
 	 	}
 	 	else
@@ -466,6 +473,37 @@
 		}
 
 		$(":mobile-pagecontainer").pagecontainer("change", "#readings");
+	 }
+
+	 function deleteReading(meadId, readingId)
+	 {
+	 	window.Android.logDebug('MainActivity', 'Delete Reading Button pressed. Mead ID: ' + meadId);
+	 	window.Android.logDebug('MainActivity', 'Reading ID: ' + readingId);
+
+	 	if(window.Android && meadId > 0 && readingId > 0)
+	 	{
+			$.confirm({
+				title: 'Delete Reading',
+				content: 'Are you sure?',
+				buttons: {
+					confirm: function () {
+						window.Android.deleteReading(readingId);
+
+						viewReadings(meadId);
+					},
+					cancel: function () {
+						// do nothing
+					}
+				}
+			});
+	 	}
+	 	else
+		{
+			$.alert('Android Javascript bridge is not available');
+		}
+
+		// Keep link from doing anything
+		return false;
 	 }
 
 	 function viewMead(id)
