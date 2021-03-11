@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
+import com.dawsonsoftware.meadmate.models.LogEntry;
 import com.dawsonsoftware.meadmate.models.Mead;
 import com.dawsonsoftware.meadmate.models.Reading;
 import com.google.gson.Gson;
@@ -59,6 +60,24 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
+    public String fetchLogEntries(String meadId){
+
+        Log.i("JavaScriptBridge", "Fetching log entry data for mead " + meadId + ".");
+
+        List<LogEntry> logEntries = data.getLogEntries(parseInt(meadId));
+
+        Log.i("JavaScriptBridge", "Fetched " + logEntries.size() + " records.");
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(logEntries);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
     public String fetchMead(String id)
     {
         Log.i("JavaScriptBridge", "Fetching mead data by ID: " + id);
@@ -104,6 +123,21 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
+    public void addLogEntry(String meadId, String date, String type, String entry) throws ParseException {
+
+        Log.d("JavaScriptBridge", "Adding log entry record for: " + meadId);
+
+        LogEntry logEntry = new LogEntry();
+
+        logEntry.setMeadId(parseInt(meadId));
+        logEntry.setDate(date);
+        logEntry.setType(type);
+        logEntry.setEntry(entry);
+
+        data.addLogEntry(logEntry);
+    }
+
+    @JavascriptInterface
     public void deleteMead(String id)
     {
         Log.i("JavaScriptBridge", "Deleting mead by id: " + id);
@@ -117,6 +151,14 @@ public class JavaScriptBridge {
         Log.i("JavaScriptBridge", "Deleting reading by id: " + id);
 
         data.deleteReading(parseInt(id));
+    }
+
+    @JavascriptInterface
+    public void deleteLogEntry(String id)
+    {
+        Log.i("JavaScriptBridge", "Deleting log entry by id: " + id);
+
+        data.deleteLogEntry(parseInt(id));
     }
 
     @JavascriptInterface
