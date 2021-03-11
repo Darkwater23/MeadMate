@@ -6,8 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import androidx.annotation.RequiresPermission;
-
+import com.dawsonsoftware.meadmate.models.LogEntry;
 import com.dawsonsoftware.meadmate.models.Mead;
 import com.dawsonsoftware.meadmate.models.Reading;
 
@@ -30,13 +29,15 @@ public class MeadMateData extends SQLiteOpenHelper {
     // Mead Log table fields
     private static final String TABLE_MEAD_LOG = "MEAD_LOG";
     private static final String KEY_MEAD_LOG_ID = "_ID";
+    private static final String KEY_MEAD_LOG_MEADID = "MEAD_ID";
     private static final String KEY_MEAD_LOG_DATE = "DATE";
+    private static final String KEY_MEAD_LOG_TYPE = "TYPE";
     private static final String KEY_MEAD_LOG_ENTRY = "ENTRY";
 
     // Readings table fields
     private static final String TABLE_READINGS = "READINGS";
     private static final String KEY_READINGS_ID = "_ID";
-    private static final String KEY_READINGS_BREWID = "BREW_ID";
+    private static final String KEY_READINGS_MEADID = "MEAD_ID";
     private static final String KEY_READINGS_DATE = "DATE";
     private static final String KEY_READINGS_GRAV = "SPECIFIC_GRAVITY";
 
@@ -55,12 +56,14 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         String CREATE_MEAD_LOG_TABLE = "CREATE TABLE " + TABLE_MEAD_LOG + " (" +
                 KEY_MEAD_LOG_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
+                KEY_MEAD_LOG_MEADID + " INTEGER NOT NULL," +
                 KEY_MEAD_LOG_DATE + " TEXT NOT NULL, " +
+                KEY_MEAD_LOG_TYPE + " TEXT NOT NULL, " +
                 KEY_MEAD_LOG_ENTRY + " TEXT NOT NULL)";
 
         String CREATE_READINGS_TABLE = "CREATE TABLE " + TABLE_READINGS + " (" +
                 KEY_READINGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
-                KEY_READINGS_BREWID + " INTEGER NOT NULL," +
+                KEY_READINGS_MEADID + " INTEGER NOT NULL," +
                 KEY_READINGS_DATE + " TEXT NOT NULL," +
                 KEY_READINGS_GRAV + " TEXT NOT NULL)";
 
@@ -71,9 +74,9 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEADS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEAD_LOG);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_READINGS);
+        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEADS);
+        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEAD_LOG);
+        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_READINGS);
 
         onCreate(db);
     }
@@ -98,12 +101,27 @@ public class MeadMateData extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_READINGS_BREWID, reading.getBrewId());
+        values.put(KEY_READINGS_MEADID, reading.getMeadId());
         values.put(KEY_READINGS_DATE, reading.getDate());
         values.put(KEY_READINGS_GRAV, reading.getSpecificGravity());
 
         // Inserting Row
         db.insert(TABLE_READINGS, null, values);
+
+        db.close(); // Closing database connection
+    }
+
+    void addLogEntry(LogEntry entry) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_MEAD_LOG_MEADID, entry.getMeadId());
+        values.put(KEY_MEAD_LOG_DATE, entry.getDate());
+        values.put(KEY_MEAD_LOG_TYPE, entry.getType());
+        values.put(KEY_MEAD_LOG_ENTRY, entry.getEntry());
+
+        // Inserting Row
+        db.insert(TABLE_MEAD_LOG, null, values);
 
         db.close(); // Closing database connection
     }
@@ -133,6 +151,18 @@ public class MeadMateData extends SQLiteOpenHelper {
         String[] whereArgs = new String[] { String.valueOf(readingId) };
 
         db.delete(TABLE_READINGS, whereClause, whereArgs);
+
+        db.close();
+    }
+
+    void deleteLogEntry(int logEntryId)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String whereClause = "_ID=?";
+        String[] whereArgs = new String[] { String.valueOf(logEntryId) };
+
+        db.delete(TABLE_MEAD_LOG, whereClause, whereArgs);
 
         db.close();
     }
@@ -251,12 +281,12 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         String[] tableColumns = new String[] {
                 KEY_READINGS_ID,
-                KEY_READINGS_BREWID,
+                KEY_READINGS_MEADID,
                 KEY_READINGS_DATE,
                 KEY_READINGS_GRAV
         };
 
-        String whereClause = KEY_READINGS_BREWID + " = ?";
+        String whereClause = KEY_READINGS_MEADID + " = ?";
 
         String[] whereArgs = new String[] {
                 String.valueOf(meadId)
@@ -278,11 +308,61 @@ public class MeadMateData extends SQLiteOpenHelper {
                 Reading reading = new Reading();
 
                 reading.setId(c.getInt(c.getColumnIndex(KEY_READINGS_ID)));
-                reading.setBrewId(c.getInt(c.getColumnIndex(KEY_READINGS_BREWID)));
+                reading.setMeadId(c.getInt(c.getColumnIndex(KEY_READINGS_MEADID)));
                 reading.setDate(c.getString(c.getColumnIndex(KEY_READINGS_DATE)));
                 reading.setSpecificGravity(c.getString(c.getColumnIndex(KEY_READINGS_GRAV)));
 
                 model.add(reading);
+
+            }while(c.moveToNext());
+        }
+
+        db.close();
+
+        return model;
+    }
+
+    List<LogEntry> getLogEntries(Integer meadId)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<LogEntry> model = new ArrayList<LogEntry>();
+
+        String[] tableColumns = new String[] {
+                KEY_MEAD_LOG_ID,
+                KEY_MEAD_LOG_MEADID,
+                KEY_MEAD_LOG_DATE,
+                KEY_MEAD_LOG_TYPE,
+                KEY_MEAD_LOG_ENTRY
+        };
+
+        String whereClause = KEY_MEAD_LOG_MEADID + " = ?";
+
+        String[] whereArgs = new String[] {
+                String.valueOf(meadId)
+        };
+        //String groupBy = null;
+        //String having = null;
+        String orderBy = KEY_MEAD_LOG_DATE; //TODO: Descending?
+        //String limit = null;
+
+        Cursor c = db.query(TABLE_MEAD_LOG, tableColumns, whereClause, whereArgs,
+                null, null, orderBy, null);
+
+        if(c.getCount() > 0)
+        {
+            c.moveToFirst();
+
+            do {
+
+                LogEntry entry = new LogEntry();
+
+                entry.setId(c.getInt(c.getColumnIndex(KEY_MEAD_LOG_ID)));
+                entry.setMeadId(c.getInt(c.getColumnIndex(KEY_MEAD_LOG_MEADID)));
+                entry.setDate(c.getString(c.getColumnIndex(KEY_MEAD_LOG_DATE)));
+                entry.setType(c.getString(c.getColumnIndex(KEY_MEAD_LOG_TYPE)));
+                entry.setEntry(c.getString(c.getColumnIndex(KEY_MEAD_LOG_ENTRY)));
+
+                model.add(entry);
 
             }while(c.moveToNext());
         }

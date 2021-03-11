@@ -1,8 +1,6 @@
 package com.dawsonsoftware.meadmate;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
@@ -10,12 +8,7 @@ import com.dawsonsoftware.meadmate.models.Mead;
 import com.dawsonsoftware.meadmate.models.Reading;
 import com.google.gson.Gson;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
@@ -97,13 +90,13 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
-    public void addReading(String brewId, String date, String specificGravity) throws ParseException {
+    public void addReading(String meadId, String date, String specificGravity) throws ParseException {
 
-        Log.d("JavaScriptBridge", "Adding reading record for: " + brewId);
+        Log.d("JavaScriptBridge", "Adding reading record for: " + meadId);
 
         Reading reading = new Reading();
 
-        reading.setBrewId(parseInt(brewId));
+        reading.setMeadId(parseInt(meadId));
         reading.setDate(date);
         reading.setSpecificGravity(specificGravity);
 

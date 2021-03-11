@@ -52,6 +52,12 @@ $(document).on("pagebeforeshow","#new-reading",function() {
 
 });
 
+$(document).on("pagebeforeshow","#new-event",function()
+{
+    //Clear form
+
+});
+
 // Form validation events
 
 $("#new-mead-form").validate({
@@ -80,6 +86,23 @@ $("#new-reading-form").validate({
     wrapper: "li",
     rules: {
         newReadingDate: {
+            required: true
+        },
+        newReadingGravity: {
+            required: true
+        }
+    },
+    messages: {
+        newReadingDate: "Reading Date is required.",
+        newReadingGravity: "Specific Gravity is required."
+    }
+});
+
+$("#new-event-form").validate({
+    errorLabelContainer: "#newEventMessageList",
+    wrapper: "li",
+    rules: {
+        newEventDate: {
             required: true
         },
         newReadingGravity: {

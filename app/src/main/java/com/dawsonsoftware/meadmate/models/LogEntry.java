@@ -1,11 +1,11 @@
 package com.dawsonsoftware.meadmate.models;
 
-public class Reading {
-
+public class LogEntry {
     private Integer id;
     private Integer meadId;
     private String date;
-    private String specificGravity;
+    private String type;
+    private String entry;
 
     public Integer getId() {
         return id;
@@ -27,9 +27,15 @@ public class Reading {
 
     public void setDate(String date) { this.date = date; }
 
-    public String getSpecificGravity() {
-        return specificGravity;
+    public String getType() {
+        return type;
     }
 
-    public void setSpecificGravity(String specificGravity) { this.specificGravity = specificGravity; }
+    public void setType(String type) { this.type = type; }
+
+    public String getEntry() {
+        return entry;
+    }
+
+    public void setEntry(String entry) { this.entry = entry; }
 }
