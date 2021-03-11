@@ -52,10 +52,12 @@ $(document).on("pagebeforeshow","#new-reading",function() {
 
 });
 
-$(document).on("pagebeforeshow","#new-event",function()
-{
+$(document).on("pagebeforeshow","#new-event",function() {
     //Clear form
-
+    $("#newEventDate").val('');
+    $("#newEventType").val('');
+    $("#newEventType").selectmenu("refresh", true);
+    $("#newEventEntry").text('');
 });
 
 // Form validation events
@@ -105,13 +107,13 @@ $("#new-event-form").validate({
         newEventDate: {
             required: true
         },
-        newReadingGravity: {
+        newEventType: {
             required: true
         }
     },
     messages: {
-        newReadingDate: "Reading Date is required.",
-        newReadingGravity: "Specific Gravity is required."
+        newEventDate: "Event Date is required.",
+        newEventType: "Event Type is required."
     }
 });
 
@@ -178,10 +180,6 @@ $("#new-event-form").validate({
                 content: 'New Reading Saved!',
                 buttons: {
                     ok: function () {
-                        // Navigate back doesn't refresh table
-                        //$.mobile.back();
-                        var index = $.mobile.navigate.history.stack.length - 2;
-                        $.mobile.navigate.history.stack.splice(index, 1);
 
                         viewReadings(meadId);
                     }
@@ -195,6 +193,46 @@ $("#new-event-form").validate({
     }
 
  });
+
+ $("#saveEventButton").on("tap", function(event){
+
+     if(window.Android)
+     {
+         if($("#new-event-form").valid()){
+
+             // Persist data
+             var meadId = $("#newEventMeadId").val();
+             var date = $("#newEventDate").val();
+             var type = $("#newEventType").val();
+             var entry = $("#newEventEntry").val();
+
+             window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
+             window.Android.logDebug('MainActivity', 'Date: ' + date);
+             window.Android.logDebug('MainActivity', 'Type: ' + type);
+             window.Android.logDebug('MainActivity', 'Entry: ' + entry);
+
+             window.Android.addLogEntry(meadId, date, type, entry);
+
+             window.Android.logInfo('MainActivity', 'New mead log entry saved!');
+
+             $.alert({
+                 title: '',
+                 content: 'New Event Saved!',
+                 buttons: {
+                     ok: function () {
+
+                         viewEvents(meadId);
+                     }
+                 }
+             });
+         }
+     }
+     else
+     {
+         $.alert('Android Javascript bridge is not available');
+     }
+
+  });
 
  $("#calcButton").on("tap", function(event) {
      var ig = $('#initialGravity').val();
@@ -264,6 +302,64 @@ $("#new-event-form").validate({
     $(":mobile-pagecontainer").pagecontainer("change", "#readings");
  }
 
+function viewEvents(meadId)
+ {
+    if(window.Android && meadId > 0)
+    {
+        window.Android.logInfo('MainActivity', 'Fetching Events for mead ID ' + meadId);
+
+        // Fetch data from database
+        var meadJson = window.Android.fetchMead(meadId);
+        var meadData = JSON.parse(meadJson);
+
+        var eventsJson = window.Android.fetchLogEntries(meadId);
+        var eventsData = JSON.parse(eventsJson);
+
+        window.Android.logDebug('MainActivity', meadJson);
+        window.Android.logDebug('MainActivity', eventsJson);
+
+        // Clear existing rows from table
+        // Clear list
+        $("#events-list tbody").empty();
+
+        // Append to data
+        for (var i = 0; i < eventsData.length; i++) {
+
+            var disableButtonFlag = 'ui-state-disabled';
+
+            if(eventsData[i].entry)
+            {
+                disableButtonFlag = '';
+            }
+
+            // Append data to list
+            $("#events-list tbody").append('<tr><td style="white-space: nowrap;">' + eventsData[i].date + '</td><td>' + eventsData[i].typeName + '</td><td style="white-space: nowrap;">' +
+                '<a href="javascript:showEntry(' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
+                '<a href="javascript:deleteEvent(' + meadId + ',' + eventsData[i].id + ');" class="ui-btn un-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a>' +
+                '</td></tr>');
+        }
+
+        $("#newEventButton").off("tap"); // clear existing event handlers
+
+        $("#newEventButton").on("tap", { meadId: meadId }, function(event) {
+            event.preventDefault();
+
+            window.Android.logDebug('MainActivity', 'New Event Button pressed. Mead ID: ' + event.data.meadId);
+
+            // set value of hidden form
+            $("#newEventMeadId").val(event.data.meadId);
+
+            $(":mobile-pagecontainer").pagecontainer("change", "#new-event",{changeHash:false});
+        });
+    }
+    else
+    {
+        // Populate sample data
+    }
+
+    $(":mobile-pagecontainer").pagecontainer("change", "#events");
+ }
+
  function deleteReading(meadId, readingId)
  {
     window.Android.logDebug('MainActivity', 'Delete Reading Button pressed. Mead ID: ' + meadId);
@@ -294,6 +390,37 @@ $("#new-event-form").validate({
     // Keep link from doing anything
     return false;
  }
+
+ function deleteEvent(meadId, eventId)
+  {
+     window.Android.logDebug('MainActivity', 'Delete Event Button pressed. Mead ID: ' + meadId);
+     window.Android.logDebug('MainActivity', 'Log Entry ID: ' + eventId);
+
+     if(window.Android && meadId > 0 && eventId > 0)
+     {
+         $.confirm({
+             title: 'Delete Event',
+             content: 'Are you sure?',
+             buttons: {
+                 confirm: function () {
+                     window.Android.deleteLogEntry(eventId);
+
+                     viewEvents(meadId);
+                 },
+                 cancel: function () {
+                     // do nothing
+                 }
+             }
+         });
+     }
+     else
+     {
+         $.alert('Android Javascript bridge is not available');
+     }
+
+     // Keep link from doing anything
+     return false;
+  }
 
  function viewMead(id)
  {
@@ -342,7 +469,13 @@ $("#new-event-form").validate({
         $("#readingsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadStartDate: jsonData.startDate, meadOriginalGravity: jsonData.originalGravity }, function(event) {
             event.preventDefault();
 
-            viewReadings(event.data.meadId, event.data.meadName, event.data.meadStartDate, event.data.meadOriginalGravity);
+            viewReadings(event.data.meadId);
+        });
+
+        $("#eventsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadStartDate: jsonData.startDate, meadOriginalGravity: jsonData.originalGravity }, function(event) {
+            event.preventDefault();
+
+            viewEvents(event.data.meadId);
         });
     }
     else
@@ -378,4 +511,42 @@ function calculateAbv(initialGravity, subsequentGravity)
     var result = ig.minus(sg).times('131.25');
 
     return 'ABV ' + result.toFixed(2) + '%';
+}
+
+function showEntry(id)
+{
+    if(window.Android && id > 0)
+    {
+        window.Android.logInfo('MainActivity', 'Fetching entry for LogEntry ' + id);
+
+        // Fetch data from database
+        var entry = window.Android.fetchLogEntry(id);
+
+        window.Android.logDebug('MainActivity', entry);
+
+        $.alert({
+            title: '',
+            content: entry,
+            buttons: {
+                ok: function () {
+                    // Do nothing
+                }
+            }
+        });
+    }
+    else
+    {
+        $.alert({
+            title: '',
+            content: 'Android Javascript Bridge is not available.',
+            buttons: {
+                ok: function () {
+                    // Do nothing
+                }
+            }
+        });
+    }
+
+    // Tell browser not to activate link
+    return false;
 }

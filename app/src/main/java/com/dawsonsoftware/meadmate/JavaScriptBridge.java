@@ -78,6 +78,16 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
+    public String fetchLogEntry(String id)
+    {
+        Log.i("JavaScriptBridge", "Fetching log entry data for log entry id " + id + ".");
+
+        String entry = data.getLogEntry(parseInt(id));
+
+        return entry;
+    }
+
+    @JavascriptInterface
     public String fetchMead(String id)
     {
         Log.i("JavaScriptBridge", "Fetching mead data by ID: " + id);
@@ -131,7 +141,7 @@ public class JavaScriptBridge {
 
         logEntry.setMeadId(parseInt(meadId));
         logEntry.setDate(date);
-        logEntry.setTypeId(type);
+        logEntry.setTypeId(parseInt(type));
         logEntry.setEntry(entry);
 
         data.addLogEntry(logEntry);

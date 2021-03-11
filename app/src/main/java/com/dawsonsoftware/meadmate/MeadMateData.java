@@ -381,4 +381,28 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         return model;
     }
+
+    String getLogEntry(Integer id)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String entry = "";
+
+        String query = "SELECT ENTRY " +
+                "FROM MEAD_LOG " +
+                "WHERE _ID = ?";
+
+        Cursor c = db.rawQuery(query, new String[] { id.toString() });
+
+        if(c.getCount() > 0)
+        {
+            c.moveToFirst();
+
+            entry = c.getString(c.getColumnIndex(KEY_MEAD_LOG_ENTRY));
+        }
+
+        db.close();
+
+        return entry;
+    }
 }

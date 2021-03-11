@@ -40,22 +40,23 @@
 <div id="events" data-role="page">
 	<div data-role="header" data-position="fixed" data-add-back-btn="true">
 		<h1>Mead Mate</h1>
-		<a href="#new-event" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+		<a id="newEventButton" href="#new-event" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
 	<div data-role="content">
 		<h2 class="content-title">Events</h2>
-		<p id="event-list-title"></p>
-		<ul id="event-list" data-role="listview">
-		</ul>
+		<p id="events-list-title"></p>
+		<table id="events-list">
+			<tbody></tbody>
+		</table>
 	</div>
 </div>
 
-<div id="new-events" data-role="page">
+<div id="new-event" data-role="page">
 	<div data-role="header" data-position="fixed" data-add-back-btn="true">
 		<h1>Mead Mate</h1>
 	</div>
 	<div data-role="content">
-		<h2 class="content-title">New Reading</h2>
+		<h2 class="content-title">New Event</h2>
 		<p id="new-event-savemsg"></p>
 		<form id="new-event-form">
 			<ul id="newEventMessageList"></ul>
@@ -66,7 +67,7 @@
 
 			<label for="newEventType">Type:</label>
 			<select id="newEventType">
-				<option value="--">--</option>
+				<option value="">- select -</option>
 				<option value="1">Primary Fermentation</option>
 				<option value="2">Secondary Fermentation</option>
 				<option value="3">Racked</option>
@@ -75,7 +76,10 @@
 				<option value="6">Tasting</option>
 			</select>
 
-			<input type="button" value="Save" name="saveReadingButton" id="saveEventButton">
+			<label for="newEventEntry">Description:</label>
+			<textarea name="newEventEntry" id="newEventEntry"></textarea>
+
+			<input type="button" value="Save" name="saveEventButton" id="saveEventButton">
 		</form>
 	</div>
 </div>
