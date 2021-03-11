@@ -31,8 +31,13 @@ public class MeadMateData extends SQLiteOpenHelper {
     private static final String KEY_MEAD_LOG_ID = "_ID";
     private static final String KEY_MEAD_LOG_MEADID = "MEAD_ID";
     private static final String KEY_MEAD_LOG_DATE = "DATE";
-    private static final String KEY_MEAD_LOG_TYPE = "TYPE";
+    private static final String KEY_MEAD_LOG_TYPEID = "TYPE_ID";
     private static final String KEY_MEAD_LOG_ENTRY = "ENTRY";
+
+    // Mead Log Types table fields
+    private static final String TABLE_MEAD_LOG_TYPE = "MEAD_LOG_TYPE";
+    private static final String KEY_MEAD_LOG_TYPE_ID = "_ID";
+    private static final String KEY_MEAD_LOG_TYPE_NAME = "TYPE_NAME";
 
     // Readings table fields
     private static final String TABLE_READINGS = "READINGS";
@@ -58,8 +63,21 @@ public class MeadMateData extends SQLiteOpenHelper {
                 KEY_MEAD_LOG_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
                 KEY_MEAD_LOG_MEADID + " INTEGER NOT NULL," +
                 KEY_MEAD_LOG_DATE + " TEXT NOT NULL, " +
-                KEY_MEAD_LOG_TYPE + " TEXT NOT NULL, " +
+                KEY_MEAD_LOG_TYPEID + " INTEGER NOT NULL, " +
                 KEY_MEAD_LOG_ENTRY + " TEXT NOT NULL)";
+
+        String CREATE_MEAD_LOG_TYPE_TABLE = "CREATE TABLE " + TABLE_MEAD_LOG_TYPE + " (" +
+                KEY_MEAD_LOG_TYPE_ID + " INTEGER NOT NULL PRIMARY KEY UNIQUE," +
+                KEY_MEAD_LOG_TYPE_NAME + " TEXT NOT NULL)";
+
+        String LOAD_MEAD_LOG_TYPE_TABLE = "INSERT INTO " + TABLE_MEAD_LOG_TYPE + " (" +
+                KEY_MEAD_LOG_TYPE_ID + "," + KEY_MEAD_LOG_TYPE_NAME + ") VALUES " +
+                "(1,\"Primary Fermentation\")," +
+                "(2,\"Secondary Fermentation\")," +
+                "(3,\"Racked\")," +
+                "(4,\"Bottled\")," +
+                "(5,\"Discarded\")," +
+                "(6,\"Tasting\")";
 
         String CREATE_READINGS_TABLE = "CREATE TABLE " + TABLE_READINGS + " (" +
                 KEY_READINGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
@@ -67,9 +85,13 @@ public class MeadMateData extends SQLiteOpenHelper {
                 KEY_READINGS_DATE + " TEXT NOT NULL," +
                 KEY_READINGS_GRAV + " TEXT NOT NULL)";
 
-        db.execSQL(CREATE_MEAD_LOG_TABLE);
         db.execSQL(CREATE_MEAD_TABLE);
+        db.execSQL(CREATE_MEAD_LOG_TABLE);
+        db.execSQL(CREATE_MEAD_LOG_TYPE_TABLE);
+        db.execSQL(LOAD_MEAD_LOG_TYPE_TABLE);
         db.execSQL(CREATE_READINGS_TABLE);
+
+
     }
 
     @Override
@@ -117,7 +139,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_MEAD_LOG_MEADID, entry.getMeadId());
         values.put(KEY_MEAD_LOG_DATE, entry.getDate());
-        values.put(KEY_MEAD_LOG_TYPE, entry.getType());
+        values.put(KEY_MEAD_LOG_TYPEID, entry.getTypeId());
         values.put(KEY_MEAD_LOG_ENTRY, entry.getEntry());
 
         // Inserting Row
@@ -327,26 +349,13 @@ public class MeadMateData extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         List<LogEntry> model = new ArrayList<LogEntry>();
 
-        String[] tableColumns = new String[] {
-                KEY_MEAD_LOG_ID,
-                KEY_MEAD_LOG_MEADID,
-                KEY_MEAD_LOG_DATE,
-                KEY_MEAD_LOG_TYPE,
-                KEY_MEAD_LOG_ENTRY
-        };
+        String query = "SELECT MEAD_LOG._ID, MEAD_ID, DATE, TYPE_ID, ENTRY, TYPE_NAME " +
+                "FROM MEAD_LOG " +
+                "INNER JOIN MEAD_LOG_TYPE " +
+                "ON MEAD_LOG_TYPE._ID = MEAD_LOG.TYPE_ID " +
+                "WHERE MEAD_LOG.MEAD_ID = ?";
 
-        String whereClause = KEY_MEAD_LOG_MEADID + " = ?";
-
-        String[] whereArgs = new String[] {
-                String.valueOf(meadId)
-        };
-        //String groupBy = null;
-        //String having = null;
-        String orderBy = KEY_MEAD_LOG_DATE; //TODO: Descending?
-        //String limit = null;
-
-        Cursor c = db.query(TABLE_MEAD_LOG, tableColumns, whereClause, whereArgs,
-                null, null, orderBy, null);
+        Cursor c = db.rawQuery(query, new String[] { meadId.toString() });
 
         if(c.getCount() > 0)
         {
@@ -359,8 +368,9 @@ public class MeadMateData extends SQLiteOpenHelper {
                 entry.setId(c.getInt(c.getColumnIndex(KEY_MEAD_LOG_ID)));
                 entry.setMeadId(c.getInt(c.getColumnIndex(KEY_MEAD_LOG_MEADID)));
                 entry.setDate(c.getString(c.getColumnIndex(KEY_MEAD_LOG_DATE)));
-                entry.setType(c.getString(c.getColumnIndex(KEY_MEAD_LOG_TYPE)));
+                entry.setTypeId(c.getInt(c.getColumnIndex(KEY_MEAD_LOG_TYPEID)));
                 entry.setEntry(c.getString(c.getColumnIndex(KEY_MEAD_LOG_ENTRY)));
+                entry.setTypeName(c.getString(c.getColumnIndex(KEY_MEAD_LOG_TYPE_NAME)));
 
                 model.add(entry);
 

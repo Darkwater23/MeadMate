@@ -131,7 +131,7 @@ public class JavaScriptBridge {
 
         logEntry.setMeadId(parseInt(meadId));
         logEntry.setDate(date);
-        logEntry.setType(type);
+        logEntry.setTypeId(type);
         logEntry.setEntry(entry);
 
         data.addLogEntry(logEntry);

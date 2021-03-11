@@ -50,6 +50,36 @@
 	</div>
 </div>
 
+<div id="new-events" data-role="page">
+	<div data-role="header" data-position="fixed" data-add-back-btn="true">
+		<h1>Mead Mate</h1>
+	</div>
+	<div data-role="content">
+		<h2 class="content-title">New Reading</h2>
+		<p id="new-event-savemsg"></p>
+		<form id="new-event-form">
+			<ul id="newEventMessageList"></ul>
+			<input type="hidden" name="newEventMeadId" id="newEventMeadId" value="">
+
+			<label for="newEventDate">Date:</label>
+			<input type="date" name="newEventDate" id="newEventDate" value="">
+
+			<label for="newEventType">Type:</label>
+			<select id="newEventType">
+				<option value="--">--</option>
+				<option value="1">Primary Fermentation</option>
+				<option value="2">Secondary Fermentation</option>
+				<option value="3">Racked</option>
+				<option value="4">Bottled</option>
+				<option value="5">Discarded</option>
+				<option value="6">Tasting</option>
+			</select>
+
+			<input type="button" value="Save" name="saveReadingButton" id="saveEventButton">
+		</form>
+	</div>
+</div>
+
 <div id="readings" data-role="page">
 	<div data-role="header" data-position="fixed" data-add-back-btn="true">
 		<h1>Mead Mate</h1>
