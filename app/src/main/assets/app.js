@@ -243,6 +243,10 @@ $("#new-event-form").validate({
      $('#abvResult').text(result);
  });
 
+ $("#exportButton").on("tap", function(event) {
+
+ });
+
 // Custom app functions
 
  function viewReadings(meadId)

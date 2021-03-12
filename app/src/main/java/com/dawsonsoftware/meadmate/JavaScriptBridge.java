@@ -24,6 +24,31 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
+    public void exportData()
+    {
+        Log.i("JavaScriptBridge", "Exporting app data.");
+
+        //TODO: Add method for exporting data
+
+        Log.i("JavaScriptBridge", "Export complete!");
+    }
+
+    @JavascriptInterface
+    public String importData(String filePath)
+    {
+        Log.i("JavaScriptBridge", "Importing app data.");
+        Log.d("JavaScriptBridge", "Path to user-selected file:" + filePath);
+
+        String result = "Not implemented yet.";
+
+        //TODO: Add method for exporting data
+
+        Log.i("JavaScriptBridge", "Import complete!");
+
+        return result;
+    }
+
+    @JavascriptInterface
     public String fetchMeads(){
 
         Log.i("JavaScriptBridge", "Fetching mead data.");

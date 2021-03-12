@@ -15,6 +15,7 @@
 <div id="home" data-role="page">
 	<div data-role="header" data-position="fixed">
 		<h1>Mead Mate</h1>
+		<a id="optionsButton" href="#options" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">Options</a>
 	</div>
 	<div data-role="content">
 		<ul id="mainMenu" data-role="listview">
@@ -34,6 +35,48 @@
 	<div data-role="content">
 		<ul id="mead-list" data-role="listview">
 		</ul>
+	</div>
+</div>
+
+<div id="options" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<h1>Mead Mate</h1>
+	</div>
+	<div data-role="content">
+		<ul data-role="listview">
+			<li><a href="#export">Export Data</a></li>
+			<li><a href="#import">Import Data</a></li>
+		</ul>
+	</div>
+</div>
+
+<div id="export" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#options" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-gear">Options</a>
+		<h1>Mead Mate</h1>
+	</div>
+	<div data-role="content">
+		<p>Export Data</p>
+		<p>The export feature will read the data out of the app's database, convert to a file and write it out to your device's storage.</p>
+		<p>The data format is a standard, unencrypted format.</p>
+		<p class="button-container">
+			<a id="exportButton" href="#export" class="ui-btn ui-btn-inline ui-btn-icon-right ui-state-disabled">Export App Data</a>
+		</p>
+	</div>
+</div>
+
+<div id="import" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#options" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-gear">Options</a>
+		<h1>Mead Mate</h1>
+	</div>
+	<div data-role="content">
+		<p>Import Data</p>
+		<p>Notes here...</p>
+		<p class="button-container">
+			<a id="restoreButton" href="#import" class="ui-btn ui-btn-inline ui-btn-icon-right ui-state-disabled">Restore App Data</a>
+		</p>
 	</div>
 </div>
 
