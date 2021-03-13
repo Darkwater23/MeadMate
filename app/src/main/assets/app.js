@@ -40,8 +40,6 @@ $(document).on("pagebeforeshow","#new-mead",function() {
     $("#newMeadStartDate").val('');
     $("#newMeadOriginalGravity").val('');
     $("#newMeadDescription").val('');
-
-    $("#new-mead-savemsg").hide(0);
 });
 
 $(document).on("pagebeforeshow","#new-reading",function() {
@@ -119,7 +117,7 @@ $("#new-event-form").validate({
 
 // Button tap events
 
- $("#new-mead-save").on("tap", function(event){
+ $("#saveMeadButton").on("tap", function(event){
 
     if(window.Android)
     {
@@ -135,23 +133,20 @@ $("#new-event-form").validate({
 
             window.Android.logInfo('MainActivity', 'New mead saved!');
 
-            // Set result message and alert user
-            $("#new-mead-savemsg").text("Saved!");
-            $("#new-mead-savemsg").show();
-
-            setTimeout(function() {
-                $("#new-mead-savemsg").hide(1500);
-            }, 2000);
+            $.alert({
+                title: '',
+                content: 'New Mead Saved!',
+                buttons: {
+                    ok: function () {
+                        $.mobile.navigate("#my-meads");
+                    }
+                }
+            });
         }
     }
     else
     {
-        $("#new-mead-savemsg").text("Save not available outside Android environment.");
-        $("#new-mead-savemsg").show();
-
-        setTimeout(function() {
-            $("#new-mead-savemsg").hide(1500);
-        }, 2000);
+        $.alert('Android Javascript bridge is not available');
     }
 
  });
@@ -240,7 +235,10 @@ $("#new-event-form").validate({
 
      var result = calculateAbv(ig,ng);
 
-     $('#abvResult').text(result);
+     $.alert({
+        title: '',
+        content: '<h2 class="content-title">' + result + '</h2>'
+     });
  });
 
  $("#exportButton").on("tap", function(event) {
@@ -264,6 +262,9 @@ $("#new-event-form").validate({
 
         window.Android.logDebug('MainActivity', meadJson);
         window.Android.logDebug('MainActivity', readingsJson);
+
+        // Set mead name on page
+        $("#readings-mead-name").text(meadData.name);
 
         // Clear existing rows from table
         // Clear list
@@ -322,6 +323,9 @@ function viewEvents(meadId)
         window.Android.logDebug('MainActivity', meadJson);
         window.Android.logDebug('MainActivity', eventsJson);
 
+        // Set mead name on page
+        $("#events-mead-name").text(meadData.name);
+
         // Clear existing rows from table
         // Clear list
         $("#events-list tbody").empty();
@@ -330,6 +334,7 @@ function viewEvents(meadId)
         for (var i = 0; i < eventsData.length; i++) {
 
             var disableButtonFlag = 'ui-state-disabled';
+            var daysAgo = Math.floor(daysSince(eventsData[i].date));
 
             if(eventsData[i].entry)
             {
@@ -337,7 +342,7 @@ function viewEvents(meadId)
             }
 
             // Append data to list
-            $("#events-list tbody").append('<tr><td style="white-space: nowrap;">' + eventsData[i].date + '</td><td>' + eventsData[i].typeName + '</td><td style="white-space: nowrap;">' +
+            $("#events-list tbody").append('<tr><td style="white-space: nowrap;">' + eventsData[i].date + '</td><td>' + eventsData[i].typeName + '</td><td style="text-align: center;">' + daysAgo + '</td><td style="white-space: nowrap;">' +
                 '<a href="javascript:showEntry(' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
                 '<a href="javascript:deleteEvent(' + meadId + ',' + eventsData[i].id + ');" class="ui-btn un-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a>' +
                 '</td></tr>');
@@ -553,4 +558,18 @@ function showEntry(id)
 
     // Tell browser not to activate link
     return false;
+}
+
+function daysSince(date)
+{
+    var today = new Date();
+    var prevDate = new Date(date);
+
+    // To calculate the time difference of two dates
+    var Difference_In_Time = today.getTime() - prevDate.getTime();
+
+    // To calculate the no. of days between two dates
+    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+
+    return Difference_In_Days;
 }

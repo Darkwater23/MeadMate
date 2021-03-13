@@ -13,7 +13,7 @@ body
 }
 
 dl{
-    border: 2px solid #333;
+    /*border: 2px solid #333;*/
     padding: 0.5em;
 }
 
@@ -42,13 +42,6 @@ dd {
 label.error {
     color: #C00;
     font-weight: bold;
-}
-
-#new-mead-savemsg
-{
-    font-weight: bold;
-    font-size: 1.2em;
-    color: #000;
 }
 
 p.button-container

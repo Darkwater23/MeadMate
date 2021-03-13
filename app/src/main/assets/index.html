@@ -87,8 +87,16 @@
 	</div>
 	<div data-role="content">
 		<h2 class="content-title">Events</h2>
-		<p id="events-list-title"></p>
+		<h3	id="events-mead-name"></h3>
 		<table id="events-list">
+			<thead>
+				<tr>
+					<th>Date</th>
+					<th>Event</th>
+					<th>Days Ago</th>
+					<th> </th>
+				</tr>
+			</thead>
 			<tbody></tbody>
 		</table>
 	</div>
@@ -134,7 +142,7 @@
 	</div>
 	<div data-role="content">
 		<h2 class="content-title">Readings</h2>
-		<p id="reading-list-title"></p>
+		<h3	id="readings-mead-name"></h3>
 		<table id="reading-list">
 			<thead>
 				<tr>
@@ -204,7 +212,6 @@
 	</div>
 	<div data-role="content">
 		<h2 class="content-title">Add New Mead</h2>
-		<p id="new-mead-savemsg"></p>
 		<form id="new-mead-form">
 			<ul id="messageList"></ul>
 			<label for="newMeadName">Mead Name:</label>
@@ -219,7 +226,7 @@
 			<label for="newMeadDescription">Description:</label>
 			<textarea name="newMeadDescription" id="newMeadDescription"></textarea>
 
-			<input type="button" value="Save" name="new-mead-save" id="new-mead-save">
+			<input type="button" value="Save" name="saveMeadButton" id="saveMeadButton">
 		</form>
 	</div>
 </div>
@@ -239,10 +246,7 @@
 			<label class="abvForm" for="newGravity">New Specific Gravity:</label>
 			<input class="abvForm" type="text" inputmode="numeric" name="newGravity" value="" id="newGravity" />
 		</p>
-		<a id="calcButton" href="#popupBasic" data-rel="popup" class="ui-btn" data-transition="pop">Calculate</a>
-		<div data-role="popup" id="popupBasic">
-			<p id="abvResult"></p>
-		</div>
+		<input type="button" value="Calculate" name="calcButton" id="calcButton">
 	</div>
 </div>
 
