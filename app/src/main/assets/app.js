@@ -453,6 +453,7 @@ function viewEvents(meadId)
         // add event handlers for buttons
         $("#deleteMeadButton").off("tap"); // clear existing event handlers
         $("#readingsButton").off("tap"); // clear existing event handlers
+        $("#eventsButton").off("tap"); // clear existing event handlers
 
         $("#deleteMeadButton").on("tap", { value: id }, function(event) {
             event.preventDefault();
@@ -474,13 +475,11 @@ function viewEvents(meadId)
                 }
             });
         });
-
         $("#readingsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadStartDate: jsonData.startDate, meadOriginalGravity: jsonData.originalGravity }, function(event) {
             event.preventDefault();
 
             viewReadings(event.data.meadId);
         });
-
         $("#eventsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadStartDate: jsonData.startDate, meadOriginalGravity: jsonData.originalGravity }, function(event) {
             event.preventDefault();
 
