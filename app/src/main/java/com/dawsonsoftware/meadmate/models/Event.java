@@ -1,12 +1,12 @@
 package com.dawsonsoftware.meadmate.models;
 
-public class LogEntry {
+public class Event {
     private Integer id;
     private Integer meadId;
     private String date;
     private Integer typeId;
     private String typeName;
-    private String entry;
+    private String description;
 
     public Integer getId() {
         return id;
@@ -34,11 +34,11 @@ public class LogEntry {
 
     public void setTypeId(Integer typeId) { this.typeId = typeId; }
 
-    public String getEntry() {
-        return entry;
+    public String getDescription() {
+        return description;
     }
 
-    public void setEntry(String entry) { this.entry = entry; }
+    public void setDescription(String description) { this.description = description; }
 
     public String getTypeName() {
         return typeName;

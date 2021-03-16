@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
-import com.dawsonsoftware.meadmate.models.LogEntry;
+import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.Mead;
 import com.dawsonsoftware.meadmate.models.Reading;
 import com.google.gson.Gson;
@@ -85,17 +85,17 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
-    public String fetchLogEntries(String meadId){
+    public String fetchEvents(String meadId){
 
-        Log.i("JavaScriptBridge", "Fetching log entry data for mead " + meadId + ".");
+        Log.i("JavaScriptBridge", "Fetching event data for mead " + meadId + ".");
 
-        List<LogEntry> logEntries = data.getLogEntries(parseInt(meadId));
+        List<Event> events = data.getEvents(parseInt(meadId));
 
-        Log.i("JavaScriptBridge", "Fetched " + logEntries.size() + " records.");
+        Log.i("JavaScriptBridge", "Fetched " + events.size() + " records.");
 
         Gson gson = new Gson();
 
-        String json = gson.toJson(logEntries);
+        String json = gson.toJson(events);
 
         Log.d("JavaScriptBridge", json);
 
@@ -103,13 +103,11 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
-    public String fetchLogEntry(String id)
+    public String fetchEventDescription(String id)
     {
-        Log.i("JavaScriptBridge", "Fetching log entry data for log entry id " + id + ".");
+        Log.i("JavaScriptBridge", "Fetching event description data for event id " + id + ".");
 
-        String entry = data.getLogEntry(parseInt(id));
-
-        return entry;
+        return data.getEventDescription(parseInt(id));
     }
 
     @JavascriptInterface
@@ -131,7 +129,7 @@ public class JavaScriptBridge {
     @JavascriptInterface
     public void addMead(String name, String startDate, String originalGravity, String description) throws ParseException {
 
-        Log.d("JavaScriptBridge", "Adding mead record for: " + name);
+        Log.d("JavaScriptBridge", "Adding mead record for mead: " + name);
 
         Mead mead = new Mead();
 
@@ -140,7 +138,9 @@ public class JavaScriptBridge {
         mead.setDescription(description);
         mead.setOriginalGravity(originalGravity);
 
-        data.addMead(mead);
+        data.addMead(mead); // should I return new mead ID?
+
+        //TODO: Insert primary fermentation event as well?
     }
 
     @JavascriptInterface
@@ -158,18 +158,18 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
-    public void addLogEntry(String meadId, String date, String type, String entry) throws ParseException {
+    public void addEvent(String meadId, String date, String typeId, String description) throws ParseException {
 
         Log.d("JavaScriptBridge", "Adding log entry record for: " + meadId);
 
-        LogEntry logEntry = new LogEntry();
+        Event event = new Event();
 
-        logEntry.setMeadId(parseInt(meadId));
-        logEntry.setDate(date);
-        logEntry.setTypeId(parseInt(type));
-        logEntry.setEntry(entry);
+        event.setMeadId(parseInt(meadId));
+        event.setDate(date);
+        event.setTypeId(parseInt(typeId));
+        event.setDescription(description);
 
-        data.addLogEntry(logEntry);
+        data.addEvent(event);
     }
 
     @JavascriptInterface
@@ -189,11 +189,11 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
-    public void deleteLogEntry(String id)
+    public void deleteEvent(String id)
     {
-        Log.i("JavaScriptBridge", "Deleting log entry by id: " + id);
+        Log.i("JavaScriptBridge", "Deleting event by id: " + id);
 
-        data.deleteLogEntry(parseInt(id));
+        data.deleteEvent(parseInt(id));
     }
 
     @JavascriptInterface
