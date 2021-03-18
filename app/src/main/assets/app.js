@@ -199,14 +199,14 @@ $("#new-event-form").validate({
              var meadId = $("#newEventMeadId").val();
              var date = $("#newEventDate").val();
              var type = $("#newEventType").val();
-             var entry = $("#newEventEntry").val();
+             var description = $("#newEventDescription").val();
 
              window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
              window.Android.logDebug('MainActivity', 'Date: ' + date);
              window.Android.logDebug('MainActivity', 'Type: ' + type);
-             window.Android.logDebug('MainActivity', 'Entry: ' + entry);
+             window.Android.logDebug('MainActivity', 'Description: ' + description);
 
-             window.Android.addLogEntry(meadId, date, type, entry);
+             window.Android.addEvent(meadId, date, type, description);
 
              window.Android.logInfo('MainActivity', 'New mead log entry saved!');
 
@@ -317,7 +317,7 @@ function viewEvents(meadId)
         var meadJson = window.Android.fetchMead(meadId);
         var meadData = JSON.parse(meadJson);
 
-        var eventsJson = window.Android.fetchLogEntries(meadId);
+        var eventsJson = window.Android.fetchEvents(meadId);
         var eventsData = JSON.parse(eventsJson);
 
         window.Android.logDebug('MainActivity', meadJson);
@@ -412,7 +412,7 @@ function viewEvents(meadId)
              content: 'Are you sure?',
              buttons: {
                  confirm: function () {
-                     window.Android.deleteLogEntry(eventId);
+                     window.Android.deleteEvent(eventId);
 
                      viewEvents(meadId);
                  },
@@ -453,6 +453,7 @@ function viewEvents(meadId)
         // add event handlers for buttons
         $("#deleteMeadButton").off("tap"); // clear existing event handlers
         $("#readingsButton").off("tap"); // clear existing event handlers
+        $("#eventsButton").off("tap"); // clear existing event handlers
 
         $("#deleteMeadButton").on("tap", { value: id }, function(event) {
             event.preventDefault();
@@ -474,13 +475,11 @@ function viewEvents(meadId)
                 }
             });
         });
-
         $("#readingsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadStartDate: jsonData.startDate, meadOriginalGravity: jsonData.originalGravity }, function(event) {
             event.preventDefault();
 
             viewReadings(event.data.meadId);
         });
-
         $("#eventsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadStartDate: jsonData.startDate, meadOriginalGravity: jsonData.originalGravity }, function(event) {
             event.preventDefault();
 
@@ -522,20 +521,20 @@ function calculateAbv(initialGravity, subsequentGravity)
     return 'ABV ' + result.toFixed(2) + '%';
 }
 
-function showEntry(id)
+function showEventDescription(id)
 {
     if(window.Android && id > 0)
     {
-        window.Android.logInfo('MainActivity', 'Fetching entry for LogEntry ' + id);
+        window.Android.logInfo('MainActivity', 'Fetching event for Event ' + id);
 
         // Fetch data from database
-        var entry = window.Android.fetchLogEntry(id);
+        var description = window.Android.fetchEventDescription(id);
 
-        window.Android.logDebug('MainActivity', entry);
+        window.Android.logDebug('MainActivity', description);
 
         $.alert({
             title: '',
-            content: entry,
+            content: description,
             buttons: {
                 ok: function () {
                     // Do nothing
