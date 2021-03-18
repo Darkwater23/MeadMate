@@ -35,11 +35,23 @@ $(document).on("pagebeforeshow","#my-meads",function() {
 
 $(document).on("pagebeforeshow","#new-mead",function() {
 
-    // Clear form values
-    $("#newMeadName").val('');
-    $("#newMeadStartDate").val('');
-    $("#newMeadOriginalGravity").val('');
-    $("#newMeadDescription").val('');
+    // use hidden field as the trigger for the form mode
+
+    var meadId = $("#meadId").val();
+
+    if(meadId)
+    {
+        // Field values should already be set from invoking function
+        $("#new-mead-content-title").text("Edit Mead");
+    }
+    else
+    {
+        $("#new-mead-content-title").text("Add New Mead");
+        $("#newMeadName").val('');
+        $("#newMeadStartDate").val('');
+        $("#newMeadOriginalGravity").val('1.000');
+        $("#newMeadDescription").val('');
+    }
 });
 
 $(document).on("pagebeforeshow","#new-reading",function() {
@@ -116,134 +128,177 @@ $("#new-event-form").validate({
 });
 
 // Button tap events
+$("#newMeadButton").on("tap", function(event) {
 
- $("#saveMeadButton").on("tap", function(event){
+    // Set hidden field value so form switches to correct mode
+    $("#meadId").val('');
+    $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
+});
 
-    if(window.Android)
-    {
-        if($("#new-mead-form").valid()){
+$("#saveMeadButton").on("tap", function(event){
 
-            // Persist data
-            var mName = $("#newMeadName").val();
-            var mDate = $("#newMeadStartDate").val();
-            var mGravity = $("#newMeadOriginalGravity").val();
-            var mDesc = $("#newMeadDescription").val();
+if(window.Android)
+{
+    if($("#new-mead-form").valid()){
 
+        // Persist data
+        var mId = $("#meadId").val();
+        var mName = $("#newMeadName").val();
+        var mDate = $("#newMeadStartDate").val();
+        var mGravity = $("#newMeadOriginalGravity").val();
+        var mDesc = $("#newMeadDescription").val();
+
+        if(mId)
+        {
+            window.Android.updateMead(mId, mName, mDate, mGravity, mDesc);
+            window.Android.logInfo('MainActivity', 'Mead updated!');
+        }
+        else
+        {
             window.Android.addMead(mName, mDate, mGravity, mDesc);
-
             window.Android.logInfo('MainActivity', 'New mead saved!');
+        }
 
-            $.alert({
-                title: '',
-                content: 'New Mead Saved!',
-                buttons: {
-                    ok: function () {
+        $.alert({
+            title: '',
+            content: 'Mead Saved!',
+            animation: 'top',
+            closeAnimation: 'top',
+            backgroundDismiss: true,
+            buttons: {
+                ok: function () {
+
+                    if(mId)
+                    {
+                        viewMead(mId);
+                    }
+                    else
+                    {
                         $.mobile.navigate("#my-meads");
                     }
                 }
-            });
-        }
+            }
+        });
     }
-    else
-    {
-        $.alert('Android Javascript bridge is not available');
-    }
+}
+else
+{
+    $.alert('Android Javascript bridge is not available');
+}
 
- });
+});
 
- $("#saveReadingButton").on("tap", function(event){
+$("#saveReadingButton").on("tap", function(event){
 
-    if(window.Android)
-    {
-        if($("#new-reading-form").valid()){
+if(window.Android)
+{
+    if($("#new-reading-form").valid()){
 
-            // Persist data
-            var meadId = $("#newReadingMeadId").val();
-            var date = $("#newReadingDate").val();
-            var gravity = $("#newReadingGravity").val();
+        // Persist data
+        var meadId = $("#newReadingMeadId").val();
+        var date = $("#newReadingDate").val();
+        var gravity = $("#newReadingGravity").val();
 
-            window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
-            window.Android.logDebug('MainActivity', 'Date: ' + date);
-            window.Android.logDebug('MainActivity', 'Gravity: ' + gravity);
+        window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
+        window.Android.logDebug('MainActivity', 'Date: ' + date);
+        window.Android.logDebug('MainActivity', 'Gravity: ' + gravity);
 
-            window.Android.addReading(meadId, date, gravity);
+        window.Android.addReading(meadId, date, gravity);
 
-            window.Android.logInfo('MainActivity', 'New mead reading saved!');
+        window.Android.logInfo('MainActivity', 'New mead reading saved!');
 
-            $.alert({
-                title: '',
-                content: 'New Reading Saved!',
-                buttons: {
-                    ok: function () {
+        $.alert({
+            title: '',
+            content: 'New Reading Saved!',
+            animation: 'top',
+            closeAnimation: 'top',
+            backgroundDismiss: true,
+            buttons: {
+                ok: function () {
 
-                        viewReadings(meadId);
-                    }
+                    viewReadings(meadId);
                 }
-            });
+            }
+        });
+    }
+}
+else
+{
+    $.alert('Android Javascript bridge is not available');
+}
+
+});
+
+$("#saveEventButton").on("tap", function(event){
+
+ if(window.Android)
+ {
+     if($("#new-event-form").valid()){
+
+         // Persist data
+         var meadId = $("#newEventMeadId").val();
+         var date = $("#newEventDate").val();
+         var type = $("#newEventType").val();
+         var description = $("#newEventDescription").val();
+
+         window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
+         window.Android.logDebug('MainActivity', 'Date: ' + date);
+         window.Android.logDebug('MainActivity', 'Type: ' + type);
+         window.Android.logDebug('MainActivity', 'Description: ' + description);
+
+         window.Android.addEvent(meadId, date, type, description);
+
+         window.Android.logInfo('MainActivity', 'New mead log entry saved!');
+
+         $.alert({
+             title: '',
+             content: 'New Event Saved!',
+             animation: 'top',
+             closeAnimation: 'top',
+             backgroundDismiss: true,
+             buttons: {
+                 ok: function () {
+
+                     viewEvents(meadId);
+                 }
+             }
+         });
+     }
+ }
+ else
+ {
+     $.alert('Android Javascript bridge is not available');
+ }
+
+});
+
+$("#calcButton").on("tap", function(event) {
+ var ig = $('#initialGravity').val();
+ var ng = $('#newGravity').val();
+
+ var result = calculateAbv(ig,ng);
+
+ $.confirm({
+    title: '',
+    content: '<h2 class="content-title">' + result + '</h2>',
+    animation: 'top',
+    closeAnimation: 'top',
+    backgroundDismiss: true,
+    buttons: {
+        ok: function () {
+            // Just close
         }
     }
-    else
-    {
-        $.alert('Android Javascript bridge is not available');
-    }
-
  });
+});
 
- $("#saveEventButton").on("tap", function(event){
+$("#exportButton").on("tap", function(event) {
 
-     if(window.Android)
-     {
-         if($("#new-event-form").valid()){
+});
 
-             // Persist data
-             var meadId = $("#newEventMeadId").val();
-             var date = $("#newEventDate").val();
-             var type = $("#newEventType").val();
-             var description = $("#newEventDescription").val();
+$("#importButton").on("tap", function(event) {
 
-             window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
-             window.Android.logDebug('MainActivity', 'Date: ' + date);
-             window.Android.logDebug('MainActivity', 'Type: ' + type);
-             window.Android.logDebug('MainActivity', 'Description: ' + description);
-
-             window.Android.addEvent(meadId, date, type, description);
-
-             window.Android.logInfo('MainActivity', 'New mead log entry saved!');
-
-             $.alert({
-                 title: '',
-                 content: 'New Event Saved!',
-                 buttons: {
-                     ok: function () {
-
-                         viewEvents(meadId);
-                     }
-                 }
-             });
-         }
-     }
-     else
-     {
-         $.alert('Android Javascript bridge is not available');
-     }
-
-  });
-
- $("#calcButton").on("tap", function(event) {
-     var ig = $('#initialGravity').val();
-     var ng = $('#newGravity').val();
-
-     var result = calculateAbv(ig,ng);
-
-     $.alert({
-        title: '',
-        content: '<h2 class="content-title">' + result + '</h2>'
-     });
- });
-
- $("#exportButton").on("tap", function(event) {
-
- });
+});
 
 // Custom app functions
 
@@ -379,6 +434,8 @@ function viewEvents(meadId)
         $.confirm({
             title: 'Delete Reading',
             content: 'Are you sure?',
+            animation: 'top',
+            closeAnimation: 'top',
             buttons: {
                 confirm: function () {
                     window.Android.deleteReading(readingId);
@@ -410,6 +467,8 @@ function viewEvents(meadId)
          $.confirm({
              title: 'Delete Event',
              content: 'Are you sure?',
+             animation: 'top',
+             closeAnimation: 'top',
              buttons: {
                  confirm: function () {
                      window.Android.deleteEvent(eventId);
@@ -454,6 +513,7 @@ function viewEvents(meadId)
         $("#deleteMeadButton").off("tap"); // clear existing event handlers
         $("#readingsButton").off("tap"); // clear existing event handlers
         $("#eventsButton").off("tap"); // clear existing event handlers
+        $("#editMeadButton").off("tap"); // clear existing event handlers
 
         $("#deleteMeadButton").on("tap", { value: id }, function(event) {
             event.preventDefault();
@@ -463,6 +523,8 @@ function viewEvents(meadId)
             $.confirm({
                 title: 'Delete Mead Entry',
                 content: 'Are you sure?',
+                animation: 'top',
+                closeAnimation: 'top',
                 buttons: {
                     confirm: function () {
                         window.Android.deleteMead(id);
@@ -485,6 +547,17 @@ function viewEvents(meadId)
 
             viewEvents(event.data.meadId);
         });
+        $("#editMeadButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadStartDate: jsonData.startDate, meadOriginalGravity: jsonData.originalGravity, meadDescription: jsonData.description }, function(event) {
+
+            // Populate data
+            $("#meadId").val(event.data.meadId);
+            $("#newMeadName").val(event.data.meadName);
+            $("#newMeadStartDate").val(event.data.meadStartDate);
+            $("#newMeadOriginalGravity").val(event.data.meadOriginalGravity);
+            $("#newMeadDescription").text(event.data.meadDescription);
+
+            $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
+        });
     }
     else
     {
@@ -501,7 +574,12 @@ function viewEvents(meadId)
 
 function calculateAbv(initialGravity, subsequentGravity)
 {
-    // ABV = (OG - FG) * 131.25
+    // old way ABV = (OG - FG) * 131.25
+
+    //new fancy way
+    //ABW = 76.08 * (OG – FG) / (1.775 – OG)
+
+    //ABV = ABW / 0.794, where 0.794 is the SG of ethanol
 
     if(isNaN(parseFloat(initialGravity)))
     {
@@ -515,10 +593,20 @@ function calculateAbv(initialGravity, subsequentGravity)
 
     var ig = new Decimal(initialGravity);
     var sg = new Decimal(subsequentGravity);
+    var c1 = new Decimal('76.08');
+    var c2 = new Decimal('1.775');
+    var c3 = new Decimal('0.794');
 
-    var result = ig.minus(sg).times('131.25');
+    //var result = ig.minus(sg).times('131.25');
 
-    return 'ABV ' + result.toFixed(2) + '%';
+    var sgdiff = ig.minus(sg);
+    var ogdiff = c2.minus(ig);
+
+    var abw = c1.times(sgdiff).dividedBy(ogdiff);
+
+    var abv = abw.dividedBy(c3);
+
+    return 'ABV ' + abv.toFixed(2) + '%';
 }
 
 function showEventDescription(id)
@@ -535,6 +623,8 @@ function showEventDescription(id)
         $.alert({
             title: '',
             content: description,
+            animation: 'top',
+            closeAnimation: 'top',
             buttons: {
                 ok: function () {
                     // Do nothing
@@ -544,15 +634,7 @@ function showEventDescription(id)
     }
     else
     {
-        $.alert({
-            title: '',
-            content: 'Android Javascript Bridge is not available.',
-            buttons: {
-                ok: function () {
-                    // Do nothing
-                }
-            }
-        });
+        $.alert('Android Javascript Bridge is not available.');
     }
 
     // Tell browser not to activate link

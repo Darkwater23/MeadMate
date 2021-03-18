@@ -138,9 +138,37 @@ public class JavaScriptBridge {
         mead.setDescription(description);
         mead.setOriginalGravity(originalGravity);
 
-        data.addMead(mead); // should I return new mead ID?
+        Integer meadId = data.addMead(mead);
 
-        //TODO: Insert primary fermentation event as well?
+        // Create primary fermentation event
+        if(meadId > 0)
+        {
+            Event event = new Event();
+
+            event.setDate(mead.getStartDate());
+            event.setDescription("");
+            event.setMeadId(meadId);
+            event.setTypeId(1);
+
+            data.addEvent(event);
+        }
+    }
+
+    //window.Android.updateMead(mId, mName, mDate, mGravity, mDesc);
+    @JavascriptInterface
+    public void updateMead(String id, String name, String startDate, String originalGravity, String description)
+    {
+        Log.d("JavaScriptBridge", "Updating mead record for mead: " + name);
+
+        Mead mead = new Mead();
+
+        mead.setId(parseInt(id));
+        mead.setName(name);
+        mead.setStartDate(startDate);
+        mead.setDescription(description);
+        mead.setOriginalGravity(originalGravity);
+
+        data.updateMead(mead);
     }
 
     @JavascriptInterface

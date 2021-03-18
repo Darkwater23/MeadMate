@@ -69,3 +69,8 @@ td, th {
   padding: 0.5rem;
   text-align: left;
 }
+
+.ui-btn
+{
+    font-size: 18px;  /* Make button text a touch bigger */
+}

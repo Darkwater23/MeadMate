@@ -30,7 +30,7 @@
 	<div data-role="header" data-position="fixed">
 		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
-		<a href="#new-mead" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+		<a id="newMeadButton" href="#new-mead" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
 	<div data-role="content">
 		<ul id="mead-list" data-role="listview">
@@ -198,22 +198,25 @@
 		<p><strong>Description:</strong><br/>
 			<span id="mead-description"></span>
 		</p>
-		<p class="button-container">
-			<a id="eventsButton" href="#events" class="ui-btn ui-btn-inline ui-icon-calendar ui-btn-icon-right">Events</a>
-			<a id="readingsButton" href="#readings" class="ui-btn ui-btn-inline ui-icon-edit ui-btn-icon-right">Readings</a>
-		</p>
+		<div data-role="navbar">
+			<ul>
+				<li><a id="editMeadButton" href="#new-mead" class="ui-btn ui-btn-inline ui-icon-edit ui-btn-icon-left">Edit</a></li>
+				<li><a id="eventsButton" href="#events" class="ui-btn ui-btn-inline ui-icon-calendar ui-btn-icon-left">Events</a></li>
+				<li><a id="readingsButton" href="#readings" class="ui-btn ui-btn-inline ui-icon-plus ui-btn-icon-left">Readings</a></li>
+			</ul>
+		</div>
 	</div>
 </div>
 
 <div id="new-mead" data-role="page">
-	<div data-role="header" data-position="fixed">
-		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">My Meads</a>
+	<div data-role="header" data-position="fixed" data-add-back-btn="true">
 		<h1>Mead Mate</h1>
 	</div>
 	<div data-role="content">
-		<h2 class="content-title">Add New Mead</h2>
+		<h2 id="new-mead-content-title" class="content-title">Add New Mead</h2>
 		<form id="new-mead-form">
 			<ul id="messageList"></ul>
+			<input type="hidden" name="meadId" id="meadId" value="0">
 			<label for="newMeadName">Mead Name:</label>
 			<input type="text" name="newMeadName" id="newMeadName" value="">
 
@@ -238,6 +241,9 @@
 	</div>
 	<div data-role="content">
 		<h2 class="content-title">Calculate ABV</h2>
+		<p>Alcohol by volume (abbreviated as ABV, abv, or alc/vol) is a standard measure of how much alcohol (ethanol) is contained in a given volume of an alcoholic beverage (expressed as a volume percent).</p>
+		<p>This app uses a fancy formula from a paper by Michael L. Hall, Ph.D.</p>
+		<p>ABW = 76.08 * (OG – FG) / (1.775 – OG)<br />ABV = ABW / 0.794</p>
 		<p>
 			<label class="abvForm" for="initialGravity">Initial Specific Gravity:</label>
 			<input class="abvForm" type="text" inputmode="numeric" name="initialGravity" value="" id="initialGravity" />
