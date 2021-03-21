@@ -292,14 +292,6 @@ $("#calcButton").on("tap", function(event) {
  });
 });
 
-$("#exportButton").on("tap", function(event) {
-
-});
-
-$("#importButton").on("tap", function(event) {
-
-});
-
 // Custom app functions
 
  function viewReadings(meadId)
@@ -643,8 +635,11 @@ function showEventDescription(id)
 
 function daysSince(date)
 {
-    var today = new Date();
+    var now = new Date(); // This includes date and time UTC. Most methods called will localize the time.
     var prevDate = new Date(date);
+
+    // Only the date part is needed; cutting off the time part to prevent temporary off-by-one errors.
+    var today = new Date(now.toISOString().substring(0, 10));
 
     // To calculate the time difference of two dates
     var Difference_In_Time = today.getTime() - prevDate.getTime();
