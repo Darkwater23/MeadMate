@@ -130,12 +130,16 @@ $("#new-event-form").validate({
 // Button tap events
 $("#newMeadButton").on("tap", function(event) {
 
+    event.preventDefault();
+
     // Set hidden field value so form switches to correct mode
     $("#meadId").val('');
     $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
 });
 
 $("#saveMeadButton").on("tap", function(event){
+
+event.preventDefault();
 
 if(window.Android)
 {
@@ -190,6 +194,8 @@ else
 
 $("#saveReadingButton").on("tap", function(event){
 
+event.preventDefault();
+
 if(window.Android)
 {
     if($("#new-reading-form").valid()){
@@ -230,6 +236,8 @@ else
 });
 
 $("#saveEventButton").on("tap", function(event){
+
+ event.preventDefault();
 
  if(window.Android)
  {
@@ -273,10 +281,15 @@ $("#saveEventButton").on("tap", function(event){
 });
 
 $("#calcButton").on("tap", function(event) {
+
+ event.preventDefault();
+
  var ig = $('#initialGravity').val();
  var ng = $('#newGravity').val();
 
- var result = calculateAbv(ig,ng);
+ //var result = calculateAbv(ig,ng);
+
+ var result = 'Testing';
 
  $.confirm({
     title: '',
