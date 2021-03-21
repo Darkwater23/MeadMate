@@ -287,9 +287,7 @@ $("#calcButton").on("tap", function(event) {
  var ig = $('#initialGravity').val();
  var ng = $('#newGravity').val();
 
- //var result = calculateAbv(ig,ng);
-
- var result = 'Testing';
+ var result = calculateAbv(ig,ng);
 
  $.confirm({
     title: '',
