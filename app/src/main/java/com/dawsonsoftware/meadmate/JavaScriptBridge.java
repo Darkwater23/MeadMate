@@ -127,7 +127,7 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
-    public void addMead(String name, String startDate, String originalGravity, String description) throws ParseException {
+    public void addMead(String name, String startDate, String originalGravity, String description) {
 
         Log.d("JavaScriptBridge", "Adding mead record for mead: " + name);
 
@@ -172,7 +172,7 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
-    public void addReading(String meadId, String date, String specificGravity) throws ParseException {
+    public void addReading(String meadId, String date, String specificGravity) {
 
         Log.d("JavaScriptBridge", "Adding reading record for: " + meadId);
 
@@ -186,7 +186,7 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
-    public void addEvent(String meadId, String date, String typeId, String description) throws ParseException {
+    public void addEvent(String meadId, String date, String typeId, String description) {
 
         Log.d("JavaScriptBridge", "Adding log entry record for: " + meadId);
 
@@ -198,6 +198,21 @@ public class JavaScriptBridge {
         event.setDescription(description);
 
         data.addEvent(event);
+    }
+
+    @JavascriptInterface
+    public void updateEvent(String eventId, String meadId, String date, String typeId, String description) {
+
+        Log.d("JavaScriptBridge", "Updating event record for event ID: " + eventId);
+
+        Event event = new Event();
+
+        event.setMeadId(parseInt(meadId));
+        event.setDate(date);
+        event.setTypeId(parseInt(typeId));
+        event.setDescription(description);
+
+        data.updateEvent(event);
     }
 
     @JavascriptInterface

@@ -211,6 +211,29 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    void updateEvent(Event event)
+    {
+        try
+        {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_EVENT_DATE, event.getDate());
+            values.put(KEY_EVENT_DESC, event.getDescription());
+
+            String whereClause = KEY_EVENT_ID + " = ?";
+
+            // Update row
+            db.update(TABLE_EVENTS, values, whereClause, new String[]{ event.getId().toString() });
+
+            db.close(); // Closing database connection
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+    }
+
     void deleteMead(Mead mead)
     {
         deleteMead(mead.getId());

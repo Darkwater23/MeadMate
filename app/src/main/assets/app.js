@@ -63,11 +63,23 @@ $(document).on("pagebeforeshow","#new-reading",function() {
 });
 
 $(document).on("pagebeforeshow","#new-event",function() {
-    //Clear form
-    $("#newEventDate").val('');
-    $("#newEventType").val('');
-    $("#newEventType").selectmenu("refresh", true);
-    $("#newEventEntry").text('');
+
+    var eventId = $("#eventId").val();
+
+    if(eventId)
+    {
+        // Field values should already be set from invoking function
+        $("#new-event-content-title").text("Edit Event");
+    }
+    else
+    {
+        $("#new-event-content-title").text("Add New Event");
+
+        $("#newEventDate").val('');
+        $("#newEventType").val('');
+        $("#newEventType").selectmenu("refresh", true);
+        $("#newEventEntry").text('');
+    }
 });
 
 // Form validation events
@@ -145,7 +157,7 @@ if(window.Android)
 {
     if($("#new-mead-form").valid()){
 
-        // Persist data
+        // Grab form inputs
         var mId = $("#meadId").val();
         var mName = $("#newMeadName").val();
         var mDate = $("#newMeadStartDate").val();
@@ -155,7 +167,7 @@ if(window.Android)
         if(mId)
         {
             window.Android.updateMead(mId, mName, mDate, mGravity, mDesc);
-            window.Android.logInfo('MainActivity', 'Mead updated!');
+            window.Android.logInfo('MainActivity', 'Mead ' + mId + ' updated!');
         }
         else
         {
@@ -243,31 +255,34 @@ $("#saveEventButton").on("tap", function(event){
  {
      if($("#new-event-form").valid()){
 
-         // Persist data
+         // Grab form inputs
+         var eventId = $("eventId").val();
          var meadId = $("#newEventMeadId").val();
          var date = $("#newEventDate").val();
          var type = $("#newEventType").val();
          var description = $("#newEventDescription").val();
 
-         window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
-         window.Android.logDebug('MainActivity', 'Date: ' + date);
-         window.Android.logDebug('MainActivity', 'Type: ' + type);
-         window.Android.logDebug('MainActivity', 'Description: ' + description);
-
-         window.Android.addEvent(meadId, date, type, description);
-
-         window.Android.logInfo('MainActivity', 'New mead log entry saved!');
+         if(eventId)
+         {
+             window.Android.updateEvent(eventId, meadId, date, type, description);
+             window.Android.logInfo('MainActivity', 'Event ' + eventId + ' updated!');
+         }
+         else
+         {
+             window.Android.addEvent(meadId, date, type, description);
+             window.Android.logInfo('MainActivity', 'New event saved!');
+         }
 
          $.alert({
              title: '',
-             content: 'New Event Saved!',
+             content: 'Event Saved!',
              animation: 'top',
              closeAnimation: 'top',
-             backgroundDismiss: true,
+             backgroundDismiss: false,
              buttons: {
-                 ok: function () {
-
-                     viewEvents(meadId);
+                 ok: function ()
+                 {
+                    viewEvents(meadId);
                  }
              }
          });
