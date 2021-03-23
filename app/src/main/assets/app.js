@@ -78,7 +78,7 @@ $(document).on("pagebeforeshow","#new-event",function() {
         $("#newEventDate").val('');
         $("#newEventType").val('');
         $("#newEventType").selectmenu("refresh", true);
-        $("#newEventEntry").text('');
+        $("#newEventDescription").text('');
     }
 });
 
@@ -256,20 +256,26 @@ $("#saveEventButton").on("tap", function(event){
      if($("#new-event-form").valid()){
 
          // Grab form inputs
-         var eventId = $("eventId").val();
+         var eventId = $("#eventId").val();
          var meadId = $("#newEventMeadId").val();
          var date = $("#newEventDate").val();
-         var type = $("#newEventType").val();
+         var typeId = $("#newEventType").val();
          var description = $("#newEventDescription").val();
+
+         window.Android.logDebug('MainActivity', 'Event ID: ' + eventId);
+         window.Android.logDebug('MainActivity', 'Event Mead ID: ' + meadId);
+         window.Android.logDebug('MainActivity', 'Event Date: ' + date);
+         window.Android.logDebug('MainActivity', 'Event Type: ' + typeId);
+         window.Android.logDebug('MainActivity', 'Event Description: ' + description);
 
          if(eventId)
          {
-             window.Android.updateEvent(eventId, meadId, date, type, description);
+             window.Android.updateEvent(eventId, meadId, date, typeId, description);
              window.Android.logInfo('MainActivity', 'Event ' + eventId + ' updated!');
          }
          else
          {
-             window.Android.addEvent(meadId, date, type, description);
+             window.Android.addEvent(meadId, date, typeId, description);
              window.Android.logInfo('MainActivity', 'New event saved!');
          }
 
@@ -407,17 +413,26 @@ function viewEvents(meadId)
         for (var i = 0; i < eventsData.length; i++) {
 
             var disableButtonFlag = 'ui-state-disabled';
+            var daysAgoOutput = '';
             var daysAgo = Math.floor(daysSince(eventsData[i].date));
 
-            if(eventsData[i].entry)
+            // Showing 45 days, 60 days, 120 days starts to seem weird.
+            // Adding more logic to switch to weeks might be ok, but dates should be fine for now
+            if(daysAgo > 0 && daysAgo < 32)
+            {
+                daysAgoOutput = '(' + daysAgo + ' days ago)';
+            }
+
+            if(eventsData[i].description)
             {
                 disableButtonFlag = '';
             }
 
             // Append data to list
-            $("#events-list tbody").append('<tr><td style="white-space: nowrap;">' + eventsData[i].date + '</td><td>' + eventsData[i].typeName + '</td><td style="text-align: center;">' + daysAgo + '</td><td style="white-space: nowrap;">' +
-                '<a href="javascript:showEntry(' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
-                '<a href="javascript:deleteEvent(' + meadId + ',' + eventsData[i].id + ');" class="ui-btn un-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a>' +
+            $("#events-list tbody").append('<tr><td style="white-space: nowrap; text-align: center;">' + eventsData[i].date + '<br>' + daysAgoOutput + '</td><td>' + eventsData[i].typeName + '</td><td style="white-space: nowrap; text-align: center;">' +
+                '<a href="javascript:showEventDescription(' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
+                '<a href="javascript:editEvent(' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-edit ui-btn-icon-notext">Edit</a>' +
+                '<a href="javascript:deleteEvent(' + meadId + ',' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a>' +
                 '</td></tr>');
         }
 
@@ -428,10 +443,11 @@ function viewEvents(meadId)
 
             window.Android.logDebug('MainActivity', 'New Event Button pressed. Mead ID: ' + event.data.meadId);
 
-            // set value of hidden form
+            // set value of hidden form fields
+            $("#eventId").val('');
             $("#newEventMeadId").val(event.data.meadId);
 
-            $(":mobile-pagecontainer").pagecontainer("change", "#new-event",{changeHash:false});
+            $(":mobile-pagecontainer").pagecontainer("change", "#new-event", {changeHash:false});
         });
     }
     else
@@ -589,6 +605,38 @@ function viewEvents(meadId)
 
     $(":mobile-pagecontainer").pagecontainer("change", "#mead-view");
  }
+
+function editEvent(eventId)
+{
+    window.Android.logDebug('MainActivity', 'Edit Event Button pressed. Event ID: ' + eventId);
+
+    // query event details
+    if(window.Android && eventId > 0)
+    {
+        window.Android.logInfo('MainActivity', 'Fetching event ' + eventId);
+
+        // Fetch data from database
+        var eventJson = window.Android.fetchEvent(eventId);
+        var eventData = JSON.parse(eventJson);
+
+        window.Android.logDebug('MainActivity', eventJson);
+
+        // set form fields on event form
+        $("#eventId").val(eventId);
+        $("#newEventMeadId").val(eventData.meadId);
+        $("#newEventDate").val(eventData.date);
+        $("#newEventType").val(eventData.typeId);
+        $("#newEventType").selectmenu().selectmenu("refresh", true);
+        $("#newEventDescription").val(eventData.description);
+
+        // transition to event form
+        $(":mobile-pagecontainer").pagecontainer("change", "#new-event", {changeHash:false});
+    }
+    else
+    {
+        $.alert('Android Javascript bridge is not available');
+    }
+}
 
 function calculateAbv(initialGravity, subsequentGravity)
 {

@@ -186,6 +186,22 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
+    public String fetchEvent(String id)
+    {
+        Log.i("JavaScriptBridge", "Fetching event data by ID: " + id);
+
+        Event event = data.getEvent(parseInt(id));
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(event);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
     public void addEvent(String meadId, String date, String typeId, String description) {
 
         Log.d("JavaScriptBridge", "Adding log entry record for: " + meadId);
@@ -207,6 +223,7 @@ public class JavaScriptBridge {
 
         Event event = new Event();
 
+        event.setId(parseInt(eventId));
         event.setMeadId(parseInt(meadId));
         event.setDate(date);
         event.setTypeId(parseInt(typeId));

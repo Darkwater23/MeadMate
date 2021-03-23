@@ -219,6 +219,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
             ContentValues values = new ContentValues();
             values.put(KEY_EVENT_DATE, event.getDate());
+            values.put(KEY_EVENT_TYPEID, event.getTypeId());
             values.put(KEY_EVENT_DESC, event.getDescription());
 
             String whereClause = KEY_EVENT_ID + " = ?";
@@ -512,6 +513,58 @@ public class MeadMateData extends SQLiteOpenHelper {
             Log.e(MeadMateData.class.getTypeName(),ex.toString());
 
             //TODO: custom exception class?
+        }
+
+        return model;
+    }
+
+    Event getEvent(Integer eventId)
+    {
+        Event model = new Event();
+
+        String[] tableColumns = new String[] {
+                KEY_EVENT_MEADID,
+                KEY_EVENT_DATE,
+                KEY_EVENT_DESC,
+                KEY_EVENT_TYPEID
+        };
+
+        String whereClause = KEY_EVENT_ID + " = ?";
+
+        String[] whereArgs = new String[] {
+                String.valueOf(eventId)
+        };
+
+        //String groupBy = null;
+        //String having = null;
+        //String orderBy = null;
+        //String limit = null;
+
+        try
+        {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor c = db.query(TABLE_EVENTS, tableColumns, whereClause, whereArgs,
+                    null, null, null, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                model.setId(eventId);
+                model.setTypeId(c.getInt(c.getColumnIndex(KEY_EVENT_TYPEID)));
+                model.setMeadId(c.getInt((c.getColumnIndex(KEY_EVENT_MEADID))));
+                model.setDescription(c.getString(c.getColumnIndex(KEY_EVENT_DESC)));
+                model.setDate(c.getString(c.getColumnIndex(KEY_EVENT_DATE)));
+            }
+
+            db.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+
+            //TODO: Add custom exception class?
         }
 
         return model;
