@@ -78,7 +78,7 @@ $(document).on("pagebeforeshow","#new-event",function() {
         $("#newEventDate").val('');
         $("#newEventType").val('');
         $("#newEventType").selectmenu("refresh", true);
-        $("#newEventDescription").text('');
+        $("#newEventDescription").val('');
     }
 });
 
