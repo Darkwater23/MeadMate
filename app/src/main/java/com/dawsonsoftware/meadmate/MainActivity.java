@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         // Enable Javascript
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
 
         // Establish JS to Java method access
         mWebView.addJavascriptInterface(new JavaScriptBridge(this), "Android");

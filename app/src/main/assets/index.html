@@ -21,6 +21,7 @@
 			<li><a href="#my-meads">My Meads</a></li>
 			<li><a href="#abv">ABV Calculator</a></li>
 			<li><a href="#mead-types">Types of Mead</a></li>
+			<li><a href="#preferences">Preferences</a></li>
 		</ul>
 	</div>
 </div>
@@ -199,8 +200,7 @@
 	<div data-role="content">
 		<h2 class="content-title">Calculate ABV</h2>
 		<p>Alcohol by volume (abbreviated as ABV, abv, or alc/vol) is a standard measure of how much alcohol (ethanol) is contained in a given volume of an alcoholic beverage (expressed as a volume percent).</p>
-		<p>This app uses a fancy formula from a paper by Michael L. Hall, Ph.D.</p>
-		<p>ABW = 76.08 * (OG – FG) / (1.775 – OG)<br />ABV = ABW / 0.794</p>
+		<p>Set your preferred formula under 'Preferences' on the Main Menu.</p>
 		<p>
 			<label class="abvForm" for="initialGravity">Initial Specific Gravity:</label>
 			<input class="abvForm" type="text" inputmode="numeric" name="initialGravity" value="" id="initialGravity" />
@@ -261,6 +261,28 @@
 		<p>Mead is an ancient beverage that has been part of the culture of various societies around the world for thousands of years. Use the link below to learn more about mead at Wikipedia.</p>
 		<p><a href="https://en.wikipedia.org/wiki/Mead" rel="external">Mead</a></p>
 		<p>&nbsp;</p>
+	</div>
+</div>
+
+<div id="preferences" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<h1>Mead Mate</h1>
+	</div>
+	<div data-role="content">
+		<h2 class="content-title">Preferences</h2>
+		<h3>ABV Formula</h3>
+		<p>Mead Mate supports three common Alcohol By Volume (ABV) formulas. The Standard formula is the default.</p>
+		<p><strong>Standard Formula:</strong><br>(OG - FG) * 131.25</p>
+		<p><strong>Alternate Formula:</strong><br>76.08 * (OG - FG) / (1.775 - OG) * (FG / 0.794)</p>
+		<p><strong>Wine Formula:</strong><br>(OG - FG) / 7.36 * 1000</p>
+		<p><strong>Select Preferred Formula:</strong><br>
+			<select id="abv-formula-pref" name="abv-formula-pref">
+				<option value="std">Standard</option>
+				<option value="alt">Alternate</option>
+				<option value="wine">Wine</option>
+			</select>
+		</p>
 	</div>
 </div>
 
