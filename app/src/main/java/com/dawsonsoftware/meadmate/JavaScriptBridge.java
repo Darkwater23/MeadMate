@@ -50,11 +50,48 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
-    public String fetchMeads(){
+    public String fetchMeads(String sortBy){
 
         Log.i("JavaScriptBridge", "Fetching mead data.");
 
-        List<Mead> meads = data.getMeads();
+        //private static final String KEY_MEAD_ID = "_ID";
+        //private static final String KEY_MEAD_NAME = "NAME";
+        //private static final String KEY_MEAD_START_DATE = "START_DATE";
+
+        //<option value="byId">Record Id (Oldest First)</option>
+        //<option value="byName">Mead Name (A-Z)</option>
+        //<option value="byDate">Mead Start Date (Oldest First)</option>
+        //<option value="byIdDesc">Record Id (Newest First)</option>
+        //<option value="byNameDesc">Mead Name (Z-A)</option>
+        //<option value="byDateDesc">Mead Start Date (Newest First)</option>
+
+        String orderBy;
+
+        switch(sortBy)
+        {
+            case "byId":
+                orderBy = "_ID";
+                break;
+            case "byName":
+                orderBy = "NAME";
+                break;
+            case "byDate":
+                orderBy = "START_DATE";
+                break;
+            case "byIdDesc":
+                orderBy = "_ID DESC";
+                break;
+            case "byNameDesc":
+                orderBy = "NAME DESC";
+                break;
+            case "byDateDesc":
+                orderBy = "START_DATE DESC";
+                break;
+            default:
+                orderBy = null;
+        }
+
+        List<Mead> meads = data.getMeads(orderBy);
 
         Log.i("JavaScriptBridge", "Fetched " + meads.size() + " records.");
 

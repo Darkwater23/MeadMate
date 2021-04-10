@@ -360,7 +360,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    List<Mead> getMeads()
+    List<Mead> getMeads(String orderBy)
     {
         List<Mead> model = new ArrayList<Mead>();
 
@@ -384,7 +384,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getReadableDatabase();
 
             Cursor c = db.query(TABLE_MEADS, tableColumns, null, null,
-                    null, null, null, null);
+                    null, null, orderBy, null);
 
             if(c.getCount() > 0)
             {

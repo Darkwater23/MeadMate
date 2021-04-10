@@ -1,4 +1,5 @@
 const abvPrefKeyName = 'ABVPREF';
+const sortPrefKeyName = 'SORTPREF';
 const specificGravityRange = [0.980, 1.160];
 
 // One-time code executions
@@ -70,11 +71,14 @@ $(document).on("pagebeforeshow","#my-meads",function() {
     {
         window.Android.logInfo('MainActivity','JS Bridge available. Starting data fetch for mead list.');
 
+        // Retrieve user preference
+        var sortPref = localStorage.getItem(sortPrefKeyName) ?? 'byId';
+
         // Clear list
         $("#mead-list").empty();
 
         // Fetch data from database
-        var results = window.Android.fetchMeads();
+        var results = window.Android.fetchMeads(sortPref);
         var jsonData = JSON.parse(results);
 
         window.Android.logDebug('MainActivity', 'Fetched JSON: ' + results);
@@ -150,9 +154,13 @@ $(document).on("pagebeforeshow","#new-event",function() {
 $(document).on("pagebeforeshow","#preferences",function(){
 
     var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
+    var sortPref = localStorage.getItem(sortPrefKeyName) ?? 'byId';
 
     $("#abv-formula-pref").val(abvPref);
     $("#abv-formula-pref").selectmenu("refresh", true);
+
+    $("#sort-pref").val(sortPref);
+    $("#sort-pref").selectmenu("refresh", true);
 
 });
 
@@ -401,6 +409,11 @@ $("#calcButton").on("tap", function(event) {
 $("#abv-formula-pref").change(function() {
     localStorage.setItem(abvPrefKeyName,this.value);
     window.Android.logDebug('ChangeEvent','Formula preference set to: ' + this.value);
+});
+
+$("#sort-pref").change(function() {
+    localStorage.setItem(sortPrefKeyName,this.value);
+    window.Android.logDebug('ChangeEvent','Sort preference set to: ' + this.value);
 });
 
 // Custom app functions
