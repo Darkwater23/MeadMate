@@ -546,7 +546,7 @@ function viewEvents(meadId)
 
             // Append data to list
             $("#events-list tbody").append('<tr><td style="white-space: nowrap; text-align: center;">' + eventsData[i].date + '<br>' + daysAgoOutput + '</td><td>' + eventsData[i].typeName + '</td><td style="white-space: nowrap; text-align: center;">' +
-                '<a href="javascript:showEventDescription(' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
+                '<a href="javascript:showEventDescription(' + eventsData[i].id + ',\'' + eventsData[i].date + '\');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
                 '<a href="javascript:editEvent(' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-edit ui-btn-icon-notext">Edit</a>' +
                 '<a href="javascript:deleteEvent(' + meadId + ',' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a>' +
                 '</td></tr>');
@@ -858,7 +858,7 @@ function calculateAbvWine(initialGravity, subsequentGravity)
     }
 }
 
-function showEventDescription(id)
+function showEventDescription(id, dateString)
 {
     if(window.Android && id > 0)
     {
@@ -870,7 +870,7 @@ function showEventDescription(id)
         window.Android.logDebug('MainActivity', description);
 
         $.alert({
-            title: '',
+            title: dateString,
             content: '<span class="description">' + description + '</span>',
             animation: 'top',
             closeAnimation: 'top',
