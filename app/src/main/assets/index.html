@@ -64,7 +64,7 @@
 		<h1>Mead Mate</h1>
 	</div>
 	<div data-role="content">
-		<h2 class="content-title">New Event</h2>
+		<h2 id="new-event-content-title" class="content-title">New Event</h2>
 		<p id="new-event-savemsg"></p>
 		<form id="new-event-form">
 			<ul id="newEventMessageList"></ul>
@@ -76,13 +76,7 @@
 
 			<label for="newEventType">Type:</label>
 			<select id="newEventType">
-				<option value="">- select -</option>
-				<option value="1">Primary Fermentation</option>
-				<option value="2">Secondary Fermentation</option>
-				<option value="3">Racked</option>
-				<option value="4">Bottled</option>
-				<option value="5">Discarded</option>
-				<option value="6">Tasting</option>
+
 			</select>
 
 			<label for="newEventDescription">Description:</label>
@@ -154,7 +148,7 @@
 			<dd id="mead-original-gravity"></dd>
 		</dl>
 		<p><strong>Description:</strong><br/>
-			<span id="mead-description"></span>
+			<span id="mead-description" class="description"></span>
 		</p>
 		<div data-role="navbar">
 			<ul>
@@ -201,15 +195,22 @@
 		<h2 class="content-title">Calculate ABV</h2>
 		<p>Alcohol by volume (abbreviated as ABV, abv, or alc/vol) is a standard measure of how much alcohol (ethanol) is contained in a given volume of an alcoholic beverage (expressed as a volume percent).</p>
 		<p>Set your preferred formula under 'Preferences' on the Main Menu.</p>
-		<p>
-			<label class="abvForm" for="initialGravity">Initial Specific Gravity:</label>
-			<input class="abvForm" type="text" inputmode="numeric" name="initialGravity" value="" id="initialGravity" />
-		</p>
-		<p>
-			<label class="abvForm" for="newGravity">New Specific Gravity:</label>
-			<input class="abvForm" type="text" inputmode="numeric" name="newGravity" value="" id="newGravity" />
-		</p>
-		<input type="button" value="Calculate" name="calcButton" id="calcButton">
+		<p id="abvFormulaPref"></p>
+		<form id="abv-form">
+			<ul id="abvMessageList"></ul>
+			<p>
+				<label for="initialGravity">Initial Specific Gravity:</label>
+				<input type="text" inputmode="numeric" name="initialGravity" value="" id="initialGravity" />
+			</p>
+			<p>
+				<label for="newGravity">New Specific Gravity:</label>
+				<input type="text" inputmode="numeric" name="newGravity" value="" id="newGravity" />
+			</p>
+			<p>Result:<br>
+				<span id="abvResult"></span>
+			</p>
+			<input type="button" value="Calculate" name="calcButton" id="calcButton">
+		</form>
 	</div>
 </div>
 

@@ -1,13 +1,71 @@
 const abvPrefKeyName = 'ABVPREF';
+const specificGravityRange = [0.980, 1.160];
+
+// One-time code executions
+
+$(function() {
+
+    // If options list is empty, load values from database
+    var count = $('#newEventType').children('option').length;
+
+    if(count == 0)
+    {
+        // Add default option
+        $('#newEventType').append($('<option>', {
+            value: '',
+            text : '- select -'
+        }));
+
+        // Add database table values
+        // Function returns a JSON string, need to convert it
+        var eventTypesJson = window.Android.fetchEventTypes();
+
+        var eventTypes = JSON.parse(eventTypesJson);
+
+        $.each(eventTypes, function (i, item) {
+            $('#newEventType').append($('<option>', {
+                value: item.id,
+                text : item.name
+            }));
+        });
+    }
+
+    $("#newEventType").selectmenu();
+});
 
 // Page Transition events
 
 $(document).on("pagebeforeshow","#abv", function(){
+
+    var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
+
+    switch(abvPref)
+    {
+        case 'std':
+            $("#abvFormulaPref").html("Currently using <strong>Standard</strong> formula.");
+            window.Android.logDebug('abvShow',"avbPref detected as 'std'.");
+            break;
+        case 'alt':
+            $("#abvFormulaPref").html("Currently using <strong>Alternate</strong> formula.");
+            window.Android.logDebug('calcButton',"avbPref detected as 'alt'.");
+            break;
+        case 'wine':
+            $("#abvFormulaPref").html("Currently using <strong>Wine</strong> formula.");
+            window.Android.logDebug('calcButton',"avbPref detected as 'wine'.");
+            break;
+        default:
+            abvDisplayValue = result.standard;
+            $("#abvFormulaPref").html("Preference not found. Using <strong>Wine</strong> formula.");
+            window.Android.logError('calcButton','avbPref variable fell through switch.');
+    }
+
     $('#initialGravity').val('');
     $('#newGravity').val('');
+    $("#abvResult").text('0.00%');
 });
 
 $(document).on("pagebeforeshow","#my-meads",function() {
+
     if(window.Android)
     {
         window.Android.logInfo('MainActivity','JS Bridge available. Starting data fetch for mead list.');
@@ -56,7 +114,7 @@ $(document).on("pagebeforeshow","#new-mead",function() {
         $("#new-mead-content-title").text("Add New Mead");
         $("#newMeadName").val('');
         $("#newMeadStartDate").val('');
-        $("#newMeadOriginalGravity").val('1.000');
+        $("#newMeadOriginalGravity").val('');
         $("#newMeadDescription").val('');
     }
 });
@@ -111,13 +169,14 @@ $("#new-mead-form").validate({
             required: true
         },
         newMeadOriginalGravity: {
-            required: true
+            required: true,
+            range: specificGravityRange
         }
     },
     messages: {
         newMeadName: "Mead Name is required.",
         newMeadStartDate: "Start Date is required.",
-        newMeadOriginalGravity: "Specific Gravity is required."
+        newMeadOriginalGravity: "Specific Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
 
@@ -129,12 +188,13 @@ $("#new-reading-form").validate({
             required: true
         },
         newReadingGravity: {
-            required: true
+            required: true,
+            range: specificGravityRange
         }
     },
     messages: {
         newReadingDate: "Reading Date is required.",
-        newReadingGravity: "Specific Gravity is required."
+        newReadingGravity: "Specific Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
 
@@ -152,6 +212,25 @@ $("#new-event-form").validate({
     messages: {
         newEventDate: "Event Date is required.",
         newEventType: "Event Type is required."
+    }
+});
+
+$("#abv-form").validate({
+    errorLabelContainer: "#abvMessageList",
+    wrapper: "li",
+    rules: {
+        initialGravity: {
+            required: true,
+            range: specificGravityRange
+        },
+        newGravity: {
+            required: true,
+            range: specificGravityRange
+        }
+    },
+    messages: {
+        initialGravity: "Initial Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
+        newGravity: "New Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
 
@@ -191,26 +270,14 @@ if(window.Android)
             window.Android.logInfo('MainActivity', 'New mead saved!');
         }
 
-        $.alert({
-            title: '',
-            content: 'Mead Saved!',
-            animation: 'top',
-            closeAnimation: 'top',
-            backgroundDismiss: true,
-            buttons: {
-                ok: function () {
-
-                    if(mId)
-                    {
-                        viewMead(mId);
-                    }
-                    else
-                    {
-                        $.mobile.navigate("#my-meads");
-                    }
-                }
-            }
-        });
+        if(mId)
+        {
+            viewMead(mId);
+        }
+        else
+        {
+            $.mobile.navigate("#my-meads");
+        }
     }
 }
 else
@@ -241,19 +308,7 @@ if(window.Android)
 
         window.Android.logInfo('MainActivity', 'New mead reading saved!');
 
-        $.alert({
-            title: '',
-            content: 'New Reading Saved!',
-            animation: 'top',
-            closeAnimation: 'top',
-            backgroundDismiss: true,
-            buttons: {
-                ok: function () {
-
-                    viewReadings(meadId);
-                }
-            }
-        });
+        viewReadings(meadId);
     }
 }
 else
@@ -295,19 +350,7 @@ $("#saveEventButton").on("tap", function(event){
              window.Android.logInfo('MainActivity', 'New event saved!');
          }
 
-         $.alert({
-             title: '',
-             content: 'Event Saved!',
-             animation: 'top',
-             closeAnimation: 'top',
-             backgroundDismiss: false,
-             buttons: {
-                 ok: function ()
-                 {
-                    viewEvents(meadId);
-                 }
-             }
-         });
+         viewEvents(meadId);
      }
  }
  else
@@ -321,44 +364,37 @@ $("#calcButton").on("tap", function(event) {
 
     event.preventDefault();
 
-    var ig = $('#initialGravity').val();
-    var ng = $('#newGravity').val();
+    if($("#abv-form").valid()){
 
-    var result = calculateAbv(ig,ng);
+        var ig = $('#initialGravity').val();
+        var ng = $('#newGravity').val();
 
-    var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
+        var result = calculateAbv(ig,ng);
 
-    switch(abvPref)
-    {
-        case 'std':
-            abvDisplayValue = result.standard;
-            window.Android.logDebug('calcButton',"avbPref detected as 'std'.");
-            break;
-        case 'alt':
-            abvDisplayValue = result.alternate;
-            window.Android.logDebug('calcButton',"avbPref detected as 'alt'.");
-            break;
-        case 'wine':
-            abvDisplayValue = result.wine;
-            window.Android.logDebug('calcButton',"avbPref detected as 'wine'.");
-            break;
-        default:
-            abvDisplayValue = result.standard;
-            window.Android.logError('calcButton','avbPref variable fell through switch.');
-    }
+        var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
 
- $.confirm({
-    title: '',
-    content: '<h2 class="content-title">' + abvDisplayValue + '</h2>',
-    animation: 'top',
-    closeAnimation: 'top',
-    backgroundDismiss: true,
-    buttons: {
-        ok: function () {
-            // Just close
+        switch(abvPref)
+        {
+            case 'std':
+                abvDisplayValue = result.standard;
+                window.Android.logDebug('calcButton',"avbPref detected as 'std'.");
+                break;
+            case 'alt':
+                abvDisplayValue = result.alternate;
+                window.Android.logDebug('calcButton',"avbPref detected as 'alt'.");
+                break;
+            case 'wine':
+                abvDisplayValue = result.wine;
+                window.Android.logDebug('calcButton',"avbPref detected as 'wine'.");
+                break;
+            default:
+                abvDisplayValue = result.standard;
+                window.Android.logError('calcButton','avbPref variable fell through switch.');
         }
+
+        $("#abvResult").text(abvDisplayValue);
     }
- });
+
 });
 
 // Select change events
@@ -693,7 +729,7 @@ function editEvent(eventId)
         $("#newEventMeadId").val(eventData.meadId);
         $("#newEventDate").val(eventData.date);
         $("#newEventType").val(eventData.typeId);
-        $("#newEventType").selectmenu().selectmenu("refresh", true);
+        $("#newEventType").selectmenu("refresh", true);
         $("#newEventDescription").val(eventData.description);
 
         // transition to event form
@@ -707,21 +743,29 @@ function editEvent(eventId)
 
 function calculateAbv(initialGravity, subsequentGravity)
 {
+    // Initial model error result first
+    var results = new Object();
+
+    results.standard = '-.--%';
+    results.alternate = '-.--%';
+    results.wine = '-.--%';
+
     if(isNaN(parseFloat(initialGravity)))
     {
-        return "Initial Gravity value is invalid.";
+        // return error result
+        return results;
     }
 
     if(isNaN(parseFloat(subsequentGravity)))
     {
-        return "Gravity value is invalid."
+        // return error result
+        return results;
     }
 
     var std = calculateAbvStandard(initialGravity, subsequentGravity);
     var alt = calculateAbvAlternate(initialGravity, subsequentGravity);
     var wine = calculateAbvWine(initialGravity, subsequentGravity);
 
-    var results = new Object();
     results.standard = std.toFixed(2) + '%';
     results.alternate = alt.toFixed(2) + '%';
     results.wine = wine.toFixed(2) + '%';
@@ -814,7 +858,7 @@ function showEventDescription(id)
 
         $.alert({
             title: '',
-            content: description,
+            content: '<span class="description">' + description + '</span>',
             animation: 'top',
             closeAnimation: 'top',
             buttons: {

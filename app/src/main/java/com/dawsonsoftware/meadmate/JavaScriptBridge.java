@@ -5,6 +5,7 @@ import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import com.dawsonsoftware.meadmate.models.Event;
+import com.dawsonsoftware.meadmate.models.EventType;
 import com.dawsonsoftware.meadmate.models.Mead;
 import com.dawsonsoftware.meadmate.models.Reading;
 import com.google.gson.Gson;
@@ -96,6 +97,24 @@ public class JavaScriptBridge {
         Gson gson = new Gson();
 
         String json = gson.toJson(events);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
+    public String fetchEventTypes(){
+
+        Log.i("JavaScriptBridge", "Fetching event types.");
+
+        List<EventType> eventTypes = data.getEventTypes();
+
+        Log.i("JavaScriptBridge", "Fetched " + eventTypes.size() + " records.");
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(eventTypes);
 
         Log.d("JavaScriptBridge", json);
 

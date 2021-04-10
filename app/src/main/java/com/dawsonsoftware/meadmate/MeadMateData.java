@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.dawsonsoftware.meadmate.models.Event;
+import com.dawsonsoftware.meadmate.models.EventType;
 import com.dawsonsoftware.meadmate.models.Mead;
 import com.dawsonsoftware.meadmate.models.Reading;
 
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class MeadMateData extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     private static final String DB_NAME = "appdata";
 
     // Meads table fields
@@ -78,7 +79,9 @@ public class MeadMateData extends SQLiteOpenHelper {
                 "(3,\"Racked\")," +
                 "(4,\"Bottled\")," +
                 "(5,\"Discarded\")," +
-                "(6,\"Tasting\")";
+                "(6,\"Tasting\")," +
+                "(7,\"Backsweetened\")," +
+                "(8,\"Note\")";
 
         String CREATE_READINGS_TABLE = "CREATE TABLE " + TABLE_READINGS + " (" +
                 KEY_READINGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
@@ -95,11 +98,12 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEADS);
-        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEAD_LOG);
-        //db.execSQL("DROP TABLE IF EXISTS " + TABLE_READINGS);
+        String ADD_NEW_EVENT_TYPES = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
+                KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
+                "(7,\"Backsweetened\")," +
+                "(8,\"Note\")";
 
-        onCreate(db);
+        db.execSQL(ADD_NEW_EVENT_TYPES);
     }
 
     // **** CRUD (Create, Read, Update, Delete) Operations ***** //
@@ -472,7 +476,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     List<Event> getEvents(Integer meadId)
     {
-        List<Event> model = new ArrayList<Event>();
+        List<Event> model = new ArrayList<>();
 
         String query = "SELECT EVENTS._ID, MEAD_ID, DATE, TYPE_ID, DESCRIPTION, NAME " +
                 "FROM EVENTS " +
@@ -613,5 +617,54 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
 
         return eventDescription;
+    }
+
+    List<EventType> getEventTypes()
+    {
+        List<EventType> model = new ArrayList<>();
+
+        String[] tableColumns = new String[] {
+                KEY_EVENT_TYPE_ID, KEY_EVENT_TYPE_NAME
+        };
+
+        //String whereClause = null;
+        //String groupBy = null;
+        //String having = null;
+        //String orderBy = null;
+        //String limit = null;
+
+        try
+        {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor c = db.query(TABLE_EVENT_TYPES, tableColumns, null, null,
+                    null, null, null, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                do {
+
+                    EventType eventType = new EventType();
+
+                    eventType.setId(c.getInt(c.getColumnIndex(KEY_EVENT_TYPE_ID)));
+                    eventType.setName(c.getString(c.getColumnIndex(KEY_EVENT_TYPE_NAME)));
+
+                    model.add(eventType);
+
+                }while(c.moveToNext());
+            }
+
+            db.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(),ex.toString());
+
+            //TODO: custom exception class?
+        }
+
+        return model;
     }
 }
