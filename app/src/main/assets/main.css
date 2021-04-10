@@ -81,3 +81,9 @@ td, th {
 {
     white-space: pre-line;
 }
+
+hr
+{
+    border: 4px solid #b5651d;
+    border-radius: 3px;
+}
