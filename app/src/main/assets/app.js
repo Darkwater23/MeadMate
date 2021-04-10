@@ -704,7 +704,7 @@ function viewEvents(meadId)
             $("#newMeadName").val(event.data.meadName);
             $("#newMeadStartDate").val(event.data.meadStartDate);
             $("#newMeadOriginalGravity").val(event.data.meadOriginalGravity);
-            $("#newMeadDescription").text(event.data.meadDescription);
+            $("#newMeadDescription").val(event.data.meadDescription);
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
         });
