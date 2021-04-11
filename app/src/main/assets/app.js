@@ -32,10 +32,6 @@ $(function() {
     }
 
     $("#newEventType").selectmenu();
-
-    $('.no-fouc').removeClass('no-fouc');
-
-    $(":mobile-pagecontainer").pagecontainer("change", "#home",{changeHash:false});
 });
 
 // Page Transition events

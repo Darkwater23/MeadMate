@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js">
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
@@ -12,16 +12,10 @@
 	<link rel="stylesheet" href="main.css">
 
 	<style type="text/css">
-		.no-fouc { display: none; }
+		.no-js { display: none; }
 	</style>
-	<script type="text/javascript">
-		document.documentElement.className = 'no-fouc';
-	</script>
 </head>
 <body>
-
-<div id="splash" data-role="page">
-</div>
 
 <div id="home" data-role="page">
 	<div data-role="header" data-position="fixed">
@@ -310,12 +304,15 @@
 		</p>
 	</div>
 </div>
-
 <script src="dist/jquery-1.11.1.min.js"></script>
 <script src="dist/jquery.validate.min.js"></script>
 <script src="dist/jquery.mobile-1.4.5.min.js"></script>
 <script src="dist/decimal.min.js"></script>
 <script src="dist/jquery-confirm.min.js"></script>
 <script src="app.js"></script>
+<script>
+	// borrowed from Mr. Paul Irish http://paulirish.com/2009/avoiding-the-fouc-v3/ (thanks!)
+	(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)
+</script>
 </body>
 </html>
