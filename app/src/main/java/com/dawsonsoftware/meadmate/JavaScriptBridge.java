@@ -76,7 +76,7 @@ public class JavaScriptBridge {
                 orderBy = "NAME";
                 break;
             case "byDate":
-                orderBy = "START_DATE";
+                orderBy = "START_DATE, _ID"; // The dates don't have a time portion, so use the record ID to put them in input order.
                 break;
             case "byIdDesc":
                 orderBy = "_ID DESC";
@@ -85,7 +85,7 @@ public class JavaScriptBridge {
                 orderBy = "NAME DESC";
                 break;
             case "byDateDesc":
-                orderBy = "START_DATE DESC";
+                orderBy = "START_DATE DESC, _ID DESC"; // The dates don't have a time portion, so use the record ID to put them in input order.
                 break;
             default:
                 orderBy = null;

@@ -434,7 +434,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         //String groupBy = null;
         //String having = null;
-        String orderBy = KEY_READINGS_DATE;
+        String orderBy = KEY_READINGS_DATE + ", " + KEY_READINGS_ID; // Make sure readings appear in date and input order for when two readings are taken on the same day
         //String limit = null;
 
         try
@@ -482,7 +482,8 @@ public class MeadMateData extends SQLiteOpenHelper {
                 "FROM EVENTS " +
                 "INNER JOIN EVENT_TYPES " +
                 "ON EVENT_TYPES._ID = EVENTS.TYPE_ID " +
-                "WHERE EVENTS.MEAD_ID = ?";
+                "WHERE EVENTS.MEAD_ID = ? " +
+                "ORDER BY DATE, EVENTS._ID"; // Make sure events appear in date and input order for when two events are logged on the same day
 
         try
         {
