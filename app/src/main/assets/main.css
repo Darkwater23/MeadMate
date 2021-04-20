@@ -37,6 +37,8 @@ dd {
 #abvResult {
     font-weight: bold;
     font-size: 2em;
+    text-align: center;
+    display: block;
 }
 
 label.error {
@@ -73,4 +75,15 @@ td, th {
 .ui-btn
 {
     font-size: 18px;  /* Make button text a touch bigger */
+}
+
+.description
+{
+    white-space: pre-line;
+}
+
+hr
+{
+    border: 4px solid #b5651d;
+    border-radius: 3px;
 }
