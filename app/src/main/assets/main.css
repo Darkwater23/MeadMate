@@ -87,3 +87,14 @@ hr
     border: 4px solid #b5651d;
     border-radius: 3px;
 }
+
+#mead-tags span
+{
+    display: inline-block;
+    padding: 0.5em 1em;
+    margin: 0.5em 0.25em 0 0;
+    border-radius: 5px;
+    border: 1px solid #B5651D;
+    background-color: #F3CD05;
+    white-space: nowrap;
+}

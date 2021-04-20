@@ -664,6 +664,7 @@ function viewEvents(meadId)
         $("#readingsButton").off("tap"); // clear existing event handlers
         $("#eventsButton").off("tap"); // clear existing event handlers
         $("#editMeadButton").off("tap"); // clear existing event handlers
+        $("#tagsButton").off("tap"); //clear existing event handlers
 
         $("#deleteMeadButton").on("tap", { value: id }, function(event) {
             event.preventDefault();
@@ -708,6 +709,25 @@ function viewEvents(meadId)
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
         });
+        $("#tagsButton").on("tap", { meadId: jsonData.id }, function(event) {
+
+            $.confirm({
+                title: 'Add Tag',
+                content: '<input id="newTagMeadId" name="newTagMeadId" type="hidden" value="' + event.data.meadId + '"><input id="newTag" name="newTag" type="text">',
+                buttons: {
+                    save: function () {
+                        var meadId = $("#newTagMeadId").val();
+                        var tag = $("#newTag").val();
+                        saveMeadTag(meadId, tag);
+                        displayTag(tag); // Update DOM so we don't have to re-fetch data
+                    },
+                    cancel: function () {
+                        // do nothing
+                    }
+                }
+            });
+        });
+
     }
     else
     {
@@ -905,4 +925,14 @@ function daysSince(date)
     var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
 
     return Difference_In_Days;
+}
+
+function saveMeadTag(meadId, tag)
+{
+
+}
+
+function displayTag(tag)
+{
+    $("#mead-tags").append("<span>" + $.trim(tag) + "</span>");
 }

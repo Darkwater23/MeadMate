@@ -17,7 +17,7 @@ import java.util.List;
 
 public class MeadMateData extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
     private static final String DB_NAME = "appdata";
 
     // Meads table fields
@@ -103,7 +103,16 @@ public class MeadMateData extends SQLiteOpenHelper {
                 "(7,\"Backsweetened\")," +
                 "(8,\"Note\")";
 
-        db.execSQL(ADD_NEW_EVENT_TYPES);
+        if(oldVersion == 1) // Initial release of database
+        {
+            db.execSQL(ADD_NEW_EVENT_TYPES); // Add new event types
+        }
+
+        if(oldVersion == 1 || oldVersion == 2) // Correlates to 1.0 or 1.3 versions
+        {
+            // Add tags table
+            // Add meadtags table
+        }
     }
 
     // **** CRUD (Create, Read, Update, Delete) Operations ***** //

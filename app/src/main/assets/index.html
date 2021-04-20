@@ -140,7 +140,7 @@
 	<div data-role="header" data-position="fixed">
 		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">My Meads</a>
 		<h1>Mead Mate</h1>
-		<a href="#my-meads" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete" id="deleteMeadButton">Delete</a>
+		<a href="#mead-menu" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-bars" id="meadMenuButton">Menu</a>
 	</div>
 	<div data-role="content">
 		<h2 class="content-title">My Meads</h2>
@@ -155,13 +155,22 @@
 		<p><strong>Description:</strong><br/>
 			<span id="mead-description" class="description"></span>
 		</p>
-		<div data-role="navbar">
-			<ul>
-				<li><a id="editMeadButton" href="#new-mead" class="ui-btn ui-btn-inline ui-icon-edit ui-btn-icon-left">Edit</a></li>
-				<li><a id="eventsButton" href="#events" class="ui-btn ui-btn-inline ui-icon-calendar ui-btn-icon-left">Events</a></li>
-				<li><a id="readingsButton" href="#readings" class="ui-btn ui-btn-inline ui-icon-plus ui-btn-icon-left">Readings</a></li>
-			</ul>
-		</div>
+		<p id="mead-tags"><strong>Tags:</strong><br/>
+			<span>Tag Example</span>
+			<span>Tag</span>
+			<span>Tag Long Example</span>
+			<span>Tag Example</span>
+		</p>
+	</div>
+	<div data-role="panel" id="mead-menu" data-position="right" data-display="overlay">
+		<ul data-role="listview">
+			<li><a id="editMeadButton" href="#new-mead" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
+			<li><a id="eventsButton" href="#events" class="ui-btn ui-icon-calendar ui-btn-icon-left">Events</a></li>
+			<li><a id="readingsButton" href="#readings" class="ui-btn ui-icon-plus ui-btn-icon-left">Readings</a></li>
+			<li><a id="tagsButton" href="#mead-view" class="ui-btn ui-icon-cloud ui-btn-icon-left">Tags</a></li>
+			<li><a id="deleteMeadButton" href="#my-meads" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
+			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
+		</ul>
 	</div>
 </div>
 
