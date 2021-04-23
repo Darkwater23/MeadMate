@@ -105,15 +105,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             KEY_TAGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
             KEY_TAGS_NAME + " TEXT NOT NULL)";
 
-    String LOAD_TAGS_TABLE = "INSERT INTO " + TABLE_TAGS + " (" +
-            KEY_TAGS_NAME + ") VALUES " +
-            "(\"Traditional\")," +
-            "(\"Melomel\")," +
-            "(\"1 Gallon Batch\")," +
-            "(\"5 Gallon Batch\")," +
-            "(\"Yellow\")," +
-            "(\"Orange\")";
-
     String CREATE_MEAD_TAGS_TABLE = "CREATE TABLE " + TABLE_MEAD_TAGS + " (" +
             KEY_MEAD_TAGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
             KEY_MEAD_TAGS_MEAD_ID + " INTEGER NOT NULL," +
@@ -152,7 +143,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 break;
             default:
                 //log no update applied
-                Log.i(MeadMateData.class.getTypeName(), "No upgrades applied.");
+                Log.i(MeadMateData.class.getTypeName(), "No upgrades applied. OldVersion: " + oldVersion);
         }
     }
 
@@ -351,30 +342,102 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
-    void addTag(String name) {
+    int addTag(String name) {
+
+        int tagId = 0;
 
         try
         {
             if(name == null || name.isEmpty())
             {
                 Log.e(MeadMateData.class.getTypeName(), "Parameter is null or empty.");
-                return;
+
+                return 0; // Not using variable in case it gets renamed, reassigned or moved.
             }
 
             SQLiteDatabase db = this.getWritableDatabase();
 
-            ContentValues values = new ContentValues();
-            values.put(KEY_TAGS_NAME, name);
+            String[] tableColumns = new String[] {
+                    KEY_TAGS_ID
+            };
 
-            // Inserting Row
-            db.insert(TABLE_TAGS, null, values);
+            String whereClause = KEY_TAGS_NAME + " = ?";
+
+            String[] whereArgs = new String[] {
+                    name
+            };
+
+            Cursor c = db.query(TABLE_TAGS, tableColumns, whereClause, whereArgs,
+                    null, null, null, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                tagId = c.getInt(c.getColumnIndex(KEY_TAGS_ID));
+            }
+            else
+            {
+                ContentValues values = new ContentValues();
+                values.put(KEY_TAGS_NAME, name);
+
+                // Inserting Row
+                tagId = (int)db.insert(TABLE_TAGS, null, values);
+            }
 
             db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
+
+            return 0;  // Not using variable in case it gets renamed, reassigned or moved.
         }
+
+        return tagId;
+    }
+
+    List<Tag> getMeadTags(Integer meadId)
+    {
+        List<Tag> model = new ArrayList<>();
+
+        String query = "SELECT DISTINCT " + TABLE_TAGS + "." + KEY_TAGS_ID + ", " + TABLE_TAGS + "." + KEY_TAGS_NAME +
+                " FROM " + TABLE_TAGS +
+                " INNER JOIN " + TABLE_MEAD_TAGS +
+                " ON " + TABLE_TAGS + "." + KEY_TAGS_ID + " = " + TABLE_MEAD_TAGS + "." + KEY_MEAD_TAGS_TAG_ID +
+                " WHERE " + TABLE_MEAD_TAGS + "." + KEY_MEAD_TAGS_MEAD_ID + " = ? " +
+                " ORDER BY " + TABLE_TAGS + "." + KEY_TAGS_NAME;
+
+        try
+        {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor c = db.rawQuery(query, new String[] { meadId.toString() });
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                do {
+
+                    Tag tag = new Tag();
+
+                    tag.setId(c.getInt(c.getColumnIndex(KEY_TAGS_ID)));
+                    tag.setName(c.getString(c.getColumnIndex(KEY_TAGS_NAME)));
+
+                    model.add(tag);
+
+                }while(c.moveToNext());
+            }
+
+            db.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+
+        return model;
     }
 
     List<Tag> getTags()
@@ -390,7 +453,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         //String[] whereArgs = null;
         //String groupBy = null;
         //String having = null;
-        //String orderBy = null;
+        String orderBy = KEY_TAGS_NAME;
         //String limit = null;
 
         try
@@ -398,7 +461,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getReadableDatabase();
 
             Cursor c = db.query(TABLE_TAGS, tableColumns, null, null,
-                    null, null, null, null);
+                    null, null, orderBy, null);
 
             if(c.getCount() > 0)
             {
@@ -658,8 +721,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
-
-            //TODO: custom exception class?
         }
 
         return model;
@@ -707,8 +768,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(),ex.toString());
-
-            //TODO: custom exception class?
         }
 
         return model;
@@ -759,8 +818,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
-
-            //TODO: Add custom exception class?
         }
 
         return model;
@@ -804,8 +861,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
-
-            //TODO: Add custom exception class?
         }
 
         return eventDescription;
@@ -853,8 +908,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(),ex.toString());
-
-            //TODO: custom exception class?
         }
 
         return model;

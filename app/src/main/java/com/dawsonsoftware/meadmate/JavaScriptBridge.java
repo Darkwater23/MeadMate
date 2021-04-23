@@ -8,6 +8,7 @@ import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.EventType;
 import com.dawsonsoftware.meadmate.models.Mead;
 import com.dawsonsoftware.meadmate.models.Reading;
+import com.dawsonsoftware.meadmate.models.Tag;
 import com.google.gson.Gson;
 
 import java.text.ParseException;
@@ -183,6 +184,42 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
+    public String fetchTags()
+    {
+        Log.i("JavaScriptBridge", "Fetching tags.");
+
+        List<Tag> tags = data.getTags();
+
+        Log.i("JavaScriptBridge", "Fetched " + tags.size() + " records.");
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(tags);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
+    public String fetchMeadTags(String meadId)
+    {
+        Log.i("JavaScriptBridge", "Fetching tags for mead: " + meadId);
+
+        List<Tag> tags = data.getMeadTags(parseInt(meadId));
+
+        Log.i("JavaScriptBridge", "Fetched " + tags.size() + " records.");
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(tags);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
     public void addMead(String name, String startDate, String originalGravity, String description) {
 
         Log.d("JavaScriptBridge", "Adding mead record for mead: " + name);
@@ -207,6 +244,21 @@ public class JavaScriptBridge {
             event.setTypeId(1);
 
             data.addEvent(event);
+        }
+    }
+
+    @JavascriptInterface
+    public void addMeadTag(String meadId, String tag)
+    {
+        Log.d("JavaScriptBridge", "Adding '" + tag + "' tag to mead " + meadId);
+
+        // Create or fetch tag's ID
+        Integer tagId = data.addTag(tag);
+
+        // Associate tag with mead by ID
+        if(tagId > 0)
+        {
+            data.addMeadTag(parseInt(meadId), tagId);
         }
     }
 

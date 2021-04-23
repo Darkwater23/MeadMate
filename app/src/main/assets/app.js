@@ -3,6 +3,7 @@ const sortPrefKeyName = 'SORTPREF';
 const specificGravityRange = [0.980, 1.160];
 
 // One-time code executions
+var tagList;
 
 $(function() {
 
@@ -30,6 +31,9 @@ $(function() {
             }));
         });
     }
+
+    var tagJson = window.Android.fetchTags();
+    tagList = JSON.parse(tagJson);
 
     $("#newEventType").selectmenu();
 });
@@ -650,6 +654,9 @@ function viewEvents(meadId)
         var results = window.Android.fetchMead(id);
         var jsonData = JSON.parse(results);
 
+        var tagResults = window.Android.fetchMeadTags(id);
+        var tagJson = JSON.parse(tagResults);
+
         window.Android.logInfo('MainActivity', results);
 
         // Populate fields
@@ -658,6 +665,10 @@ function viewEvents(meadId)
         $("#mead-start-date").text(jsonData.startDate);
         $("#mead-description").text(jsonData.description);
         $("#mead-original-gravity").text(jsonData.originalGravity);
+
+        // Clear & update tags
+        $("#mead-tags span").remove();
+        displayMeadTags(tagJson);
 
         // add event handlers for buttons
         $("#deleteMeadButton").off("tap"); // clear existing event handlers
@@ -711,6 +722,8 @@ function viewEvents(meadId)
         });
         $("#tagsButton").on("tap", { meadId: jsonData.id }, function(event) {
 
+            event.preventDefault();
+
             $.confirm({
                 title: 'Add Tag',
                 content: '<input id="newTagMeadId" name="newTagMeadId" type="hidden" value="' + event.data.meadId + '"><input id="newTag" name="newTag" type="text">',
@@ -718,7 +731,7 @@ function viewEvents(meadId)
                     save: function () {
                         var meadId = $("#newTagMeadId").val();
                         var tag = $("#newTag").val();
-                        saveMeadTag(meadId, tag);
+                        window.Android.addMeadTag(meadId, tag);
                         displayTag(tag); // Update DOM so we don't have to re-fetch data
                     },
                     cancel: function () {
@@ -927,12 +940,24 @@ function daysSince(date)
     return Difference_In_Days;
 }
 
-function saveMeadTag(meadId, tag)
-{
-
-}
-
 function displayTag(tag)
 {
-    $("#mead-tags").append("<span>" + $.trim(tag) + "</span>");
+    $("#mead-tags span:contains(" + tag + ")").length;
+
+    if(length === 0)
+    {
+        $("#mead-tags").append("<span>" + $.trim(tag) + "</span>");
+    }
+}
+
+function displayMeadTags(tagData)
+{
+    if(Array.isArray(tagData))
+    {
+        window.Android.logDebug('displayMeadTags', 'Adding tags to view.');
+
+        $.each(tagData, function (i, item) {
+            displayTag(item.name);
+        });
+    }
 }

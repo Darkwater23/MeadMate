@@ -18,10 +18,6 @@ dl{
 }
 
 dt {
-    float: left;
-    clear: left;
-    width: 130px;
-    text-align: right;
     font-weight: bold;
 }
 
@@ -30,8 +26,8 @@ dt::after {
 }
 
 dd {
-    margin: 0 0 0 140px;
-    padding: 0 0 0.5em 0;
+    font-size: 1.2em;
+    margin: 0.25em 0 1em 0;
 }
 
 #abvResult {
