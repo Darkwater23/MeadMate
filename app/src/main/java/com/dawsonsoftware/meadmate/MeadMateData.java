@@ -559,6 +559,47 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    public void deleteMeadTag(int meadId, String tagName)
+    {
+        String[] tableColumns = new String[] {
+                KEY_TAGS_ID
+        };
+        String tagsWhereClause = KEY_TAGS_NAME + "=?";
+        String[] tagsWhereArgs = new String[] { tagName };
+
+        try
+        {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            int tagId = 0;
+
+            Cursor c = db.query(TABLE_TAGS, tableColumns, tagsWhereClause, tagsWhereArgs,
+                    null, null, null, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                do {
+
+                    tagId = c.getInt(c.getColumnIndex(KEY_TAGS_ID));
+
+                }while(c.moveToNext());
+            }
+
+            String meadTagsWhereClause = KEY_MEAD_TAGS_MEAD_ID + "=? AND " + KEY_MEAD_TAGS_TAG_ID + "=?";
+            String[] meadTagsWhereArgs = new String[] { String.valueOf(meadId), String.valueOf(tagId) };
+
+            db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, meadTagsWhereArgs);
+
+            db.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+    }
+
     Mead getMead(int meadId)
     {
         Mead model = null;

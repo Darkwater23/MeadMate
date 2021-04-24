@@ -676,6 +676,7 @@ function viewEvents(meadId)
         $("#eventsButton").off("tap"); // clear existing event handlers
         $("#editMeadButton").off("tap"); // clear existing event handlers
         $("#tagsButton").off("tap"); //clear existing event handlers
+        $("#mead-tags").off("taphold"); //clear existing event handlers
 
         $("#deleteMeadButton").on("tap", { value: id }, function(event) {
             event.preventDefault();
@@ -741,6 +742,26 @@ function viewEvents(meadId)
             });
         });
 
+        $("#mead-tags").on("taphold", "span", function(event)
+            {
+                var tagName = $(event.target).text();
+
+                $.confirm({
+                    title: "Remove Tag '" + tagName + "'",
+                    content: 'Are you sure?',
+                    animation: 'top',
+                    closeAnimation: 'top',
+                    buttons: {
+                        confirm: function () {
+                            window.Android.deleteMeadTag(id, tagName);
+                            $(event.target).remove();
+                        },
+                        cancel: function () {
+                            // do nothing
+                        }
+                    }
+                });
+            });
     }
     else
     {

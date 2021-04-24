@@ -349,6 +349,14 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
+    public void deleteMeadTag(String meadId, String tagName)
+    {
+        Log.i("JavaScriptBridge", "Deleting mead tag by name " + tagName + " off of mead " + meadId);
+
+        data.deleteMeadTag(parseInt(meadId), tagName);
+    }
+
+    @JavascriptInterface
     public void deleteReading(String id)
     {
         Log.i("JavaScriptBridge", "Deleting reading by id: " + id);
