@@ -93,7 +93,8 @@
 </div>
 
 <div id="readings" data-role="page">
-	<div data-role="header" data-position="fixed" data-add-back-btn="true">
+	<div data-role="header" data-position="fixed">
+		<a id="backToMeadViewButton" href="#mead-view" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
 		<h1>Mead Mate</h1>
 		<a id="newReadingButton" href="#new-reading" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
@@ -149,6 +150,8 @@
 			<dd id="mead-start-date"></dd>
 			<dt>Original Gravity</dt>
 			<dd id="mead-original-gravity"></dd>
+			<dt>Last ABV Reading</dt>
+			<dd id="mead-last-reading"></dd>
 			<dt>Description</dt>
 			<dd id="mead-description" class="description"></dd>
 			<dt>Tags</dt>
