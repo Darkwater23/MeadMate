@@ -721,6 +721,7 @@ function viewEvents(meadId)
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
         });
+
         $("#tagsButton").on("tap", { meadId: jsonData.id }, function(event) {
 
             event.preventDefault();
