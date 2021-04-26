@@ -11,13 +11,14 @@ import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.EventType;
 import com.dawsonsoftware.meadmate.models.Mead;
 import com.dawsonsoftware.meadmate.models.Reading;
+import com.dawsonsoftware.meadmate.models.Tag;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MeadMateData extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
     private static final String DB_NAME = "appdata";
 
     // Meads table fields
@@ -48,62 +49,102 @@ public class MeadMateData extends SQLiteOpenHelper {
     private static final String KEY_READINGS_DATE = "DATE";
     private static final String KEY_READINGS_GRAV = "SPECIFIC_GRAVITY";
 
+    // Tags table fields
+    private static final String TABLE_TAGS = "TAGS";
+    private static final String KEY_TAGS_ID = "_ID";
+    private static final String KEY_TAGS_NAME = "NAME";
+
+    // MeadTags table fields
+    private static final String TABLE_MEAD_TAGS = "MEAD_TAGS";
+    private static final String KEY_MEAD_TAGS_ID = "_ID";
+    private static final String KEY_MEAD_TAGS_MEAD_ID = "MEAD_ID";
+    private static final String KEY_MEAD_TAGS_TAG_ID = "TAG_ID";
+
+    // Table creation strings
+    String CREATE_MEAD_TABLE = "CREATE TABLE " + TABLE_MEADS + " (" +
+            KEY_MEAD_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
+            KEY_MEAD_NAME + " TEXT NOT NULL," +
+            KEY_MEAD_START_DATE + " TEXT NOT NULL," +
+            KEY_MEAD_DESC + " TEXT," +
+            KEY_MEAD_ORIG_GRAV + " TEXT NOT NULL DEFAULT 0.0)";
+
+    String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + " (" +
+            KEY_EVENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
+            KEY_EVENT_MEADID + " INTEGER NOT NULL," +
+            KEY_EVENT_DATE + " TEXT NOT NULL, " +
+            KEY_EVENT_TYPEID + " INTEGER NOT NULL, " +
+            KEY_EVENT_DESC + " TEXT NOT NULL)";
+
+    String CREATE_EVENT_TYPES_TABLE = "CREATE TABLE " + TABLE_EVENT_TYPES + " (" +
+            KEY_EVENT_TYPE_ID + " INTEGER NOT NULL PRIMARY KEY UNIQUE," +
+            KEY_EVENT_TYPE_NAME + " TEXT NOT NULL)";
+
+    String LOAD_EVENT_TYPES_TABLE = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
+            KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
+            "(1,\"Primary Fermentation\")," +
+            "(2,\"Secondary Fermentation\")," +
+            "(3,\"Racked\")," +
+            "(4,\"Bottled\")," +
+            "(5,\"Discarded\")," +
+            "(6,\"Tasting\")," +
+            "(7,\"Backsweetened\")," +
+            "(8,\"Note\")";
+
+    String ADD_NEW_EVENT_TYPES = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
+            KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
+            "(7,\"Backsweetened\")," +
+            "(8,\"Note\")";
+
+    String CREATE_READINGS_TABLE = "CREATE TABLE " + TABLE_READINGS + " (" +
+            KEY_READINGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
+            KEY_READINGS_MEADID + " INTEGER NOT NULL," +
+            KEY_READINGS_DATE + " TEXT NOT NULL," +
+            KEY_READINGS_GRAV + " TEXT NOT NULL)";
+
+    String CREATE_TAGS_TABLE = "CREATE TABLE " + TABLE_TAGS + " (" +
+            KEY_TAGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
+            KEY_TAGS_NAME + " TEXT NOT NULL)";
+
+    String CREATE_MEAD_TAGS_TABLE = "CREATE TABLE " + TABLE_MEAD_TAGS + " (" +
+            KEY_MEAD_TAGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
+            KEY_MEAD_TAGS_MEAD_ID + " INTEGER NOT NULL," +
+            KEY_MEAD_TAGS_TAG_ID + " INTEGER NOT NULL)";
+
     public MeadMateData(Context context){
         super(context,DB_NAME, null, DB_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_MEAD_TABLE = "CREATE TABLE " + TABLE_MEADS + " (" +
-                KEY_MEAD_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
-                KEY_MEAD_NAME + " TEXT NOT NULL," +
-                KEY_MEAD_START_DATE + " TEXT NOT NULL," +
-                KEY_MEAD_DESC + " TEXT," +
-                KEY_MEAD_ORIG_GRAV + " TEXT NOT NULL DEFAULT 0.0)";
-
-        String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + " (" +
-                KEY_EVENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
-                KEY_EVENT_MEADID + " INTEGER NOT NULL," +
-                KEY_EVENT_DATE + " TEXT NOT NULL, " +
-                KEY_EVENT_TYPEID + " INTEGER NOT NULL, " +
-                KEY_EVENT_DESC + " TEXT NOT NULL)";
-
-        String CREATE_EVENT_TYPES_TABLE = "CREATE TABLE " + TABLE_EVENT_TYPES + " (" +
-                KEY_EVENT_TYPE_ID + " INTEGER NOT NULL PRIMARY KEY UNIQUE," +
-                KEY_EVENT_TYPE_NAME + " TEXT NOT NULL)";
-
-        String LOAD_EVENT_TYPES_TABLE = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
-                KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
-                "(1,\"Primary Fermentation\")," +
-                "(2,\"Secondary Fermentation\")," +
-                "(3,\"Racked\")," +
-                "(4,\"Bottled\")," +
-                "(5,\"Discarded\")," +
-                "(6,\"Tasting\")," +
-                "(7,\"Backsweetened\")," +
-                "(8,\"Note\")";
-
-        String CREATE_READINGS_TABLE = "CREATE TABLE " + TABLE_READINGS + " (" +
-                KEY_READINGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
-                KEY_READINGS_MEADID + " INTEGER NOT NULL," +
-                KEY_READINGS_DATE + " TEXT NOT NULL," +
-                KEY_READINGS_GRAV + " TEXT NOT NULL)";
 
         db.execSQL(CREATE_MEAD_TABLE);
         db.execSQL(CREATE_EVENTS_TABLE);
         db.execSQL(CREATE_EVENT_TYPES_TABLE);
         db.execSQL(LOAD_EVENT_TYPES_TABLE);
         db.execSQL(CREATE_READINGS_TABLE);
+        db.execSQL(CREATE_TAGS_TABLE);
+        db.execSQL(CREATE_MEAD_TAGS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String ADD_NEW_EVENT_TYPES = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
-                KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
-                "(7,\"Backsweetened\")," +
-                "(8,\"Note\")";
 
-        db.execSQL(ADD_NEW_EVENT_TYPES);
+        String msg = "Old Version: " + oldVersion + ", New Version: " + newVersion;
+        Log.i(MeadMateData.class.getTypeName(), msg);
+
+        switch(oldVersion)
+        {
+            case 1:
+                db.execSQL(ADD_NEW_EVENT_TYPES);
+                // fall thru to next update
+            case 2:
+                db.execSQL(CREATE_TAGS_TABLE);
+                db.execSQL(CREATE_MEAD_TAGS_TABLE);
+                break;
+            default:
+                //log no update applied
+                Log.i(MeadMateData.class.getTypeName(), "No upgrades applied. OldVersion: " + oldVersion);
+        }
     }
 
     // **** CRUD (Create, Read, Update, Delete) Operations ***** //
@@ -298,8 +339,264 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+    }
 
-            //TODO: custom exception class?
+    int addTag(String name) {
+
+        int tagId = 0;
+
+        try
+        {
+            if(name == null || name.isEmpty())
+            {
+                Log.e(MeadMateData.class.getTypeName(), "Parameter is null or empty.");
+
+                return 0; // Not using variable in case it gets renamed, reassigned or moved.
+            }
+
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            String[] tableColumns = new String[] {
+                    KEY_TAGS_ID
+            };
+
+            String whereClause = KEY_TAGS_NAME + " = ?";
+
+            String[] whereArgs = new String[] {
+                    name
+            };
+
+            Cursor c = db.query(TABLE_TAGS, tableColumns, whereClause, whereArgs,
+                    null, null, null, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                tagId = c.getInt(c.getColumnIndex(KEY_TAGS_ID));
+            }
+            else
+            {
+                ContentValues values = new ContentValues();
+                values.put(KEY_TAGS_NAME, name);
+
+                // Inserting Row
+                tagId = (int)db.insert(TABLE_TAGS, null, values);
+            }
+
+            db.close(); // Closing database connection
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+
+            return 0;  // Not using variable in case it gets renamed, reassigned or moved.
+        }
+
+        return tagId;
+    }
+
+    List<Tag> getMeadTags(Integer meadId)
+    {
+        List<Tag> model = new ArrayList<>();
+
+        String query = "SELECT DISTINCT " + TABLE_TAGS + "." + KEY_TAGS_ID + ", " + TABLE_TAGS + "." + KEY_TAGS_NAME +
+                " FROM " + TABLE_TAGS +
+                " INNER JOIN " + TABLE_MEAD_TAGS +
+                " ON " + TABLE_TAGS + "." + KEY_TAGS_ID + " = " + TABLE_MEAD_TAGS + "." + KEY_MEAD_TAGS_TAG_ID +
+                " WHERE " + TABLE_MEAD_TAGS + "." + KEY_MEAD_TAGS_MEAD_ID + " = ? " +
+                " ORDER BY " + TABLE_TAGS + "." + KEY_TAGS_NAME;
+
+        try
+        {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor c = db.rawQuery(query, new String[] { meadId.toString() });
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                do {
+
+                    Tag tag = new Tag();
+
+                    tag.setId(c.getInt(c.getColumnIndex(KEY_TAGS_ID)));
+                    tag.setName(c.getString(c.getColumnIndex(KEY_TAGS_NAME)));
+
+                    model.add(tag);
+
+                }while(c.moveToNext());
+            }
+
+            db.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+
+        return model;
+    }
+
+    List<Tag> getTags()
+    {
+        List<Tag> model = new ArrayList<>();
+
+        String[] tableColumns = new String[] {
+                KEY_TAGS_ID,
+                KEY_TAGS_NAME
+        };
+
+        //String whereClause = null;
+        //String[] whereArgs = null;
+        //String groupBy = null;
+        //String having = null;
+        String orderBy = KEY_TAGS_NAME;
+        //String limit = null;
+
+        try
+        {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor c = db.query(TABLE_TAGS, tableColumns, null, null,
+                    null, null, orderBy, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                do {
+
+                    Tag tag = new Tag();
+
+                    tag.setId(c.getInt(c.getColumnIndex(KEY_TAGS_ID)));
+                    tag.setName(c.getString(c.getColumnIndex(KEY_TAGS_NAME)));
+
+                    model.add(tag);
+
+                }while(c.moveToNext());
+            }
+
+            db.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+
+        return model;
+    }
+
+    void deleteTag(int tagId)
+    {
+        String meadTagsWhereClause = KEY_MEAD_TAGS_TAG_ID + "=?";
+        String[] meadTagsWhereArgs = new String[] { String.valueOf(tagId) };
+
+        String tagWhereClause = KEY_TAGS_ID + "=?";
+        String[] tagWhereArgs = new String[] { String.valueOf(tagId) };
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.beginTransaction();
+
+        try
+        {
+            db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, meadTagsWhereArgs);
+            db.delete(TABLE_TAGS, tagWhereClause, tagWhereArgs);
+
+            db.setTransactionSuccessful();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+        finally
+        {
+            db.endTransaction();
+            db.close();
+        }
+    }
+
+    void addMeadTag(int meadId, int tagId)
+    {
+        try
+        {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_MEAD_TAGS_MEAD_ID, meadId);
+            values.put(KEY_MEAD_TAGS_TAG_ID, tagId);
+
+            // Inserting Row
+            db.insert(TABLE_MEAD_TAGS, null, values);
+
+            db.close(); // Closing database connection
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+    }
+
+    void deleteMeadTag(int meadTagId)
+    {
+        String meadTagsWhereClause = KEY_MEAD_TAGS_ID + "=?";
+        String[] meadTagsWhereArgs = new String[] { String.valueOf(meadTagId) };
+
+        try
+        {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, meadTagsWhereArgs);
+
+            db.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+    }
+
+    public void deleteMeadTag(int meadId, String tagName)
+    {
+        String[] tableColumns = new String[] {
+                KEY_TAGS_ID
+        };
+        String tagsWhereClause = KEY_TAGS_NAME + "=?";
+        String[] tagsWhereArgs = new String[] { tagName };
+
+        try
+        {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            int tagId = 0;
+
+            Cursor c = db.query(TABLE_TAGS, tableColumns, tagsWhereClause, tagsWhereArgs,
+                    null, null, null, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                do {
+
+                    tagId = c.getInt(c.getColumnIndex(KEY_TAGS_ID));
+
+                }while(c.moveToNext());
+            }
+
+            String meadTagsWhereClause = KEY_MEAD_TAGS_MEAD_ID + "=? AND " + KEY_MEAD_TAGS_TAG_ID + "=?";
+            String[] meadTagsWhereArgs = new String[] { String.valueOf(meadId), String.valueOf(tagId) };
+
+            db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, meadTagsWhereArgs);
+
+            db.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
         }
     }
 
@@ -353,8 +650,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch (Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
-
-            //TODO: custom exception class?
         }
 
         return model;
@@ -434,7 +729,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         //String groupBy = null;
         //String having = null;
-        String orderBy = KEY_READINGS_DATE;
+        String orderBy = KEY_READINGS_DATE + ", " + KEY_READINGS_ID; // Make sure readings appear in date and input order for when two readings are taken on the same day
         //String limit = null;
 
         try
@@ -467,8 +762,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
-
-            //TODO: custom exception class?
         }
 
         return model;
@@ -482,7 +775,8 @@ public class MeadMateData extends SQLiteOpenHelper {
                 "FROM EVENTS " +
                 "INNER JOIN EVENT_TYPES " +
                 "ON EVENT_TYPES._ID = EVENTS.TYPE_ID " +
-                "WHERE EVENTS.MEAD_ID = ?";
+                "WHERE EVENTS.MEAD_ID = ? " +
+                "ORDER BY DATE, EVENTS._ID"; // Make sure events appear in date and input order for when two events are logged on the same day
 
         try
         {
@@ -515,8 +809,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(),ex.toString());
-
-            //TODO: custom exception class?
         }
 
         return model;
@@ -567,8 +859,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
-
-            //TODO: Add custom exception class?
         }
 
         return model;
@@ -612,8 +902,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
-
-            //TODO: Add custom exception class?
         }
 
         return eventDescription;
@@ -661,8 +949,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(),ex.toString());
-
-            //TODO: custom exception class?
         }
 
         return model;

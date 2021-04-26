@@ -3,6 +3,7 @@ const sortPrefKeyName = 'SORTPREF';
 const specificGravityRange = [0.980, 1.160];
 
 // One-time code executions
+var tagList;
 
 $(function() {
 
@@ -31,6 +32,9 @@ $(function() {
         });
     }
 
+    var tagJson = window.Android.fetchTags();
+    tagList = JSON.parse(tagJson);
+
     $("#newEventType").selectmenu();
 });
 
@@ -55,8 +59,7 @@ $(document).on("pagebeforeshow","#abv", function(){
             window.Android.logDebug('calcButton',"avbPref detected as 'wine'.");
             break;
         default:
-            abvDisplayValue = result.standard;
-            $("#abvFormulaPref").html("Preference not found. Using <strong>Wine</strong> formula.");
+            $("#abvFormulaPref").html("Preference not found. Using <strong>Standard</strong> formula.");
             window.Android.logError('calcButton','avbPref variable fell through switch.');
     }
 
@@ -78,15 +81,15 @@ $(document).on("pagebeforeshow","#my-meads",function() {
         $("#mead-list").empty();
 
         // Fetch data from database
-        var results = window.Android.fetchMeads(sortPref);
-        var jsonData = JSON.parse(results);
+        var meadsJson = window.Android.fetchMeads(sortPref);
+        var meadsData = JSON.parse(meadsJson);
 
-        window.Android.logDebug('MainActivity', 'Fetched JSON: ' + results);
+        window.Android.logDebug('MainActivity', 'Fetched JSON: ' + meadsJson);
 
         // Append to list
-        for (var i = 0; i < jsonData.length; i++) {
+        for (var i = 0; i < meadsData.length; i++) {
 
-            $("#mead-list").append('<li><a href="javascript:viewMead(' + jsonData[i].id + ');" data-ajax="false">' + jsonData[i].name + '</a></li>');
+            $("#mead-list").append('<li><a href="javascript:viewMead(' + meadsData[i].id + ');" data-ajax="false">' + meadsData[i].name + '</a></li>');
         }
 
         $("#mead-list").listview("refresh");
@@ -101,6 +104,8 @@ $(document).on("pagebeforeshow","#my-meads",function() {
         $("#mead-list").listview("refresh");
     }
 });
+
+$(document).on("pagebeforeshow","#mead-view",function() { });
 
 $(document).on("pagebeforeshow","#new-mead",function() {
 
@@ -379,26 +384,7 @@ $("#calcButton").on("tap", function(event) {
 
         var result = calculateAbv(ig,ng);
 
-        var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
-
-        switch(abvPref)
-        {
-            case 'std':
-                abvDisplayValue = result.standard;
-                window.Android.logDebug('calcButton',"avbPref detected as 'std'.");
-                break;
-            case 'alt':
-                abvDisplayValue = result.alternate;
-                window.Android.logDebug('calcButton',"avbPref detected as 'alt'.");
-                break;
-            case 'wine':
-                abvDisplayValue = result.wine;
-                window.Android.logDebug('calcButton',"avbPref detected as 'wine'.");
-                break;
-            default:
-                abvDisplayValue = result.standard;
-                window.Android.logError('calcButton','avbPref variable fell through switch.');
-        }
+        var abvDisplayValue = getPreferredAbvValue(result);
 
         $("#abvResult").text(abvDisplayValue);
     }
@@ -423,9 +409,6 @@ $("#sort-pref").change(function() {
     if(window.Android && meadId > 0)
     {
         window.Android.logInfo('MainActivity', 'Fetching Readings for mead ID ' + meadId);
-
-        // Fetch ABV formula preference
-        var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
 
         // Fetch data from database
         var meadJson = window.Android.fetchMead(meadId);
@@ -457,31 +440,13 @@ $("#sort-pref").change(function() {
 
             var result = calculateAbv(og,sg);
 
-            var abvDisplayValue = '';
-
-            switch(abvPref)
-            {
-                case 'std':
-                    abvDisplayValue = result.standard;
-                    window.Android.logDebug('viewReadings',"avbPref detected as 'std'.");
-                    break;
-                case 'alt':
-                    abvDisplayValue = result.alternate;
-                    window.Android.logDebug('viewReadings',"avbPref detected as 'alt'.");
-                    break;
-                case 'wine':
-                    abvDisplayValue = result.wine;
-                    window.Android.logDebug('viewReadings',"avbPref detected as 'wine'.");
-                    break;
-                default:
-                    abvDisplayValue = result.standard;
-                    window.Android.logError('viewReadings','avbPref variable fell through switch.');
-            }
+            var abvDisplayValue = getPreferredAbvValue(result);
 
             $("#reading-list tbody").append('<tr><td>' + readingsData[i].date + '</td><td>' + sg + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
         }
 
         $("#newReadingButton").off("tap"); // clear existing event handlers
+        $("#backToMeadViewButton").off("tap"); // clear existing event handlers
 
         $("#newReadingButton").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
@@ -492,6 +457,13 @@ $("#sort-pref").change(function() {
             $("#newReadingMeadId").val(event.data.meadId);
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-reading",{changeHash:false});
+        });
+        $("#backToMeadViewButton").on("tap", { meadId: meadId }, function(event) {
+            event.preventDefault();
+
+            window.Android.logDebug('MainActivity', 'Back To Mead View Button pressed. Mead ID: ' + event.data.meadId);
+
+            viewMead(event.data.meadId);
         });
     }
     else
@@ -647,23 +619,51 @@ function viewEvents(meadId)
         window.Android.logInfo('MainActivity', 'Fetching Mead by ID: ' + id);
 
         // Fetch data from database
-        var results = window.Android.fetchMead(id);
-        var jsonData = JSON.parse(results);
+        var meadJson = window.Android.fetchMead(id);
+        var meadData = JSON.parse(meadJson);
 
-        window.Android.logInfo('MainActivity', results);
+        var tagsJson = window.Android.fetchMeadTags(id);
+        var tagsData = JSON.parse(tagsJson);
+
+        var readingsJson = window.Android.fetchReadings(id);
+        var readingsData = JSON.parse(readingsJson);
+
+        window.Android.logDebug('MainActivity', meadJson);
+        window.Android.logDebug('MainActivity', tagsJson);
+        window.Android.logDebug('MainActivity', readingsJson);
+
+        var lastReadingDisplayValue = "N/A";
+
+        if(readingsData.length > 0)
+        {
+            var lastReading = readingsData[readingsData.length - 1];
+
+            var result = calculateAbv(meadData.originalGravity,lastReading.specificGravity);
+
+            var abvDisplayValue = getPreferredAbvValue(result);
+
+            lastReadingDisplayValue = abvDisplayValue + " as of " + lastReading.date;
+        }
 
         // Populate fields
-        //$("#mead-id").text(jsonData.id); was used for debugging; not really useful for the user
-        $("#mead-name").text(jsonData.name);
-        $("#mead-start-date").text(jsonData.startDate);
-        $("#mead-description").text(jsonData.description);
-        $("#mead-original-gravity").text(jsonData.originalGravity);
+        //$("#mead-id").text(meadData.id); was used for debugging; not really useful for the user
+        $("#mead-name").text(meadData.name);
+        $("#mead-start-date").text(meadData.startDate);
+        $("#mead-description").text(meadData.description);
+        $("#mead-original-gravity").text(meadData.originalGravity);
+        $("#mead-last-reading").text(lastReadingDisplayValue);
+
+        // Clear & update tags
+        $("#mead-tags span").remove();
+        displayMeadTags(tagsData);
 
         // add event handlers for buttons
         $("#deleteMeadButton").off("tap"); // clear existing event handlers
         $("#readingsButton").off("tap"); // clear existing event handlers
         $("#eventsButton").off("tap"); // clear existing event handlers
         $("#editMeadButton").off("tap"); // clear existing event handlers
+        $("#tagsButton").off("tap"); //clear existing event handlers
+        $("#mead-tags").off("taphold"); //clear existing event handlers
 
         $("#deleteMeadButton").on("tap", { value: id }, function(event) {
             event.preventDefault();
@@ -687,17 +687,17 @@ function viewEvents(meadId)
                 }
             });
         });
-        $("#readingsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadStartDate: jsonData.startDate, meadOriginalGravity: jsonData.originalGravity }, function(event) {
+        $("#readingsButton").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity }, function(event) {
             event.preventDefault();
 
             viewReadings(event.data.meadId);
         });
-        $("#eventsButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadStartDate: jsonData.startDate, meadOriginalGravity: jsonData.originalGravity }, function(event) {
+        $("#eventsButton").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity }, function(event) {
             event.preventDefault();
 
             viewEvents(event.data.meadId);
         });
-        $("#editMeadButton").on("tap", { meadId: jsonData.id, meadName: jsonData.name, meadStartDate: jsonData.startDate, meadOriginalGravity: jsonData.originalGravity, meadDescription: jsonData.description }, function(event) {
+        $("#editMeadButton").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity, meadDescription: meadData.description }, function(event) {
 
             // Populate data
             $("#meadId").val(event.data.meadId);
@@ -708,11 +708,53 @@ function viewEvents(meadId)
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
         });
+
+        $("#tagsButton").on("tap", { meadId: meadData.id }, function(event) {
+
+            event.preventDefault();
+
+            $.confirm({
+                title: 'Add Tag',
+                content: '<input id="newTagMeadId" name="newTagMeadId" type="hidden" value="' + event.data.meadId + '"><input id="newTag" name="newTag" type="text">',
+                buttons: {
+                    save: function () {
+                        var meadId = $("#newTagMeadId").val();
+                        var tag = $("#newTag").val();
+                        window.Android.addMeadTag(meadId, tag);
+                        displayTag(tag); // Update DOM so we don't have to re-fetch data
+                    },
+                    cancel: function () {
+                        // do nothing
+                    }
+                }
+            });
+        });
+
+        $("#mead-tags").on("taphold", "span", function(event)
+            {
+                var tagName = $(event.target).text();
+
+                $.confirm({
+                    title: "Remove Tag '" + tagName + "'",
+                    content: 'Are you sure?',
+                    animation: 'top',
+                    closeAnimation: 'top',
+                    buttons: {
+                        confirm: function () {
+                            window.Android.deleteMeadTag(id, tagName);
+                            $(event.target).remove();
+                        },
+                        cancel: function () {
+                            // do nothing
+                        }
+                    }
+                });
+            });
     }
     else
     {
         // Populate sample data
-        $("#mead-id").text("0");
+        //$("#mead-id").text("0");
         $("#mead-name").text("My First Mead");
         $("#mead-start-date").text("01/01/2021");
         $("#mead-description").text("Sample data");
@@ -905,4 +947,55 @@ function daysSince(date)
     var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
 
     return Difference_In_Days;
+}
+
+function displayTag(tag)
+{
+    $("#mead-tags span:contains(" + tag + ")").length;
+
+    if(length === 0)
+    {
+        $("#mead-tags").append("<span>" + $.trim(tag) + "</span>");
+    }
+}
+
+function displayMeadTags(tagData)
+{
+    if(Array.isArray(tagData))
+    {
+        window.Android.logDebug('displayMeadTags', 'Adding tags to view.');
+
+        $.each(tagData, function (i, item) {
+            displayTag(item.name);
+        });
+    }
+}
+
+function getPreferredAbvValue(result)
+{
+    var value = '';
+
+    // Fetch ABV formula preference
+    var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
+
+    switch(abvPref)
+    {
+        case 'std':
+            value = result.standard;
+            window.Android.logDebug('getPreferredAbvValue',"avbPref detected as 'std'.");
+            break;
+        case 'alt':
+            value = result.alternate;
+            window.Android.logDebug('getPreferredAbvValue',"avbPref detected as 'alt'.");
+            break;
+        case 'wine':
+            value = result.wine;
+            window.Android.logDebug('getPreferredAbvValue',"avbPref detected as 'wine'.");
+            break;
+        default:
+            value = result.standard;
+            window.Android.logError('getPreferredAbvValue','avbPref variable fell through switch.');
+    }
+
+    return value;
 }
