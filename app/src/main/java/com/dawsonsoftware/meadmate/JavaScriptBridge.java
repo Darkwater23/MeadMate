@@ -373,6 +373,12 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
+    public void splitMead(String meadId, String splitCount, Boolean deleteOriginal)
+    {
+        
+    }
+
+    @JavascriptInterface
     public void logError(String tag, String message)
     {
         Log.e(tag, message);

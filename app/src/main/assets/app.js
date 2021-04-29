@@ -663,6 +663,7 @@ function viewEvents(meadId)
         $("#eventsButton").off("tap"); // clear existing event handlers
         $("#editMeadButton").off("tap"); // clear existing event handlers
         $("#tagsButton").off("tap"); //clear existing event handlers
+        $("#splitButton").off("tap"); //clear existing event handlers
         $("#mead-tags").off("taphold"); //clear existing event handlers
 
         $("#deleteMeadButton").on("tap", { value: id }, function(event) {
@@ -708,7 +709,6 @@ function viewEvents(meadId)
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
         });
-
         $("#tagsButton").on("tap", { meadId: meadData.id }, function(event) {
 
             event.preventDefault();
@@ -722,6 +722,33 @@ function viewEvents(meadId)
                         var tag = $("#newTag").val();
                         window.Android.addMeadTag(meadId, tag);
                         displayTag(tag); // Update DOM so we don't have to re-fetch data
+                    },
+                    cancel: function () {
+                        // do nothing
+                    }
+                }
+            });
+        });
+        $("#splitButton").on("tap", { meadId: meadData.id }, function(event) {
+
+            event.preventDefault();
+
+            $.confirm({
+                title: 'Split Mead Batch',
+                content: 'Split into how many batches?<br>' +
+                        '<input id="splitMeadId" name="splitMeadId" type="hidden" value="' + event.data.meadId + '">' +
+                        '<input type="number" id="splitCount" name="splitCount" min="2" max="20"><br>' +
+                        '<input type="checkbox" id="splitDeleteOriginal" name="splitDeleteOriginal" checked>' +
+                        '<label for="splitDeleteOriginal">Delete Original Mead Record</label>' +
+                        '<p id="splitDescription">Deleting the original record is recommended, but can be skipped for safety since this operation is not reversible.</p>',
+                buttons: {
+                    save: function () {
+                        var meadId = $("#splitMeadId").val();
+                        var splitCount = $("#splitCount").val();
+                        var deleteOriginal = $("#splitDeleteOriginal").is(':checked')
+                        window.Android.splitMead(meadId, splitCount, deleteOriginal);
+
+                        $.mobile.navigate("#my-meads");
                     },
                     cancel: function () {
                         // do nothing
