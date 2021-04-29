@@ -953,4 +953,116 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         return model;
     }
+
+    public void splitMead(Integer meadId, Integer count, Boolean canBeDeleted)
+    {
+        Mead mead = new Mead();
+        List<Event> meadEvents = new ArrayList<>();
+        List<Reading> meadReadings = new ArrayList<>();
+
+        String[] meadColumns = new String[] {
+                KEY_MEAD_NAME, KEY_MEAD_START_DATE, KEY_MEAD_ORIG_GRAV, KEY_MEAD_DESC
+        };
+        String meadWhereClause = KEY_MEAD_ID + "=?";
+        String[] meadWhereArgs = new String[] { String.valueOf(meadId) };
+
+
+        String[] eventsColumns = new String[] {
+                KEY_EVENT_ID, KEY_EVENT_DATE, KEY_EVENT_DESC, KEY_EVENT_TYPEID
+        };
+        String eventsWhereClause = KEY_EVENT_MEADID + "=?";
+        String[] eventsWhereArgs = new String[] { String.valueOf(meadId) };
+
+
+        String[] readingsColumns = new String[] {
+                KEY_READINGS_ID, KEY_READINGS_DATE, KEY_READINGS_GRAV
+        };
+        String readingsWhereClause = KEY_READINGS_MEADID + "=?";
+        String[] readingsWhereArgs = new String[] { String.valueOf(meadId) };
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Start transaction
+        db.beginTransaction();
+
+        try
+        {
+            // Gather mead record
+            Cursor c = db.query(TABLE_MEADS, meadColumns, meadWhereClause, meadWhereArgs,
+                    null, null, null, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                mead.setId(meadId);
+                mead.setName(c.getString(c.getColumnIndex(KEY_MEAD_NAME)));
+                mead.setStartDate(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE)));
+                mead.setOriginalGravity(c.getString(c.getColumnIndex(KEY_MEAD_ORIG_GRAV)));
+                mead.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
+            }
+
+            // Gather related events
+            c = db.query(TABLE_EVENTS, eventsColumns, eventsWhereClause, eventsWhereArgs,
+                    null, null, null, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                do {
+
+                    Event event = new Event();
+                    event.setId(c.getInt(c.getColumnIndex(KEY_EVENT_ID)));
+                    event.setDate(c.getString(c.getColumnIndex(KEY_EVENT_DATE)));
+                    event.setDescription(c.getString(c.getColumnIndex(KEY_EVENT_DESC)));
+                    event.setMeadId(meadId);
+                    event.setTypeId(c.getInt(c.getColumnIndex(KEY_EVENT_TYPEID)));
+                    //event.setTypeName(); is a helper property for when events and eventtypes are joined
+
+                    meadEvents.add(event);
+
+                }while(c.moveToNext());
+            }
+
+            // Gather related readings
+            c = db.query(TABLE_READINGS, readingsColumns, readingsWhereClause, readingsWhereArgs,
+                    null, null, null, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                do {
+
+                    Reading reading = new Reading();
+                    reading.setId(c.getInt(c.getColumnIndex(KEY_READINGS_ID)));
+                    reading.setDate(c.getString(c.getColumnIndex(KEY_READINGS_DATE)));
+                    reading.setSpecificGravity(c.getString(c.getColumnIndex(KEY_READINGS_GRAV)));
+                    reading.setMeadId(meadId);
+
+                    meadReadings.add(reading);
+
+                }while(c.moveToNext());
+            }
+
+            // Create x mead records
+
+            // For each mead record, add event copies
+            // For each mead record, add reading copies
+
+
+            // Commit transaction
+            db.setTransactionSuccessful();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+        finally
+        {
+            db.endTransaction();
+            db.close();
+        }
+    }
 }

@@ -375,7 +375,24 @@ public class JavaScriptBridge {
     @JavascriptInterface
     public void splitMead(String meadId, String splitCount, Boolean deleteOriginal)
     {
-        
+        try
+        {
+            Integer meadRecordId = parseInt(meadId);
+            Integer count = parseInt(splitCount);
+            Boolean canBeDeleted = deleteOriginal;
+
+            // Minor validation
+            if(count < 2)
+            {
+                return; // this shouldn't happen, but covering the base
+            }
+
+            data.splitMead(meadRecordId, count, canBeDeleted);
+        }
+        catch(Exception ex)
+        {
+            Log.e("splitMead", ex.toString());
+        }
     }
 
     @JavascriptInterface
