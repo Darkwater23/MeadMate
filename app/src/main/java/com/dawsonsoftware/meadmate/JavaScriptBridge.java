@@ -11,21 +11,20 @@ import com.dawsonsoftware.meadmate.models.Reading;
 import com.dawsonsoftware.meadmate.models.Tag;
 import com.google.gson.Gson;
 
-import java.text.ParseException;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
 public class JavaScriptBridge {
-    private Activity activity;
-    private MeadMateData data;
+    private final Activity activity;
+    private final MeadMateData data;
 
     public JavaScriptBridge(Activity activity) {
         this.activity = activity;
         data = new MeadMateData(activity);
     }
 
-    @JavascriptInterface
+    /*@JavascriptInterface
     public void exportData()
     {
         Log.i("JavaScriptBridge", "Exporting app data.");
@@ -33,9 +32,9 @@ public class JavaScriptBridge {
         //TODO: Add method for exporting data
 
         Log.i("JavaScriptBridge", "Export complete!");
-    }
+    }*/
 
-    @JavascriptInterface
+    /*@JavascriptInterface
     public String importData(String filePath)
     {
         Log.i("JavaScriptBridge", "Importing app data.");
@@ -48,7 +47,7 @@ public class JavaScriptBridge {
         Log.i("JavaScriptBridge", "Import complete!");
 
         return result;
-    }
+    }*/
 
     @JavascriptInterface
     public String fetchMeads(String sortBy){
@@ -377,9 +376,9 @@ public class JavaScriptBridge {
     {
         try
         {
-            Integer meadRecordId = parseInt(meadId);
-            Integer count = parseInt(splitCount);
-            Boolean canBeDeleted = deleteOriginal;
+            int meadRecordId = parseInt(meadId);
+            int count = parseInt(splitCount);
+            boolean canBeDeleted = deleteOriginal;
 
             // Minor validation
             if(count < 2)
