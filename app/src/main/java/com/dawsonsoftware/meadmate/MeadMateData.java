@@ -148,10 +148,15 @@ public class MeadMateData extends SQLiteOpenHelper {
     }
 
     // **** CRUD (Create, Read, Update, Delete) Operations ***** //
-    Integer addMead(Mead mead) {
+    int addMead(Mead mead) {
 
         try
         {
+            if(mead == null)
+            {
+                throw new IllegalArgumentException("Mead object cannot be null");
+            }
+
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
@@ -402,7 +407,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return tagId;
     }
 
-    List<Tag> getMeadTags(Integer meadId)
+    List<Tag> getMeadTags(int meadId)
     {
         List<Tag> model = new ArrayList<>();
 
@@ -417,7 +422,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         {
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor c = db.rawQuery(query, new String[] { meadId.toString() });
+            Cursor c = db.rawQuery(query, new String[] { String.valueOf(meadId) });
 
             if(c.getCount() > 0)
             {
@@ -718,7 +723,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    List<Reading> getReadings(Integer meadId)
+    List<Reading> getReadings(int meadId)
     {
         List<Reading> model = new ArrayList<>();
 
@@ -776,7 +781,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    List<Event> getEvents(Integer meadId)
+    List<Event> getEvents(int meadId)
     {
         List<Event> model = new ArrayList<>();
 
@@ -791,7 +796,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         {
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor c = db.rawQuery(query, new String[] { meadId.toString() });
+            Cursor c = db.rawQuery(query, new String[] { String.valueOf(meadId) });
 
             if(c.getCount() > 0)
             {
@@ -824,7 +829,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    Event getEvent(Integer eventId)
+    Event getEvent(int eventId)
     {
         Event model = new Event();
 
@@ -875,7 +880,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    String getEventDescription(Integer id)
+    String getEventDescription(int id)
     {
         String eventDescription = "";
 
@@ -967,31 +972,17 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    public void splitMead(Integer meadId, Integer count, Boolean canBeDeleted)
+    public void splitMead(int meadId, int count, boolean canBeDeleted)
     {
-        Mead mead = new Mead();
-        List<Event> meadEvents = new ArrayList<>();
-        List<Reading> meadReadings = new ArrayList<>();
+        Mead mead;
+        List<Event> meadEvents;
+        List<Reading> meadReadings;
 
         String[] meadColumns = new String[] {
                 KEY_MEAD_NAME, KEY_MEAD_START_DATE, KEY_MEAD_ORIG_GRAV, KEY_MEAD_DESC
         };
         String meadWhereClause = KEY_MEAD_ID + "=?";
         String[] meadWhereArgs = new String[] { String.valueOf(meadId) };
-
-
-        String[] eventsColumns = new String[] {
-                KEY_EVENT_ID, KEY_EVENT_DATE, KEY_EVENT_DESC, KEY_EVENT_TYPEID
-        };
-        String eventsWhereClause = KEY_EVENT_MEADID + "=?";
-        String[] eventsWhereArgs = new String[] { String.valueOf(meadId) };
-
-
-        String[] readingsColumns = new String[] {
-                KEY_READINGS_ID, KEY_READINGS_DATE, KEY_READINGS_GRAV
-        };
-        String readingsWhereClause = KEY_READINGS_MEADID + "=?";
-        String[] readingsWhereArgs = new String[] { String.valueOf(meadId) };
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -1001,72 +992,48 @@ public class MeadMateData extends SQLiteOpenHelper {
         try
         {
             // Gather mead record
-            Cursor c = db.query(TABLE_MEADS, meadColumns, meadWhereClause, meadWhereArgs,
-                    null, null, null, null);
+            mead = getMead(meadId);
 
-            if(c.getCount() > 0)
+            if(mead == null)
             {
-                c.moveToFirst();
-
-                mead.setId(meadId);
-                mead.setName(c.getString(c.getColumnIndex(KEY_MEAD_NAME)));
-                mead.setStartDate(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE)));
-                mead.setOriginalGravity(c.getString(c.getColumnIndex(KEY_MEAD_ORIG_GRAV)));
-                mead.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
+                throw new NullPointerException("Mead record is null. SplitMead cannot continue.");
             }
 
             // Gather related events
-            c = db.query(TABLE_EVENTS, eventsColumns, eventsWhereClause, eventsWhereArgs,
-                    null, null, null, null);
-
-            if(c.getCount() > 0)
-            {
-                c.moveToFirst();
-
-                do {
-
-                    Event event = new Event();
-                    event.setId(c.getInt(c.getColumnIndex(KEY_EVENT_ID)));
-                    event.setDate(c.getString(c.getColumnIndex(KEY_EVENT_DATE)));
-                    event.setDescription(c.getString(c.getColumnIndex(KEY_EVENT_DESC)));
-                    event.setMeadId(meadId);
-                    event.setTypeId(c.getInt(c.getColumnIndex(KEY_EVENT_TYPEID)));
-                    //event.setTypeName(); is a helper property for when events and eventtypes are joined
-
-                    meadEvents.add(event);
-
-                }while(c.moveToNext());
-            }
-
-            // Gather related readings
-            c = db.query(TABLE_READINGS, readingsColumns, readingsWhereClause, readingsWhereArgs,
-                    null, null, null, null);
-
-            if(c.getCount() > 0)
-            {
-                c.moveToFirst();
-
-                do {
-
-                    Reading reading = new Reading();
-                    reading.setId(c.getInt(c.getColumnIndex(KEY_READINGS_ID)));
-                    reading.setDate(c.getString(c.getColumnIndex(KEY_READINGS_DATE)));
-                    reading.setSpecificGravity(c.getString(c.getColumnIndex(KEY_READINGS_GRAV)));
-                    reading.setMeadId(meadId);
-
-                    meadReadings.add(reading);
-
-                }while(c.moveToNext());
-            }
+            meadEvents = getEvents(meadId);
+            meadReadings = getReadings(meadId);
 
             // Create x mead records
+            for (int i = 0; i < count; i++)
+            {
+                String suffix = " #" + (i+1);
+                
+                Mead clone = new Mead();
+                clone.setName(mead.getName() + suffix);
+                clone.setDescription(mead.getDescription());
+                clone.setOriginalGravity(mead.getOriginalGravity());
+                clone.setStartDate(mead.getStartDate());
+                
+                int cloneId = addMead(clone);
+
+                for (Event event : meadEvents)
+                {
+                    //
+                }
+
+                for (Reading reading : meadReadings)
+                {
+
+                }
+                
+            }
 
             // For each mead record, add event copies
             // For each mead record, add reading copies
 
 
             // Commit transaction
-            c.close();
+            //c.close();
             db.setTransactionSuccessful();
         }
         catch(Exception ex)
