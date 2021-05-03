@@ -164,7 +164,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             db.insert(TABLE_MEADS, null, values);
 
             // Query for new mead ID
-            Integer meadId = 0;
+            int meadId = 0;
             Cursor c = db.rawQuery ("SELECT LAST_INSERT_ROWID()", null);
 
             if(c.getCount() > 0)
@@ -174,6 +174,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 meadId = c.getInt(0);
             }
 
+            c.close();
             db.close(); // Closing database connection
 
             return meadId;
@@ -280,10 +281,13 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
-    void deleteMead(Mead mead)
-    {
-        deleteMead(mead.getId());
-    }
+    //void deleteMead(Mead mead)
+    //{
+    //    if(mead != null)
+    //    {
+    //        deleteMead(mead.getId());
+    //    }
+    //}
 
     void deleteMead(int meadId)
     {
@@ -344,7 +348,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     int addTag(String name) {
 
-        int tagId = 0;
+        int tagId;
 
         try
         {
@@ -385,6 +389,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 tagId = (int)db.insert(TABLE_TAGS, null, values);
             }
 
+            c.close();
             db.close(); // Closing database connection
         }
         catch(Exception ex)
@@ -430,6 +435,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 }while(c.moveToNext());
             }
 
+            c.close();
             db.close();
         }
         catch(Exception ex)
@@ -453,7 +459,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         //String[] whereArgs = null;
         //String groupBy = null;
         //String having = null;
-        String orderBy = KEY_TAGS_NAME;
+        //String orderBy = KEY_TAGS_NAME;
         //String limit = null;
 
         try
@@ -461,7 +467,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getReadableDatabase();
 
             Cursor c = db.query(TABLE_TAGS, tableColumns, null, null,
-                    null, null, orderBy, null);
+                    null, null, KEY_TAGS_NAME, null);
 
             if(c.getCount() > 0)
             {
@@ -479,6 +485,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 }while(c.moveToNext());
             }
 
+            c.close();
             db.close();
         }
         catch(Exception ex)
@@ -489,7 +496,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    void deleteTag(int tagId)
+    /*void deleteTag(int tagId)
     {
         String meadTagsWhereClause = KEY_MEAD_TAGS_TAG_ID + "=?";
         String[] meadTagsWhereArgs = new String[] { String.valueOf(tagId) };
@@ -517,7 +524,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             db.endTransaction();
             db.close();
         }
-    }
+    }*/
 
     void addMeadTag(int meadId, int tagId)
     {
@@ -540,7 +547,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
-    void deleteMeadTag(int meadTagId)
+    /*void deleteMeadTag(int meadTagId)
     {
         String meadTagsWhereClause = KEY_MEAD_TAGS_ID + "=?";
         String[] meadTagsWhereArgs = new String[] { String.valueOf(meadTagId) };
@@ -557,7 +564,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
         }
-    }
+    }*/
 
     public void deleteMeadTag(int meadId, String tagName)
     {
@@ -592,6 +599,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
             db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, meadTagsWhereArgs);
 
+            c.close();
             db.close();
         }
         catch(Exception ex)
@@ -644,7 +652,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-
             db.close();
         }
         catch (Exception ex)
@@ -657,7 +664,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     List<Mead> getMeads(String orderBy)
     {
-        List<Mead> model = new ArrayList<Mead>();
+        List<Mead> model = new ArrayList<>();
 
         String[] tableColumns = new String[] {
                 KEY_MEAD_ID,
@@ -700,6 +707,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 }while(c.moveToNext());
             }
 
+            c.close();
             db.close();
         }
         catch(Exception ex)
@@ -712,7 +720,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     List<Reading> getReadings(Integer meadId)
     {
-        List<Reading> model = new ArrayList<Reading>();
+        List<Reading> model = new ArrayList<>();
 
         String[] tableColumns = new String[] {
                 KEY_READINGS_ID,
@@ -757,6 +765,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 }while(c.moveToNext());
             }
 
+            c.close();
             db.close();
         }
         catch(Exception ex)
@@ -804,6 +813,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 }while(c.moveToNext());
             }
 
+            c.close();
             db.close();
         }
         catch(Exception ex)
@@ -854,6 +864,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 model.setDate(c.getString(c.getColumnIndex(KEY_EVENT_DATE)));
             }
 
+            c.close();
             db.close();
         }
         catch(Exception ex)
@@ -897,6 +908,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 eventDescription = c.getString(c.getColumnIndex(KEY_EVENT_DESC));
             }
 
+            c.close();
             db.close();
         }
         catch(Exception ex)
@@ -944,6 +956,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 }while(c.moveToNext());
             }
 
+            c.close();
             db.close();
         }
         catch(Exception ex)
@@ -1053,6 +1066,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
 
             // Commit transaction
+            c.close();
             db.setTransactionSuccessful();
         }
         catch(Exception ex)
