@@ -998,7 +998,6 @@ public class MeadMateData extends SQLiteOpenHelper {
                     reading.setMeadId(cloneId);
                     addReading(reading);
                 }
-                
             }
 
             if(canBeDeleted)
