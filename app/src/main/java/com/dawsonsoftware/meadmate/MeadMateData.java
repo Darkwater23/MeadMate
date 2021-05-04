@@ -1018,22 +1018,26 @@ public class MeadMateData extends SQLiteOpenHelper {
 
                 for (Event event : meadEvents)
                 {
-                    //
+                    // override event's mead ID and save record
+                    event.setMeadId(cloneId);
+                    addEvent(event);
                 }
 
                 for (Reading reading : meadReadings)
                 {
-
+                    // override reading's mead ID and save record
+                    reading.setMeadId(cloneId);
+                    addReading(reading);
                 }
                 
             }
 
-            // For each mead record, add event copies
-            // For each mead record, add reading copies
-
+            if(canBeDeleted)
+            {
+                deleteMead(meadId);
+            }
 
             // Commit transaction
-            //c.close();
             db.setTransactionSuccessful();
         }
         catch(Exception ex)
