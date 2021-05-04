@@ -372,10 +372,14 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
-    public void splitMead(String meadId, String splitCount, Boolean deleteOriginal)
+    public void splitMead(String meadId, String splitCount, boolean deleteOriginal)
     {
         try
         {
+            logDebug("splitMead", "Mead ID: " + meadId);
+            logDebug("splitMead", "Count: " + splitCount);
+            logDebug("splitMead", "Delete Original: " + deleteOriginal);
+
             int meadRecordId = parseInt(meadId);
             int count = parseInt(splitCount);
             boolean canBeDeleted = deleteOriginal;

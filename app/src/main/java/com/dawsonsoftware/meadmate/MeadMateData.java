@@ -180,7 +180,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close(); // Closing database connection
 
             return meadId;
         }
@@ -208,8 +207,6 @@ public class MeadMateData extends SQLiteOpenHelper {
 
             // Update row
             db.update(TABLE_MEADS, values, whereClause, new String[]{ mead.getId().toString() });
-
-            db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
@@ -228,10 +225,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_READINGS_DATE, reading.getDate());
             values.put(KEY_READINGS_GRAV, reading.getSpecificGravity());
 
-            // Inserting Row
             db.insert(TABLE_READINGS, null, values);
-
-            db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
@@ -251,10 +245,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_EVENT_TYPEID, event.getTypeId());
             values.put(KEY_EVENT_DESC, event.getDescription());
 
-            // Inserting Row
             db.insert(TABLE_EVENTS, null, values);
-
-            db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
@@ -275,10 +266,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
             String whereClause = KEY_EVENT_ID + " = ?";
 
-            // Update row
             db.update(TABLE_EVENTS, values, whereClause, new String[]{ event.getId().toString() });
-
-            db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
@@ -304,8 +292,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
 
             db.delete(TABLE_MEADS, whereClause, whereArgs);
-
-            db.close();
         }
         catch(Exception ex)
         {
@@ -323,8 +309,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
 
             db.delete(TABLE_READINGS, whereClause, whereArgs);
-
-            db.close();
         }
         catch(Exception ex)
         {
@@ -342,8 +326,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
 
             db.delete(TABLE_EVENTS, whereClause, whereArgs);
-
-            db.close();
         }
         catch(Exception ex)
         {
@@ -395,7 +377,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
@@ -441,7 +422,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
         catch(Exception ex)
         {
@@ -491,7 +471,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
         catch(Exception ex)
         {
@@ -527,7 +506,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         finally
         {
             db.endTransaction();
-            db.close();
         }
     }*/
 
@@ -541,10 +519,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_MEAD_TAGS_MEAD_ID, meadId);
             values.put(KEY_MEAD_TAGS_TAG_ID, tagId);
 
-            // Inserting Row
             db.insert(TABLE_MEAD_TAGS, null, values);
-
-            db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
@@ -562,8 +537,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
 
             db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, meadTagsWhereArgs);
-
-            db.close();
         }
         catch(Exception ex)
         {
@@ -605,7 +578,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, meadTagsWhereArgs);
 
             c.close();
-            db.close();
         }
         catch(Exception ex)
         {
@@ -657,7 +629,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
         catch (Exception ex)
         {
@@ -713,7 +684,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
         catch(Exception ex)
         {
@@ -771,7 +741,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
         catch(Exception ex)
         {
@@ -819,7 +788,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
         catch(Exception ex)
         {
@@ -870,7 +838,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
         catch(Exception ex)
         {
@@ -914,7 +881,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
         catch(Exception ex)
         {
@@ -962,7 +928,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
         catch(Exception ex)
         {
@@ -974,6 +939,10 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     public void splitMead(int meadId, int count, boolean canBeDeleted)
     {
+        Log.d(MeadMateData.class.getTypeName(), "Mead ID: " + meadId);
+        Log.d(MeadMateData.class.getTypeName(), "Count: " + count);
+        Log.d(MeadMateData.class.getTypeName(), "CanBeDeleted: " + canBeDeleted);
+
         Mead mead;
         List<Event> meadEvents;
         List<Reading> meadReadings;
@@ -1047,7 +1016,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         finally
         {
             db.endTransaction();
-            db.close();
         }
     }
 }

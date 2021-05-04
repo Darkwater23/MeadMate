@@ -735,12 +735,12 @@ function viewEvents(meadId)
 
             $.confirm({
                 title: 'Split Mead Batch',
-                content: 'Split into how many batches?<br>' +
+                content: '<label for="splitCount">Split into how many batches? (2 to 20)</label><br>' +
                         '<input id="splitMeadId" name="splitMeadId" type="hidden" value="' + event.data.meadId + '">' +
-                        '<input type="number" id="splitCount" name="splitCount" min="2" max="20"><br>' +
-                        '<input type="checkbox" id="splitDeleteOriginal" name="splitDeleteOriginal" checked>' +
-                        '<label for="splitDeleteOriginal">Delete Original Mead Record</label>' +
-                        '<p id="splitDescription">Deleting the original record is recommended, but can be skipped for safety since this operation is not reversible.</p>',
+                        '<input type="number" id="splitCount" name="splitCount" min="2" max="20"><br><br>' +
+                        '<label for="splitDeleteOriginal">Delete Original Mead Record?</label>' +
+                        '<input type="checkbox" id="splitDeleteOriginal" name="splitDeleteOriginal" checked> Delete Original' +
+                        '<p id="splitDescription">Deleting the original record is recommended, but can be skipped and done later, if desired.</p>',
                 buttons: {
                     save: function () {
                         var meadId = $("#splitMeadId").val();
