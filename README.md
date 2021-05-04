@@ -1,7 +1,7 @@
 # Mead Mate
 Mead Mate is a HTML5 / jQuery Mobile single-page web app wrapped in a WebView for Android. The app uses the built-in Sqlite capabilities of Android.
 
-The scope of the app is specifically limited to mead and mead makers. Originally, the app was going to be a more general homebrewing app, but there was so many variables involved when wine & beer were considered. A more focused scope is easier to maintain.
+The scope of the app is specifically limited to mead and mead makers. Originally, the app was going to be a more general homebrewing app, but there were so many variables involved when wine & beer were considered. A more focused scope is easier to maintain.
 
 The primary function of this app is to help users manage the progress of their mead batches. There are currently three primary entities in the project: Meads, Events and Readings.
 
