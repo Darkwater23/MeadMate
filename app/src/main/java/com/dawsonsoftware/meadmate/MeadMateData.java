@@ -170,6 +170,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_MEAD_START_DATE, mead.getStartDate());
             values.put(KEY_MEAD_DESC, mead.getDescription());
             values.put(KEY_MEAD_ORIG_GRAV, mead.getOriginalGravity());
+            values.put(KEY_MEAD_ARCHIVED, (mead.getArchived() ? 1 : 0));
 
             // Inserting Row
             db.insert(TABLE_MEADS, null, values);
@@ -208,6 +209,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_MEAD_START_DATE, mead.getStartDate());
             values.put(KEY_MEAD_DESC, mead.getDescription());
             values.put(KEY_MEAD_ORIG_GRAV, mead.getOriginalGravity());
+            values.put(KEY_MEAD_ARCHIVED, (mead.getArchived() ? 1 : 0));
 
             String whereClause = KEY_MEAD_ID + " = ?";
 
@@ -659,7 +661,8 @@ public class MeadMateData extends SQLiteOpenHelper {
                 KEY_MEAD_NAME,
                 KEY_MEAD_START_DATE,
                 KEY_MEAD_DESC,
-                KEY_MEAD_ORIG_GRAV
+                KEY_MEAD_ORIG_GRAV,
+                KEY_MEAD_ARCHIVED
         };
 
         String whereClause = KEY_MEAD_ID + " = ?";
@@ -691,6 +694,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 model.setStartDate(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE)));
                 model.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
                 model.setOriginalGravity(c.getString(c.getColumnIndex(KEY_MEAD_ORIG_GRAV)));
+                model.setArchived(c.getInt(c.getColumnIndex(KEY_MEAD_ARCHIVED)) == 1);
             }
 
             c.close();
@@ -742,6 +746,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                     mead.setStartDate(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE)));
                     mead.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
                     mead.setOriginalGravity(c.getString(c.getColumnIndex(KEY_MEAD_ORIG_GRAV)));
+                    mead.setArchived(c.getInt(c.getColumnIndex(KEY_MEAD_ARCHIVED)) == 1);
 
                     model.add(mead);
 
@@ -1043,6 +1048,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 clone.setDescription(mead.getDescription());
                 clone.setOriginalGravity(mead.getOriginalGravity());
                 clone.setStartDate(mead.getStartDate());
+                clone.setArchived(false); // Doesn't make sense to archive a fresh split
                 
                 int cloneId = addMead(clone);
 
