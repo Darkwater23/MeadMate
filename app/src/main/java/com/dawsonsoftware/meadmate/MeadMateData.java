@@ -716,23 +716,17 @@ public class MeadMateData extends SQLiteOpenHelper {
                 KEY_MEAD_NAME,
                 KEY_MEAD_START_DATE,
                 KEY_MEAD_DESC,
-                KEY_MEAD_ORIG_GRAV
+                KEY_MEAD_ORIG_GRAV,
+                KEY_MEAD_ARCHIVED
         };
 
-        String whereClause = KEY_MEAD_ARCHIVED + "=?";
-        String[] whereArgs = new String[] {
-                String.valueOf(includeArchived ? 1 : 0)
-        };
-        //String groupBy = null;
-        //String having = null;
-        //String orderBy = null;
-        //String limit = null;
+        String whereClause = includeArchived ? null : KEY_MEAD_ARCHIVED + "=0";
 
         try
         {
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor c = db.query(TABLE_MEADS, tableColumns, whereClause, whereArgs,
+            Cursor c = db.query(TABLE_MEADS, tableColumns, whereClause, null,
                     null, null, orderBy, null);
 
             if(c.getCount() > 0)
