@@ -978,11 +978,14 @@ function daysSince(date)
 
 function displayTag(tag)
 {
-    $("#mead-tags span:contains(" + tag + ")").length;
-
-    if(length === 0)
+    if(tag)
     {
-        $("#mead-tags").append("<span>" + $.trim(tag) + "</span>");
+        $("#mead-tags span:contains(" + tag + ")").length;
+
+        if(length === 0)
+        {
+            $("#mead-tags").append("<span>" + $.trim(tag) + "</span>");
+        }
     }
 }
 
