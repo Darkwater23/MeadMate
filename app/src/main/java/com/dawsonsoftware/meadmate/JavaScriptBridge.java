@@ -388,9 +388,9 @@ public class JavaScriptBridge {
     {
         try
         {
-            logDebug("splitMead", "Mead ID: " + meadId);
-            logDebug("splitMead", "Count: " + splitCount);
-            logDebug("splitMead", "Delete Original: " + deleteOriginal);
+            Log.d("splitMead", "Mead ID: " + meadId);
+            Log.d("splitMead", "Count: " + splitCount);
+            Log.d("splitMead", "Delete Original: " + deleteOriginal);
 
             int meadRecordId = parseInt(meadId);
             int count = parseInt(splitCount);
