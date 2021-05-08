@@ -291,6 +291,16 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
+    public void toggleMeadArchiveFlag(String meadId)
+    {
+        Log.i("JavaScriptBridge", "Toggling archive flag for mead id: " + meadId);
+
+        Mead mead = data.getMead(parseInt(meadId));
+
+        data.setMeadArchiveFlag(mead.getId(), !mead.getArchived());
+    }
+
+    @JavascriptInterface
     public void addReading(String meadId, String date, String specificGravity) {
 
         Log.d("JavaScriptBridge", "Adding reading record for: " + meadId);
