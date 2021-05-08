@@ -764,7 +764,7 @@ function viewEvents(meadId)
         $("#archiveButton").on("tap", { meadId: meadData.id }, function(event) {
             event.preventDefault();
 
-            toggleMeadArchiveFlag(event.data.meadId);
+            window.Android.toggleMeadArchiveFlag(event.data.meadId);
 
             $.mobile.navigate("#my-meads");
         });
