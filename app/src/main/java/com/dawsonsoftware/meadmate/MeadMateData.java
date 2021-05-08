@@ -284,18 +284,36 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     void deleteMead(int meadId)
     {
-        String whereClause = "_ID=?";
+        String whereClause = KEY_MEAD_ID + "=?";
+        String meadTagsWhereClause = KEY_MEAD_TAGS_MEAD_ID + "=?";
         String[] whereArgs = new String[] { String.valueOf(meadId) };
+
+        SQLiteDatabase db = null;
 
         try
         {
-            SQLiteDatabase db = this.getWritableDatabase();
+            db = this.getWritableDatabase();
 
+            db.beginTransaction();
+
+            Log.i(MeadMateData.class.getTypeName(),"Deleting mead record " + meadId);
             db.delete(TABLE_MEADS, whereClause, whereArgs);
+
+            Log.i(MeadMateData.class.getTypeName(),"Deleting mead tag records for mead ID " + meadId);
+            db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, whereArgs);
+
+            db.setTransactionSuccessful();
         }
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+        finally
+        {
+            if(db != null)
+            {
+                db.endTransaction();
+            }
         }
     }
 
@@ -947,20 +965,14 @@ public class MeadMateData extends SQLiteOpenHelper {
         List<Event> meadEvents;
         List<Reading> meadReadings;
 
-        String[] meadColumns = new String[] {
-                KEY_MEAD_NAME, KEY_MEAD_START_DATE, KEY_MEAD_ORIG_GRAV, KEY_MEAD_DESC
-        };
-        String meadWhereClause = KEY_MEAD_ID + "=?";
-        String[] meadWhereArgs = new String[] { String.valueOf(meadId) };
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        // Start transaction
-        db.beginTransaction();
+        SQLiteDatabase db = null;
 
         try
         {
-            // Gather mead record
+            db = this.getWritableDatabase();
+
+            db.beginTransaction();
+
             mead = getMead(meadId);
 
             if(mead == null)
@@ -1014,7 +1026,10 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
         finally
         {
-            db.endTransaction();
+            if(db != null)
+            {
+                db.endTransaction();
+            }
         }
     }
 }
