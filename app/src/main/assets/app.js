@@ -1,6 +1,7 @@
 const abvPrefKeyName = 'ABVPREF';
 const sortPrefKeyName = 'SORTPREF';
 const specificGravityRange = [0.980, 1.160];
+const archivePrefKeyName = 'INCLUDE_ARCHIVED';
 
 // One-time code executions
 var tagList;
@@ -76,12 +77,15 @@ $(document).on("pagebeforeshow","#my-meads",function() {
 
         // Retrieve user preference
         var sortPref = localStorage.getItem(sortPrefKeyName) ?? 'byId';
+        var includeArchivedString = localStorage.getItem(archivePrefKeyName) ?? "false";
+
+        var includeArchived = includeArchivedString === "true";
 
         // Clear list
         $("#mead-list").empty();
 
         // Fetch data from database
-        var meadsJson = window.Android.fetchMeads(sortPref);
+        var meadsJson = window.Android.fetchMeads(sortPref, includeArchived);
         var meadsData = JSON.parse(meadsJson);
 
         window.Android.logDebug('MainActivity', 'Fetched JSON: ' + meadsJson);
