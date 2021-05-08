@@ -664,6 +664,7 @@ function viewEvents(meadId)
         $("#editMeadButton").off("tap"); // clear existing event handlers
         $("#tagsButton").off("tap"); //clear existing event handlers
         $("#splitButton").off("tap"); //clear existing event handlers
+        $("#archiveButton").off("tap"); //clear existing event handlers
         $("#mead-tags").off("taphold"); //clear existing event handlers
 
         $("#deleteMeadButton").on("tap", { value: id }, function(event) {
@@ -756,6 +757,21 @@ function viewEvents(meadId)
                 }
             });
         });
+        $("#archiveButton").on("tap", { meadId: meadData.id }, function(event) {
+            event.preventDefault();
+
+            $.alert('Archive button pressed!');
+        });
+
+        // Update link text on archive button to make it clear what clicking it will do
+        if(meadData.archived)
+        {
+            $("#archiveButton").text("Unhide Mead");
+        }
+        else
+        {
+            $("#archiveButton").text("Hide Mead");
+        }
 
         $("#mead-tags").on("taphold", "span", function(event)
             {
