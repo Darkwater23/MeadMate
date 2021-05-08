@@ -964,6 +964,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         Mead mead;
         List<Event> meadEvents;
         List<Reading> meadReadings;
+        List<Tag> meadTags;
 
         SQLiteDatabase db = null;
 
@@ -983,6 +984,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             // Gather related events
             meadEvents = getEvents(meadId);
             meadReadings = getReadings(meadId);
+            meadTags = getMeadTags(meadId);
 
             // Create x mead records
             for (int i = 0; i < count; i++)
@@ -1009,6 +1011,11 @@ public class MeadMateData extends SQLiteOpenHelper {
                     // override reading's mead ID and save record
                     reading.setMeadId(cloneId);
                     addReading(reading);
+                }
+
+                for (Tag tag : meadTags)
+                {
+                    addMeadTag(cloneId, tag.getId());
                 }
             }
 
