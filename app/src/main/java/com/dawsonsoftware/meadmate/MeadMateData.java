@@ -288,6 +288,47 @@ public class MeadMateData extends SQLiteOpenHelper {
     //    }
     //}
 
+    void archiveMead(int meadId)
+    {
+        setMeadArchiveFlag(meadId, true);
+    }
+
+    void unarchiveMead(int meadId)
+    {
+        setMeadArchiveFlag(meadId, false);
+    }
+
+    void setMeadArchiveFlag(int meadId, boolean shouldArchive)
+    {
+        int flag = (shouldArchive ? 1 : 0);
+
+        setMeadArchiveFlag(meadId, flag);
+    }
+
+    void setMeadArchiveFlag(int meadId, int archiveBit)
+    {
+        try
+        {
+            if(archiveBit > 1 || archiveBit < 0)
+            {
+                throw new IllegalArgumentException("archiveBit value out of range");
+            }
+
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_MEAD_ARCHIVED, archiveBit);
+
+            String whereClause = KEY_MEAD_ID + " = ?";
+
+            db.update(TABLE_MEADS, values, whereClause, new String[]{ String.valueOf(meadId) });
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+    }
+
     void deleteMead(int meadId)
     {
         String whereClause = KEY_MEAD_ID + "=?";
