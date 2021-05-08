@@ -18,7 +18,7 @@ import java.util.List;
 
 public class MeadMateData extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
     private static final String DB_NAME = "appdata";
 
     // Meads table fields
@@ -28,6 +28,7 @@ public class MeadMateData extends SQLiteOpenHelper {
     private static final String KEY_MEAD_START_DATE = "START_DATE";
     private static final String KEY_MEAD_DESC = "DESCRIPTION";
     private static final String KEY_MEAD_ORIG_GRAV = "ORIGINAL_GRAVITY";
+    private static final String KEY_MEAD_ARCHIVED = "ARCHIVED";
 
     // Mead Events table fields
     private static final String TABLE_EVENTS = "EVENTS";
@@ -66,7 +67,8 @@ public class MeadMateData extends SQLiteOpenHelper {
             KEY_MEAD_NAME + " TEXT NOT NULL," +
             KEY_MEAD_START_DATE + " TEXT NOT NULL," +
             KEY_MEAD_DESC + " TEXT," +
-            KEY_MEAD_ORIG_GRAV + " TEXT NOT NULL DEFAULT 0.0)";
+            KEY_MEAD_ORIG_GRAV + " TEXT NOT NULL DEFAULT 0.0," +
+            KEY_MEAD_ARCHIVED + " INTEGER NOT NULL DEFAULT 0)";
 
     String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + " (" +
             KEY_EVENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
@@ -110,6 +112,9 @@ public class MeadMateData extends SQLiteOpenHelper {
             KEY_MEAD_TAGS_MEAD_ID + " INTEGER NOT NULL," +
             KEY_MEAD_TAGS_TAG_ID + " INTEGER NOT NULL)";
 
+    String ALTER_MEAD_TABLE = "ALTER TABLE " + TABLE_MEADS +
+            " ADD COLUMN " + KEY_MEAD_ARCHIVED + " INTEGER NOT NULL DEFAULT 0";
+
     public MeadMateData(Context context){
         super(context,DB_NAME, null, DB_VERSION);
     }
@@ -140,6 +145,8 @@ public class MeadMateData extends SQLiteOpenHelper {
             case 2:
                 db.execSQL(CREATE_TAGS_TABLE);
                 db.execSQL(CREATE_MEAD_TAGS_TABLE);
+            case 3:
+                db.execSQL(ALTER_MEAD_TABLE);
                 break;
             default:
                 //log no update applied
