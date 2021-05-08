@@ -707,7 +707,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    List<Mead> getMeads(String orderBy)
+    List<Mead> getMeads(String orderBy, boolean includeArchived)
     {
         List<Mead> model = new ArrayList<>();
 
@@ -719,8 +719,10 @@ public class MeadMateData extends SQLiteOpenHelper {
                 KEY_MEAD_ORIG_GRAV
         };
 
-        //String whereClause = null;
-        //String[] whereArgs = null;
+        String whereClause = KEY_MEAD_ARCHIVED + "=?";
+        String[] whereArgs = new String[] {
+                String.valueOf(includeArchived ? 1 : 0)
+        };
         //String groupBy = null;
         //String having = null;
         //String orderBy = null;
@@ -730,7 +732,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         {
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor c = db.query(TABLE_MEADS, tableColumns, null, null,
+            Cursor c = db.query(TABLE_MEADS, tableColumns, whereClause, whereArgs,
                     null, null, orderBy, null);
 
             if(c.getCount() > 0)

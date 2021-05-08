@@ -50,7 +50,7 @@ public class JavaScriptBridge {
     }*/
 
     @JavascriptInterface
-    public String fetchMeads(String sortBy){
+    public String fetchMeads(String sortBy, boolean includeArchived){
 
         Log.i("JavaScriptBridge", "Fetching mead data.");
 
@@ -91,7 +91,7 @@ public class JavaScriptBridge {
                 orderBy = null;
         }
 
-        List<Mead> meads = data.getMeads(orderBy);
+        List<Mead> meads = data.getMeads(orderBy, includeArchived);
 
         Log.i("JavaScriptBridge", "Fetched " + meads.size() + " records.");
 
