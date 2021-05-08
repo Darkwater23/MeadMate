@@ -760,7 +760,9 @@ function viewEvents(meadId)
         $("#archiveButton").on("tap", { meadId: meadData.id }, function(event) {
             event.preventDefault();
 
-            $.alert('Archive button pressed!');
+            toggleMeadArchiveFlag(event.data.meadId);
+
+            $.mobile.navigate("#my-meads");
         });
 
         // Update link text on archive button to make it clear what clicking it will do
