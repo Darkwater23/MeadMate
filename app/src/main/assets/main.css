@@ -105,3 +105,12 @@ hr
 {
     background-color: #F49F05;
 }
+
+#my-meads-navbar
+{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 36px;
+    width: 100%;
+}

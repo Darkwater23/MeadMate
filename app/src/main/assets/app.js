@@ -105,6 +105,25 @@ $(document).on("pagebeforeshow","#my-meads",function() {
         // Insert mock item for layout testing
         $("#mead-list").empty();
         $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
         $("#mead-list").listview("refresh");
     }
 });
@@ -260,6 +279,17 @@ $("#newMeadButton").on("tap", function(event) {
     $("#meadId").val('');
     $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
 });
+
+$("#toggleArchivedMeadsButton").on("tap", function(event) {
+    var includeArchivedString = localStorage.getItem(archivePrefKeyName) ?? "false";
+
+    var includeArchived = !(includeArchivedString === "true");
+
+    localStorage.setItem(archivePrefKeyName, includeArchived);
+
+    $.mobile.navigate("#my-meads");
+});
+
 
 $("#saveMeadButton").on("tap", function(event){
 
@@ -763,6 +793,8 @@ function viewEvents(meadId)
         });
         $("#archiveButton").on("tap", { meadId: meadData.id }, function(event) {
             event.preventDefault();
+
+            window.Android.logDebug('MainActivity', 'Toggling archive bit for mead ID ' + event.data.meadId);
 
             window.Android.toggleMeadArchiveFlag(event.data.meadId);
 
