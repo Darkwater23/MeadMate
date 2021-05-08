@@ -249,6 +249,18 @@ public class JavaScriptBridge {
     @JavascriptInterface
     public void addMeadTag(String meadId, String tag)
     {
+        if(meadId == null || meadId.isEmpty())
+        {
+            Log.e("JavaScriptBridge", "MeadId is null or empty");
+            return;
+        }
+
+        if(tag == null || tag.isEmpty())
+        {
+            Log.e("JavaScriptBridge", "Tag value is null or empty");
+            return;
+        }
+
         Log.d("JavaScriptBridge", "Adding '" + tag + "' tag to mead " + meadId);
 
         // Create or fetch tag's ID
