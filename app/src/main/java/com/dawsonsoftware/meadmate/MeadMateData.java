@@ -141,7 +141,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         {
             case 1:
                 db.execSQL(ADD_NEW_EVENT_TYPES);
-                // fall thru to next update
             case 2:
                 db.execSQL(CREATE_TAGS_TABLE);
                 db.execSQL(CREATE_MEAD_TAGS_TABLE);
