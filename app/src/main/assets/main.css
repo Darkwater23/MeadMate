@@ -108,9 +108,10 @@ hr
 
 #my-meads-navbar
 {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    height: 36px;
-    width: 100%;
+  width: 100%;
+}
+
+#toggleArchivedMeadsButton
+{
+    border-width: 0;
 }

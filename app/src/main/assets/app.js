@@ -19,8 +19,7 @@ $(function() {
             text : '- select -'
         }));
 
-        // Add database table values
-        // Function returns a JSON string, need to convert it
+        //TODO: Add Android functionality check here
         var eventTypesJson = window.Android.fetchEventTypes();
 
         var eventTypes = JSON.parse(eventTypesJson);
