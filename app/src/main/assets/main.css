@@ -114,4 +114,14 @@ hr
 #toggleArchivedMeadsButton
 {
     border-width: 0;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+
+#toggleArchivedMeadsButton.ui-btn-active {
+    background-color: #F3CD05 /*{a-bup-background-color}*/;
+    border-color: #b5651d /*{a-bup-border}*/;
+    color: #000000 /*{a-bup-color}*/;
+    text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #88888888 /*{a-bup-shadow-color}*/;
 }
