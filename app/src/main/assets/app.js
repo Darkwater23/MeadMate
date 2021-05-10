@@ -19,17 +19,19 @@ $(function() {
             text : '- select -'
         }));
 
-        //TODO: Add Android functionality check here
-        var eventTypesJson = window.Android.fetchEventTypes();
+        if(window.Android)
+        {
+            var eventTypesJson = window.Android.fetchEventTypes();
 
-        var eventTypes = JSON.parse(eventTypesJson);
+            var eventTypes = JSON.parse(eventTypesJson);
 
-        $.each(eventTypes, function (i, item) {
-            $('#newEventType').append($('<option>', {
-                value: item.id,
-                text : item.name
-            }));
-        });
+            $.each(eventTypes, function (i, item) {
+                $('#newEventType').append($('<option>', {
+                    value: item.id,
+                    text : item.name
+                }));
+            });
+        }
     }
 
     var tagJson = window.Android.fetchTags();
