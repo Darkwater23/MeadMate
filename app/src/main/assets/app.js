@@ -31,11 +31,11 @@ $(function() {
                     text : item.name
                 }));
             });
+
+            var tagJson = window.Android.fetchTags();
+            tagList = JSON.parse(tagJson);
         }
     }
-
-    var tagJson = window.Android.fetchTags();
-    tagList = JSON.parse(tagJson);
 
     $("#newEventType").selectmenu();
 });
