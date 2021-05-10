@@ -125,3 +125,9 @@ hr
     color: #000000 /*{a-bup-color}*/;
     text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #88888888 /*{a-bup-shadow-color}*/;
 }
+
+span.archived
+{
+    font-style: italic;
+    color: #444;
+}
