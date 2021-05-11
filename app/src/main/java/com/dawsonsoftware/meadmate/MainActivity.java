@@ -33,10 +33,6 @@ public class MainActivity extends AppCompatActivity {
         // Establish JS to Java method access
         mWebView.addJavascriptInterface(new JavaScriptBridge(this), "Android");
 
-        // REMOTE RESOURCE
-        // mWebView.loadUrl("http://example.com");
-        // mWebView.setWebViewClient(new MyWebViewClient());
-
         // LOCAL RESOURCE
         mWebView.loadUrl("file:///android_asset/index.html");
     }
