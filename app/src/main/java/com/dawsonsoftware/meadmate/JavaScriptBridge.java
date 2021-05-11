@@ -11,21 +11,20 @@ import com.dawsonsoftware.meadmate.models.Reading;
 import com.dawsonsoftware.meadmate.models.Tag;
 import com.google.gson.Gson;
 
-import java.text.ParseException;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
 public class JavaScriptBridge {
-    private Activity activity;
-    private MeadMateData data;
+    private final Activity activity;
+    private final MeadMateData data;
 
     public JavaScriptBridge(Activity activity) {
         this.activity = activity;
         data = new MeadMateData(activity);
     }
 
-    @JavascriptInterface
+    /*@JavascriptInterface
     public void exportData()
     {
         Log.i("JavaScriptBridge", "Exporting app data.");
@@ -33,9 +32,9 @@ public class JavaScriptBridge {
         //TODO: Add method for exporting data
 
         Log.i("JavaScriptBridge", "Export complete!");
-    }
+    }*/
 
-    @JavascriptInterface
+    /*@JavascriptInterface
     public String importData(String filePath)
     {
         Log.i("JavaScriptBridge", "Importing app data.");
@@ -48,10 +47,10 @@ public class JavaScriptBridge {
         Log.i("JavaScriptBridge", "Import complete!");
 
         return result;
-    }
+    }*/
 
     @JavascriptInterface
-    public String fetchMeads(String sortBy){
+    public String fetchMeads(String sortBy, boolean includeArchived){
 
         Log.i("JavaScriptBridge", "Fetching mead data.");
 
@@ -92,7 +91,7 @@ public class JavaScriptBridge {
                 orderBy = null;
         }
 
-        List<Mead> meads = data.getMeads(orderBy);
+        List<Mead> meads = data.getMeads(orderBy, includeArchived);
 
         Log.i("JavaScriptBridge", "Fetched " + meads.size() + " records.");
 
@@ -250,6 +249,18 @@ public class JavaScriptBridge {
     @JavascriptInterface
     public void addMeadTag(String meadId, String tag)
     {
+        if(meadId == null || meadId.isEmpty())
+        {
+            Log.e("JavaScriptBridge", "MeadId is null or empty");
+            return;
+        }
+
+        if(tag == null || tag.isEmpty())
+        {
+            Log.e("JavaScriptBridge", "Tag value is null or empty");
+            return;
+        }
+
         Log.d("JavaScriptBridge", "Adding '" + tag + "' tag to mead " + meadId);
 
         // Create or fetch tag's ID
@@ -277,6 +288,16 @@ public class JavaScriptBridge {
         mead.setOriginalGravity(originalGravity);
 
         data.updateMead(mead);
+    }
+
+    @JavascriptInterface
+    public void toggleMeadArchiveFlag(String meadId)
+    {
+        Log.i("JavaScriptBridge", "Toggling archive flag for mead id: " + meadId);
+
+        Mead mead = data.getMead(parseInt(meadId));
+
+        data.setMeadArchiveFlag(mead.getId(), !mead.getArchived());
     }
 
     @JavascriptInterface
@@ -370,6 +391,33 @@ public class JavaScriptBridge {
         Log.i("JavaScriptBridge", "Deleting event by id: " + id);
 
         data.deleteEvent(parseInt(id));
+    }
+
+    @JavascriptInterface
+    public void splitMead(String meadId, String splitCount, boolean deleteOriginal)
+    {
+        try
+        {
+            Log.d("splitMead", "Mead ID: " + meadId);
+            Log.d("splitMead", "Count: " + splitCount);
+            Log.d("splitMead", "Delete Original: " + deleteOriginal);
+
+            int meadRecordId = parseInt(meadId);
+            int count = parseInt(splitCount);
+            boolean canBeDeleted = deleteOriginal;
+
+            // Minor validation
+            if(count < 2)
+            {
+                return; // this shouldn't happen, but covering the base
+            }
+
+            data.splitMead(meadRecordId, count, canBeDeleted);
+        }
+        catch(Exception ex)
+        {
+            Log.e("splitMead", ex.toString());
+        }
     }
 
     @JavascriptInterface

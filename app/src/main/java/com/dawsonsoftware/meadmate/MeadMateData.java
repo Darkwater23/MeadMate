@@ -18,7 +18,7 @@ import java.util.List;
 
 public class MeadMateData extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
     private static final String DB_NAME = "appdata";
 
     // Meads table fields
@@ -28,6 +28,7 @@ public class MeadMateData extends SQLiteOpenHelper {
     private static final String KEY_MEAD_START_DATE = "START_DATE";
     private static final String KEY_MEAD_DESC = "DESCRIPTION";
     private static final String KEY_MEAD_ORIG_GRAV = "ORIGINAL_GRAVITY";
+    private static final String KEY_MEAD_ARCHIVED = "ARCHIVED";
 
     // Mead Events table fields
     private static final String TABLE_EVENTS = "EVENTS";
@@ -66,7 +67,8 @@ public class MeadMateData extends SQLiteOpenHelper {
             KEY_MEAD_NAME + " TEXT NOT NULL," +
             KEY_MEAD_START_DATE + " TEXT NOT NULL," +
             KEY_MEAD_DESC + " TEXT," +
-            KEY_MEAD_ORIG_GRAV + " TEXT NOT NULL DEFAULT 0.0)";
+            KEY_MEAD_ORIG_GRAV + " TEXT NOT NULL DEFAULT 0.0," +
+            KEY_MEAD_ARCHIVED + " INTEGER NOT NULL DEFAULT 0)";
 
     String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + " (" +
             KEY_EVENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
@@ -110,6 +112,9 @@ public class MeadMateData extends SQLiteOpenHelper {
             KEY_MEAD_TAGS_MEAD_ID + " INTEGER NOT NULL," +
             KEY_MEAD_TAGS_TAG_ID + " INTEGER NOT NULL)";
 
+    String ALTER_MEAD_TABLE = "ALTER TABLE " + TABLE_MEADS +
+            " ADD COLUMN " + KEY_MEAD_ARCHIVED + " INTEGER NOT NULL DEFAULT 0";
+
     public MeadMateData(Context context){
         super(context,DB_NAME, null, DB_VERSION);
     }
@@ -136,10 +141,11 @@ public class MeadMateData extends SQLiteOpenHelper {
         {
             case 1:
                 db.execSQL(ADD_NEW_EVENT_TYPES);
-                // fall thru to next update
             case 2:
                 db.execSQL(CREATE_TAGS_TABLE);
                 db.execSQL(CREATE_MEAD_TAGS_TABLE);
+            case 3:
+                db.execSQL(ALTER_MEAD_TABLE);
                 break;
             default:
                 //log no update applied
@@ -148,10 +154,15 @@ public class MeadMateData extends SQLiteOpenHelper {
     }
 
     // **** CRUD (Create, Read, Update, Delete) Operations ***** //
-    Integer addMead(Mead mead) {
+    int addMead(Mead mead) {
 
         try
         {
+            if(mead == null)
+            {
+                throw new IllegalArgumentException("Mead object cannot be null");
+            }
+
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
@@ -159,12 +170,13 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_MEAD_START_DATE, mead.getStartDate());
             values.put(KEY_MEAD_DESC, mead.getDescription());
             values.put(KEY_MEAD_ORIG_GRAV, mead.getOriginalGravity());
+            values.put(KEY_MEAD_ARCHIVED, (mead.getArchived() ? 1 : 0));
 
             // Inserting Row
             db.insert(TABLE_MEADS, null, values);
 
             // Query for new mead ID
-            Integer meadId = 0;
+            int meadId = 0;
             Cursor c = db.rawQuery ("SELECT LAST_INSERT_ROWID()", null);
 
             if(c.getCount() > 0)
@@ -174,7 +186,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 meadId = c.getInt(0);
             }
 
-            db.close(); // Closing database connection
+            c.close();
 
             return meadId;
         }
@@ -197,13 +209,12 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_MEAD_START_DATE, mead.getStartDate());
             values.put(KEY_MEAD_DESC, mead.getDescription());
             values.put(KEY_MEAD_ORIG_GRAV, mead.getOriginalGravity());
+            values.put(KEY_MEAD_ARCHIVED, (mead.getArchived() ? 1 : 0));
 
             String whereClause = KEY_MEAD_ID + " = ?";
 
             // Update row
             db.update(TABLE_MEADS, values, whereClause, new String[]{ mead.getId().toString() });
-
-            db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
@@ -222,10 +233,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_READINGS_DATE, reading.getDate());
             values.put(KEY_READINGS_GRAV, reading.getSpecificGravity());
 
-            // Inserting Row
             db.insert(TABLE_READINGS, null, values);
-
-            db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
@@ -245,10 +253,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_EVENT_TYPEID, event.getTypeId());
             values.put(KEY_EVENT_DESC, event.getDescription());
 
-            // Inserting Row
             db.insert(TABLE_EVENTS, null, values);
-
-            db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
@@ -269,10 +274,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
             String whereClause = KEY_EVENT_ID + " = ?";
 
-            // Update row
             db.update(TABLE_EVENTS, values, whereClause, new String[]{ event.getId().toString() });
-
-            db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
@@ -280,27 +282,87 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
-    void deleteMead(Mead mead)
+    //void deleteMead(Mead mead)
+    //{
+    //    if(mead != null)
+    //    {
+    //        deleteMead(mead.getId());
+    //    }
+    //}
+
+    void archiveMead(int meadId)
     {
-        deleteMead(mead.getId());
+        setMeadArchiveFlag(meadId, true);
+    }
+
+    void unarchiveMead(int meadId)
+    {
+        setMeadArchiveFlag(meadId, false);
+    }
+
+    void setMeadArchiveFlag(int meadId, boolean shouldArchive)
+    {
+        int flag = (shouldArchive ? 1 : 0);
+
+        setMeadArchiveFlag(meadId, flag);
+    }
+
+    void setMeadArchiveFlag(int meadId, int archiveBit)
+    {
+        try
+        {
+            if(archiveBit > 1 || archiveBit < 0)
+            {
+                throw new IllegalArgumentException("archiveBit value out of range");
+            }
+
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_MEAD_ARCHIVED, archiveBit);
+
+            String whereClause = KEY_MEAD_ID + " = ?";
+
+            db.update(TABLE_MEADS, values, whereClause, new String[]{ String.valueOf(meadId) });
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
     }
 
     void deleteMead(int meadId)
     {
-        String whereClause = "_ID=?";
+        String whereClause = KEY_MEAD_ID + "=?";
+        String meadTagsWhereClause = KEY_MEAD_TAGS_MEAD_ID + "=?";
         String[] whereArgs = new String[] { String.valueOf(meadId) };
+
+        SQLiteDatabase db = null;
 
         try
         {
-            SQLiteDatabase db = this.getWritableDatabase();
+            db = this.getWritableDatabase();
 
+            db.beginTransaction();
+
+            Log.i(MeadMateData.class.getTypeName(),"Deleting mead record " + meadId);
             db.delete(TABLE_MEADS, whereClause, whereArgs);
 
-            db.close();
+            Log.i(MeadMateData.class.getTypeName(),"Deleting mead tag records for mead ID " + meadId);
+            db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, whereArgs);
+
+            db.setTransactionSuccessful();
         }
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+        finally
+        {
+            if(db != null)
+            {
+                db.endTransaction();
+            }
         }
     }
 
@@ -314,8 +376,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
 
             db.delete(TABLE_READINGS, whereClause, whereArgs);
-
-            db.close();
         }
         catch(Exception ex)
         {
@@ -333,8 +393,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
 
             db.delete(TABLE_EVENTS, whereClause, whereArgs);
-
-            db.close();
         }
         catch(Exception ex)
         {
@@ -344,7 +402,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     int addTag(String name) {
 
-        int tagId = 0;
+        int tagId;
 
         try
         {
@@ -385,7 +443,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 tagId = (int)db.insert(TABLE_TAGS, null, values);
             }
 
-            db.close(); // Closing database connection
+            c.close();
         }
         catch(Exception ex)
         {
@@ -397,7 +455,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return tagId;
     }
 
-    List<Tag> getMeadTags(Integer meadId)
+    List<Tag> getMeadTags(int meadId)
     {
         List<Tag> model = new ArrayList<>();
 
@@ -412,7 +470,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         {
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor c = db.rawQuery(query, new String[] { meadId.toString() });
+            Cursor c = db.rawQuery(query, new String[] { String.valueOf(meadId) });
 
             if(c.getCount() > 0)
             {
@@ -430,7 +488,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 }while(c.moveToNext());
             }
 
-            db.close();
+            c.close();
         }
         catch(Exception ex)
         {
@@ -453,7 +511,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         //String[] whereArgs = null;
         //String groupBy = null;
         //String having = null;
-        String orderBy = KEY_TAGS_NAME;
+        //String orderBy = KEY_TAGS_NAME;
         //String limit = null;
 
         try
@@ -461,7 +519,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getReadableDatabase();
 
             Cursor c = db.query(TABLE_TAGS, tableColumns, null, null,
-                    null, null, orderBy, null);
+                    null, null, KEY_TAGS_NAME, null);
 
             if(c.getCount() > 0)
             {
@@ -479,7 +537,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 }while(c.moveToNext());
             }
 
-            db.close();
+            c.close();
         }
         catch(Exception ex)
         {
@@ -489,7 +547,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    void deleteTag(int tagId)
+    /*void deleteTag(int tagId)
     {
         String meadTagsWhereClause = KEY_MEAD_TAGS_TAG_ID + "=?";
         String[] meadTagsWhereArgs = new String[] { String.valueOf(tagId) };
@@ -515,9 +573,8 @@ public class MeadMateData extends SQLiteOpenHelper {
         finally
         {
             db.endTransaction();
-            db.close();
         }
-    }
+    }*/
 
     void addMeadTag(int meadId, int tagId)
     {
@@ -529,10 +586,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_MEAD_TAGS_MEAD_ID, meadId);
             values.put(KEY_MEAD_TAGS_TAG_ID, tagId);
 
-            // Inserting Row
             db.insert(TABLE_MEAD_TAGS, null, values);
-
-            db.close(); // Closing database connection
         }
         catch(Exception ex)
         {
@@ -540,7 +594,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
-    void deleteMeadTag(int meadTagId)
+    /*void deleteMeadTag(int meadTagId)
     {
         String meadTagsWhereClause = KEY_MEAD_TAGS_ID + "=?";
         String[] meadTagsWhereArgs = new String[] { String.valueOf(meadTagId) };
@@ -550,14 +604,12 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
 
             db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, meadTagsWhereArgs);
-
-            db.close();
         }
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
         }
-    }
+    }*/
 
     public void deleteMeadTag(int meadId, String tagName)
     {
@@ -592,7 +644,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
             db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, meadTagsWhereArgs);
 
-            db.close();
+            c.close();
         }
         catch(Exception ex)
         {
@@ -609,7 +661,8 @@ public class MeadMateData extends SQLiteOpenHelper {
                 KEY_MEAD_NAME,
                 KEY_MEAD_START_DATE,
                 KEY_MEAD_DESC,
-                KEY_MEAD_ORIG_GRAV
+                KEY_MEAD_ORIG_GRAV,
+                KEY_MEAD_ARCHIVED
         };
 
         String whereClause = KEY_MEAD_ID + " = ?";
@@ -641,11 +694,10 @@ public class MeadMateData extends SQLiteOpenHelper {
                 model.setStartDate(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE)));
                 model.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
                 model.setOriginalGravity(c.getString(c.getColumnIndex(KEY_MEAD_ORIG_GRAV)));
+                model.setArchived(c.getInt(c.getColumnIndex(KEY_MEAD_ARCHIVED)) == 1);
             }
 
             c.close();
-
-            db.close();
         }
         catch (Exception ex)
         {
@@ -655,30 +707,26 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    List<Mead> getMeads(String orderBy)
+    List<Mead> getMeads(String orderBy, boolean includeArchived)
     {
-        List<Mead> model = new ArrayList<Mead>();
+        List<Mead> model = new ArrayList<>();
 
         String[] tableColumns = new String[] {
                 KEY_MEAD_ID,
                 KEY_MEAD_NAME,
                 KEY_MEAD_START_DATE,
                 KEY_MEAD_DESC,
-                KEY_MEAD_ORIG_GRAV
+                KEY_MEAD_ORIG_GRAV,
+                KEY_MEAD_ARCHIVED
         };
 
-        //String whereClause = null;
-        //String[] whereArgs = null;
-        //String groupBy = null;
-        //String having = null;
-        //String orderBy = null;
-        //String limit = null;
+        String whereClause = includeArchived ? null : KEY_MEAD_ARCHIVED + "=0";
 
         try
         {
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor c = db.query(TABLE_MEADS, tableColumns, null, null,
+            Cursor c = db.query(TABLE_MEADS, tableColumns, whereClause, null,
                     null, null, orderBy, null);
 
             if(c.getCount() > 0)
@@ -694,13 +742,14 @@ public class MeadMateData extends SQLiteOpenHelper {
                     mead.setStartDate(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE)));
                     mead.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
                     mead.setOriginalGravity(c.getString(c.getColumnIndex(KEY_MEAD_ORIG_GRAV)));
+                    mead.setArchived(c.getInt(c.getColumnIndex(KEY_MEAD_ARCHIVED)) == 1);
 
                     model.add(mead);
 
                 }while(c.moveToNext());
             }
 
-            db.close();
+            c.close();
         }
         catch(Exception ex)
         {
@@ -710,9 +759,9 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    List<Reading> getReadings(Integer meadId)
+    List<Reading> getReadings(int meadId)
     {
-        List<Reading> model = new ArrayList<Reading>();
+        List<Reading> model = new ArrayList<>();
 
         String[] tableColumns = new String[] {
                 KEY_READINGS_ID,
@@ -757,7 +806,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 }while(c.moveToNext());
             }
 
-            db.close();
+            c.close();
         }
         catch(Exception ex)
         {
@@ -767,7 +816,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    List<Event> getEvents(Integer meadId)
+    List<Event> getEvents(int meadId)
     {
         List<Event> model = new ArrayList<>();
 
@@ -782,7 +831,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         {
             SQLiteDatabase db = this.getReadableDatabase();
 
-            Cursor c = db.rawQuery(query, new String[] { meadId.toString() });
+            Cursor c = db.rawQuery(query, new String[] { String.valueOf(meadId) });
 
             if(c.getCount() > 0)
             {
@@ -804,7 +853,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 }while(c.moveToNext());
             }
 
-            db.close();
+            c.close();
         }
         catch(Exception ex)
         {
@@ -814,7 +863,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    Event getEvent(Integer eventId)
+    Event getEvent(int eventId)
     {
         Event model = new Event();
 
@@ -854,7 +903,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 model.setDate(c.getString(c.getColumnIndex(KEY_EVENT_DATE)));
             }
 
-            db.close();
+            c.close();
         }
         catch(Exception ex)
         {
@@ -864,7 +913,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    String getEventDescription(Integer id)
+    String getEventDescription(int id)
     {
         String eventDescription = "";
 
@@ -897,7 +946,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 eventDescription = c.getString(c.getColumnIndex(KEY_EVENT_DESC));
             }
 
-            db.close();
+            c.close();
         }
         catch(Exception ex)
         {
@@ -944,7 +993,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 }while(c.moveToNext());
             }
 
-            db.close();
+            c.close();
         }
         catch(Exception ex)
         {
@@ -952,5 +1001,91 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
 
         return model;
+    }
+
+    public void splitMead(int meadId, int count, boolean canBeDeleted)
+    {
+        Log.d(MeadMateData.class.getTypeName(), "Mead ID: " + meadId);
+        Log.d(MeadMateData.class.getTypeName(), "Count: " + count);
+        Log.d(MeadMateData.class.getTypeName(), "CanBeDeleted: " + canBeDeleted);
+
+        Mead mead;
+        List<Event> meadEvents;
+        List<Reading> meadReadings;
+        List<Tag> meadTags;
+
+        SQLiteDatabase db = null;
+
+        try
+        {
+            db = this.getWritableDatabase();
+
+            db.beginTransaction();
+
+            mead = getMead(meadId);
+
+            if(mead == null)
+            {
+                throw new NullPointerException("Mead record is null. SplitMead cannot continue.");
+            }
+
+            // Gather related events
+            meadEvents = getEvents(meadId);
+            meadReadings = getReadings(meadId);
+            meadTags = getMeadTags(meadId);
+
+            // Create x mead records
+            for (int i = 0; i < count; i++)
+            {
+                String suffix = " #" + (i+1);
+                
+                Mead clone = new Mead();
+                clone.setName(mead.getName() + suffix);
+                clone.setDescription(mead.getDescription());
+                clone.setOriginalGravity(mead.getOriginalGravity());
+                clone.setStartDate(mead.getStartDate());
+                clone.setArchived(false); // Doesn't make sense to archive a fresh split
+                
+                int cloneId = addMead(clone);
+
+                for (Event event : meadEvents)
+                {
+                    // override event's mead ID and save record
+                    event.setMeadId(cloneId);
+                    addEvent(event);
+                }
+
+                for (Reading reading : meadReadings)
+                {
+                    // override reading's mead ID and save record
+                    reading.setMeadId(cloneId);
+                    addReading(reading);
+                }
+
+                for (Tag tag : meadTags)
+                {
+                    addMeadTag(cloneId, tag.getId());
+                }
+            }
+
+            if(canBeDeleted)
+            {
+                deleteMead(meadId);
+            }
+
+            // Commit transaction
+            db.setTransactionSuccessful();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+        finally
+        {
+            if(db != null)
+            {
+                db.endTransaction();
+            }
+        }
     }
 }

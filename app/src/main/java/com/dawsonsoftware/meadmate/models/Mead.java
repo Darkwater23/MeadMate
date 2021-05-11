@@ -4,17 +4,18 @@ import java.util.Date;
 
 public class Mead {
 
-    private Integer id;
+    private int id;
     private String name;
     private String startDate;
     private String description;
     private String originalGravity;
+    private boolean archived;
 
     public Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -43,4 +44,8 @@ public class Mead {
     }
 
     public void setOriginalGravity(String originalGravity) { this.originalGravity = originalGravity; }
+
+    public boolean getArchived() { return archived; }
+
+    public void setArchived(boolean archived) { this.archived = archived; }
 }

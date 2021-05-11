@@ -1,6 +1,7 @@
 const abvPrefKeyName = 'ABVPREF';
 const sortPrefKeyName = 'SORTPREF';
 const specificGravityRange = [0.980, 1.160];
+const archivePrefKeyName = 'INCLUDE_ARCHIVED';
 
 // One-time code executions
 var tagList;
@@ -18,22 +19,23 @@ $(function() {
             text : '- select -'
         }));
 
-        // Add database table values
-        // Function returns a JSON string, need to convert it
-        var eventTypesJson = window.Android.fetchEventTypes();
+        if(window.Android)
+        {
+            var eventTypesJson = window.Android.fetchEventTypes();
 
-        var eventTypes = JSON.parse(eventTypesJson);
+            var eventTypes = JSON.parse(eventTypesJson);
 
-        $.each(eventTypes, function (i, item) {
-            $('#newEventType').append($('<option>', {
-                value: item.id,
-                text : item.name
-            }));
-        });
+            $.each(eventTypes, function (i, item) {
+                $('#newEventType').append($('<option>', {
+                    value: item.id,
+                    text : item.name
+                }));
+            });
+
+            var tagJson = window.Android.fetchTags();
+            tagList = JSON.parse(tagJson);
+        }
     }
-
-    var tagJson = window.Android.fetchTags();
-    tagList = JSON.parse(tagJson);
 
     $("#newEventType").selectmenu();
 });
@@ -70,39 +72,8 @@ $(document).on("pagebeforeshow","#abv", function(){
 
 $(document).on("pagebeforeshow","#my-meads",function() {
 
-    if(window.Android)
-    {
-        window.Android.logInfo('MainActivity','JS Bridge available. Starting data fetch for mead list.');
+    loadMyMeadsListView();
 
-        // Retrieve user preference
-        var sortPref = localStorage.getItem(sortPrefKeyName) ?? 'byId';
-
-        // Clear list
-        $("#mead-list").empty();
-
-        // Fetch data from database
-        var meadsJson = window.Android.fetchMeads(sortPref);
-        var meadsData = JSON.parse(meadsJson);
-
-        window.Android.logDebug('MainActivity', 'Fetched JSON: ' + meadsJson);
-
-        // Append to list
-        for (var i = 0; i < meadsData.length; i++) {
-
-            $("#mead-list").append('<li><a href="javascript:viewMead(' + meadsData[i].id + ');" data-ajax="false">' + meadsData[i].name + '</a></li>');
-        }
-
-        $("#mead-list").listview("refresh");
-
-        window.Android.logInfo('MainActivity','Mead list loaded and refreshed.');
-    }
-    else
-    {
-        // Insert mock item for layout testing
-        $("#mead-list").empty();
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").listview("refresh");
-    }
 });
 
 $(document).on("pagebeforeshow","#mead-view",function() { });
@@ -257,6 +228,16 @@ $("#newMeadButton").on("tap", function(event) {
     $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
 });
 
+$("#toggleArchivedMeadsButton").on("tap", function(event) {
+    var includeArchivedString = localStorage.getItem(archivePrefKeyName) ?? "false";
+
+    var includeArchived = !(includeArchivedString === "true");
+
+    localStorage.setItem(archivePrefKeyName, includeArchived);
+
+    loadMyMeadsListView();
+});
+
 $("#saveMeadButton").on("tap", function(event){
 
 event.preventDefault();
@@ -403,6 +384,72 @@ $("#sort-pref").change(function() {
 });
 
 // Custom app functions
+function loadMyMeadsListView()
+{
+    if(window.Android)
+    {
+        window.Android.logInfo('MainActivity','JS Bridge available. Starting data fetch for mead list.');
+
+        // Retrieve user preference
+        var sortPref = localStorage.getItem(sortPrefKeyName) ?? 'byId';
+        var includeArchivedString = localStorage.getItem(archivePrefKeyName) ?? "false";
+
+        var includeArchived = includeArchivedString === "true";
+
+        // Clear list
+        $("#mead-list").empty();
+
+        // Fetch data from database
+        var meadsJson = window.Android.fetchMeads(sortPref, includeArchived);
+        var meadsData = JSON.parse(meadsJson);
+
+        window.Android.logDebug('MainActivity', 'Fetched JSON: ' + meadsJson);
+
+        // Append to list
+        for (var i = 0; i < meadsData.length; i++) {
+
+            var meadName = meadsData[i].name;
+
+            if(meadsData[i].archived)
+            {
+                meadName = '<span class="archived">' + meadName + '</span>';
+            }
+
+            $("#mead-list").append('<li><a href="javascript:viewMead(' + meadsData[i].id + ');" data-ajax="false">' + meadName + '</a></li>');
+        }
+
+        $("#mead-list").listview("refresh");
+
+        window.Android.logInfo('MainActivity','Mead list loaded and refreshed.');
+    }
+    else
+    {
+        // Insert mock item for layout testing
+        $("#mead-list").empty();
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false"><span class="archived">My First Mead</span></a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
+        $("#mead-list").listview("refresh");
+    }
+}
+
 
  function viewReadings(meadId)
  {
@@ -663,6 +710,8 @@ function viewEvents(meadId)
         $("#eventsButton").off("tap"); // clear existing event handlers
         $("#editMeadButton").off("tap"); // clear existing event handlers
         $("#tagsButton").off("tap"); //clear existing event handlers
+        $("#splitButton").off("tap"); //clear existing event handlers
+        $("#archiveButton").off("tap"); //clear existing event handlers
         $("#mead-tags").off("taphold"); //clear existing event handlers
 
         $("#deleteMeadButton").on("tap", { value: id }, function(event) {
@@ -708,7 +757,6 @@ function viewEvents(meadId)
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
         });
-
         $("#tagsButton").on("tap", { meadId: meadData.id }, function(event) {
 
             event.preventDefault();
@@ -729,6 +777,52 @@ function viewEvents(meadId)
                 }
             });
         });
+        $("#splitButton").on("tap", { meadId: meadData.id }, function(event) {
+
+            event.preventDefault();
+
+            $.confirm({
+                title: 'Split Mead Batch',
+                content: '<label for="splitCount">Split into how many batches? (2 to 20)</label><br>' +
+                        '<input id="splitMeadId" name="splitMeadId" type="hidden" value="' + event.data.meadId + '">' +
+                        '<input type="number" id="splitCount" name="splitCount" min="2" max="20"><br><br>' +
+                        '<label for="splitDeleteOriginal">Delete Original Mead Record?</label>' +
+                        '<input type="checkbox" id="splitDeleteOriginal" name="splitDeleteOriginal" checked> Delete Original' +
+                        '<p id="splitDescription">Deleting the original record is recommended, but can be skipped and done later, if desired.</p>',
+                buttons: {
+                    save: function () {
+                        var meadId = $("#splitMeadId").val();
+                        var splitCount = $("#splitCount").val();
+                        var deleteOriginal = $("#splitDeleteOriginal").is(':checked')
+                        window.Android.splitMead(meadId, splitCount, deleteOriginal);
+
+                        $.mobile.navigate("#my-meads");
+                    },
+                    cancel: function () {
+                        // do nothing
+                    }
+                }
+            });
+        });
+        $("#archiveButton").on("tap", { meadId: meadData.id }, function(event) {
+            event.preventDefault();
+
+            window.Android.logDebug('MainActivity', 'Toggling archive bit for mead ID ' + event.data.meadId);
+
+            window.Android.toggleMeadArchiveFlag(event.data.meadId);
+
+            $.mobile.navigate("#my-meads");
+        });
+
+        // Update link text on archive button to make it clear what clicking it will do
+        if(meadData.archived)
+        {
+            $("#archiveButton").text("Unhide Mead");
+        }
+        else
+        {
+            $("#archiveButton").text("Hide Mead");
+        }
 
         $("#mead-tags").on("taphold", "span", function(event)
             {
@@ -951,11 +1045,14 @@ function daysSince(date)
 
 function displayTag(tag)
 {
-    $("#mead-tags span:contains(" + tag + ")").length;
-
-    if(length === 0)
+    if(tag)
     {
-        $("#mead-tags").append("<span>" + $.trim(tag) + "</span>");
+        $("#mead-tags span:contains(" + tag + ")").length;
+
+        if(length === 0)
+        {
+            $("#mead-tags").append("<span>" + $.trim(tag) + "</span>");
+        }
     }
 }
 

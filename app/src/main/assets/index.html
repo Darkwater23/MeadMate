@@ -21,7 +21,7 @@
 	<div data-role="header" data-position="fixed">
 		<h1>Mead Mate</h1>
 	</div>
-	<div data-role="content">
+	<div role="main" class="ui-content">
 		<ul id="mainMenu" data-role="listview">
 			<li><a href="#my-meads">My Meads</a></li>
 			<li><a href="#abv">ABV Calculator</a></li>
@@ -37,7 +37,12 @@
 		<h1>Mead Mate</h1>
 		<a id="newMeadButton" href="#new-mead" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
-	<div data-role="content">
+	<div id="my-meads-navbar" data-role="navbar">
+		<ul>
+			<li><a id="toggleArchivedMeadsButton" href="#my-meads" class="ui-btn ui-btn-inline ui-mini">Show / Hide Archived</a></li>
+		</ul>
+	</div>
+	<div role="main" class="ui-content">
 		<ul id="mead-list" data-role="listview">
 		</ul>
 	</div>
@@ -48,7 +53,7 @@
 		<h1>Mead Mate</h1>
 		<a id="newEventButton" href="#new-event" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
-	<div data-role="content">
+	<div role="main" class="ui-content">
 		<h2 class="content-title">Events</h2>
 		<h3	id="events-mead-name"></h3>
 		<table id="events-list">
@@ -68,7 +73,7 @@
 	<div data-role="header" data-position="fixed" data-add-back-btn="true">
 		<h1>Mead Mate</h1>
 	</div>
-	<div data-role="content">
+	<div role="main" class="ui-content">
 		<h2 id="new-event-content-title" class="content-title">New Event</h2>
 		<p id="new-event-savemsg"></p>
 		<form id="new-event-form">
@@ -98,7 +103,7 @@
 		<h1>Mead Mate</h1>
 		<a id="newReadingButton" href="#new-reading" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
-	<div data-role="content">
+	<div role="main" class="ui-content">
 		<h2 class="content-title">Readings</h2>
 		<h3	id="readings-mead-name"></h3>
 		<table id="reading-list">
@@ -119,7 +124,7 @@
 	<div data-role="header" data-position="fixed" data-add-back-btn="true">
 		<h1>Mead Mate</h1>
 	</div>
-	<div data-role="content">
+	<div role="main" class="ui-content">
 		<h2 class="content-title">New Reading</h2>
 		<p id="new-reading-savemsg"></p>
 		<form id="new-reading-form">
@@ -143,7 +148,7 @@
 		<h1>Mead Mate</h1>
 		<a href="#mead-menu" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-bars" id="meadMenuButton">Menu</a>
 	</div>
-	<div data-role="content">
+	<div role="main" class="ui-content">
 		<h2 id="mead-name" class="content-title"></h2>
 		<dl>
 			<dt>Start Date</dt>
@@ -163,7 +168,9 @@
 			<li><a id="editMeadButton" href="#new-mead" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
 			<li><a id="eventsButton" href="#events" class="ui-btn ui-icon-calendar ui-btn-icon-left">Events</a></li>
 			<li><a id="readingsButton" href="#readings" class="ui-btn ui-icon-plus ui-btn-icon-left">Readings</a></li>
-			<li><a id="tagsButton" href="#mead-view" class="ui-btn ui-icon-cloud ui-btn-icon-left">Tags</a></li>
+			<li><a id="tagsButton" href="#mead-view" class="ui-btn ui-icon-tag ui-btn-icon-left">Tags</a></li>
+			<li><a id="splitButton" href="#my-meads" class="ui-btn ui-icon-grid ui-btn-icon-left">Split Batch</a></li>
+			<li><a id="archiveButton" href="#my-meads" class="ui-btn ui-icon-eye ui-btn-icon-left">Show/Hide Mead</a></li>
 			<li><a id="deleteMeadButton" href="#my-meads" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
 			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
@@ -174,7 +181,7 @@
 	<div data-role="header" data-position="fixed" data-add-back-btn="true">
 		<h1>Mead Mate</h1>
 	</div>
-	<div data-role="content">
+	<div role="main" class="ui-content">
 		<h2 id="new-mead-content-title" class="content-title">Add New Mead</h2>
 		<form id="new-mead-form">
 			<ul id="messageList"></ul>
@@ -201,7 +208,7 @@
 		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
 	</div>
-	<div data-role="content">
+	<div role="main" class="ui-content">
 		<h2 class="content-title">Calculate ABV</h2>
 		<p>Alcohol by volume (abbreviated as ABV, abv, or alc/vol) is a standard measure of how much alcohol (ethanol) is contained in a given volume of an alcoholic beverage (expressed as a volume percent).</p>
 		<p>Set your preferred formula under 'Preferences' on the Main Menu.</p>
@@ -229,7 +236,7 @@
 		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
 	</div>
-	<div data-role="content">
+	<div role="main" class="ui-content">
 		<h2 class="content-title">Types of Mead</h2>
 		<p>Traditional mead is a relatively simple alcoholic beverage made from honey, water and yeast. There are numerous named variations of mead from all over the world. Here's a partial list of the various kinds of mead:</p>
 		<dl>
@@ -280,7 +287,7 @@
 		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
 	</div>
-	<div data-role="content">
+	<div role="main" class="ui-content">
 		<h2 class="content-title">Preferences</h2>
 		<h3>ABV Formula</h3>
 		<p>Mead Mate supports three common Alcohol By Volume (ABV) formulas. The Standard formula is the default.</p>
