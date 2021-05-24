@@ -35,7 +35,7 @@ import java.util.List;
 
 public class MeadMateData extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
     private static final String DB_NAME = "appdata";
 
     // Meads table fields
@@ -107,12 +107,17 @@ public class MeadMateData extends SQLiteOpenHelper {
             "(5,\"Discarded\")," +
             "(6,\"Tasting\")," +
             "(7,\"Backsweetened\")," +
-            "(8,\"Note\")";
+            "(8,\"Note\")," +
+            "(9,\"Conditioning\")";
 
     String ADD_NEW_EVENT_TYPES = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
             "(7,\"Backsweetened\")," +
             "(8,\"Note\")";
+
+    String ADD_NEW_EVENT_TYPE_REL6 = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
+            KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
+            "(9,\"Conditioning\")";
 
     String CREATE_READINGS_TABLE = "CREATE TABLE " + TABLE_READINGS + " (" +
             KEY_READINGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
@@ -163,6 +168,8 @@ public class MeadMateData extends SQLiteOpenHelper {
                 db.execSQL(CREATE_MEAD_TAGS_TABLE);
             case 3:
                 db.execSQL(ALTER_MEAD_TABLE);
+            case 4:
+                db.execSQL(ADD_NEW_EVENT_TYPE_REL6);
                 break;
             default:
                 //log no update applied
@@ -992,7 +999,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getReadableDatabase();
 
             Cursor c = db.query(TABLE_EVENT_TYPES, tableColumns, null, null,
-                    null, null, null, null);
+                    null, null, KEY_EVENT_TYPE_NAME, null);
 
             if(c.getCount() > 0)
             {
