@@ -787,6 +787,7 @@ function viewEvents(meadId)
                         var tag = $("#newTag").val();
                         window.Android.addMeadTag(meadId, tag);
                         displayTag(tag); // Update DOM so we don't have to re-fetch data
+                        displayTagTip();
                     },
                     cancel: function () {
                         // do nothing
@@ -1083,6 +1084,11 @@ function displayMeadTags(tagData)
             displayTag(item.name);
         });
     }
+}
+
+function displayTagTip()
+{
+    $("#tag-tip").show().delay(10000).fadeOut();
 }
 
 function getPreferredAbvValue(result)
