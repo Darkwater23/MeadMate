@@ -69,6 +69,10 @@ $(document).on("pagebeforeshow","#abv", function(){
             $("#abvFormulaPref").html("Currently using <strong>Standard</strong> formula.");
             window.Android.logDebug('abvShow',"avbPref detected as 'std'.");
             break;
+        case 'highstd':
+            $("#abvFormulaPref").html("Currently using <strong>High Standard</strong> formula.");
+            window.Android.logDebug('abvShow',"avbPref detected as 'highstd'.");
+            break;
         case 'alt':
             $("#abvFormulaPref").html("Currently using <strong>Alternate</strong> formula.");
             window.Android.logDebug('calcButton',"avbPref detected as 'alt'.");
@@ -914,6 +918,7 @@ function calculateAbv(initialGravity, subsequentGravity)
     var results = new Object();
 
     results.standard = '-.--%';
+    results.highstandard = '-.--%';
     results.alternate = '-.--%';
     results.wine = '-.--%';
 
@@ -930,10 +935,12 @@ function calculateAbv(initialGravity, subsequentGravity)
     }
 
     var std = calculateAbvStandard(initialGravity, subsequentGravity);
+    var highstd = calculateAbvHighStandard(initialGravity, subsequentGravity);
     var alt = calculateAbvAlternate(initialGravity, subsequentGravity);
     var wine = calculateAbvWine(initialGravity, subsequentGravity);
 
     results.standard = std.toFixed(2) + '%';
+    results.highstandard = highstd.toFixed(2) + '%';
     results.alternate = alt.toFixed(2) + '%';
     results.wine = wine.toFixed(2) + '%';
 
@@ -954,6 +961,25 @@ function calculateAbvStandard(initialGravity, subsequentGravity)
     catch(error)
     {
         window.Android.logError('CalcAbvStd', error);
+
+        return new Decimal('0'); // Make sure the toFixed(2) method fires correctly.
+    }
+}
+
+function calculateAbvHighStandard(initialGravity, subsequentGravity)
+{
+    try
+    {
+        // ABV = (ig - sg) * 135
+        var ig = new Decimal(initialGravity);
+        var sg = new Decimal(subsequentGravity);
+        var c1 = new Decimal('135');
+
+        return ig.minus(sg).times(c1);
+    }
+    catch(error)
+    {
+        window.Android.logError('CalcAbvHighStd', error);
 
         return new Decimal('0'); // Make sure the toFixed(2) method fires correctly.
     }
@@ -1103,6 +1129,10 @@ function getPreferredAbvValue(result)
         case 'std':
             value = result.standard;
             window.Android.logDebug('getPreferredAbvValue',"avbPref detected as 'std'.");
+            break;
+        case 'highstd':
+            value = result.highstandard;
+            window.Android.logDebug('getPreferredAbvValue',"avbPref detected as 'highstd'.");
             break;
         case 'alt':
             value = result.alternate;
