@@ -816,7 +816,7 @@ function viewEvents(meadId)
                             text: 'Save',
                             action: function () {
                                 var count = $('#splitCount').val();
-                                
+
                                 if(isNaN(count) || count < 2 || count > 20){
                                     $.alert('Please enter a valid split value');
                                     return false;
