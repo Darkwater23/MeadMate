@@ -812,20 +812,31 @@ function viewEvents(meadId)
                         '<input type="checkbox" id="splitDeleteOriginal" name="splitDeleteOriginal" checked> Delete Original' +
                         '<p id="splitDescription">Deleting the original record is recommended, but can be skipped and done later, if desired.</p>',
                 buttons: {
-                    save: function () {
-                        var meadId = $("#splitMeadId").val();
-                        var splitCount = $("#splitCount").val();
-                        var deleteOriginal = $("#splitDeleteOriginal").is(':checked')
-                        window.Android.splitMead(meadId, splitCount, deleteOriginal);
+                        formSubmit: {
+                            text: 'Save',
+                            action: function () {
+                                var count = $('#splitCount').val();
+                                
+                                if(isNaN(count) || count < 2 || count > 20){
+                                    $.alert('Please enter a valid split value');
+                                    return false;
+                                }
 
-                        $.mobile.navigate("#my-meads");
-                    },
-                    cancel: function () {
-                        // do nothing
-                    }
+                                var meadId = $("#splitMeadId").val();
+                                var splitCount = $("#splitCount").val();
+                                var deleteOriginal = $("#splitDeleteOriginal").is(':checked')
+                                window.Android.splitMead(meadId, splitCount, deleteOriginal);
+
+                                $.mobile.navigate("#my-meads");
+                            }
+                        },
+                        cancel: function () {
+                            //close
+                        }
                 }
             });
         });
+
         $("#archiveButton").on("tap", { meadId: meadData.id }, function(event) {
             event.preventDefault();
 
