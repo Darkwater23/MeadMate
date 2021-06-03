@@ -18,9 +18,11 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 package com.dawsonsoftware.meadmate;
 
 import android.app.Activity;
+import android.content.pm.PackageInfo;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
+import com.dawsonsoftware.meadmate.models.ApplicationInfo;
 import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.EventType;
 import com.dawsonsoftware.meadmate.models.Mead;
@@ -453,5 +455,42 @@ public class JavaScriptBridge {
     public void logInfo(String tag, String message)
     {
         Log.i(tag, message);
+    }
+
+    @JavascriptInterface
+    public String versionInfo()
+    {
+        ApplicationInfo model = new ApplicationInfo();
+
+        try
+        {
+            Log.i("JavaScriptBridge", "Fetching version info");
+
+            PackageInfo pinfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+
+            model.setDatabaseVersion(MeadMateData.getDbVersion());
+            model.setVersionName(pinfo.versionName);
+            model.setVersionNumber(pinfo.versionCode);
+
+            Gson gson = new Gson();
+            String json = gson.toJson(model);
+
+            Log.d("JavaScriptBridge", json);
+
+            return json;
+        }
+        catch(Exception ex)
+        {
+            Log.e("JavaScriptBridge", ex.toString());
+
+            model.setVersionNumber(0);
+            model.setVersionName("ERROR");
+            model.setDatabaseVersion(0);
+
+            Gson gson = new Gson();
+            String json = gson.toJson(model);
+
+            return json;
+        }
     }
 }

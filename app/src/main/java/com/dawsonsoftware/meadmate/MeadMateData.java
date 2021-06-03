@@ -177,6 +177,10 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    public static int getDbVersion() {
+        return DB_VERSION;
+    }
+
     // **** CRUD (Create, Read, Update, Delete) Operations ***** //
     int addMead(Mead mead) {
 
