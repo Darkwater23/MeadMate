@@ -1,9 +1,30 @@
+/*
+This file is part of Mead Mate.
+
+Mead Mate is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Mead Mate is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 package com.dawsonsoftware.meadmate;
 
 import android.app.Activity;
+import android.content.pm.PackageInfo;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
+import androidx.loader.app.LoaderManager;
+
+import com.dawsonsoftware.meadmate.models.ApplicationInfo;
 import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.EventType;
 import com.dawsonsoftware.meadmate.models.Mead;
@@ -11,6 +32,9 @@ import com.dawsonsoftware.meadmate.models.Reading;
 import com.dawsonsoftware.meadmate.models.Tag;
 import com.google.gson.Gson;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
@@ -436,5 +460,45 @@ public class JavaScriptBridge {
     public void logInfo(String tag, String message)
     {
         Log.i(tag, message);
+    }
+
+    @JavascriptInterface
+    public String versionInfo()
+    {
+        ApplicationInfo model = new ApplicationInfo();
+
+        try
+        {
+            Log.i("JavaScriptBridge", "Fetching version info");
+
+            PackageInfo pinfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+
+            LocalDate updateDate = Instant.ofEpochMilli(pinfo.lastUpdateTime).atZone(ZoneId.systemDefault()).toLocalDate();
+
+            model.setDatabaseVersion(MeadMateData.getDbVersion());
+            model.setVersionName(pinfo.versionName);
+            model.setVersionNumber(pinfo.versionCode);
+            model.setDateUpdated(updateDate.toString());
+
+            Gson gson = new Gson();
+            String json = gson.toJson(model);
+
+            Log.d("JavaScriptBridge", json);
+
+            return json;
+        }
+        catch(Exception ex)
+        {
+            Log.e("JavaScriptBridge", ex.toString());
+
+            model.setVersionNumber(0);
+            model.setVersionName("ERROR");
+            model.setDatabaseVersion(0);
+
+            Gson gson = new Gson();
+            String json = gson.toJson(model);
+
+            return json;
+        }
     }
 }

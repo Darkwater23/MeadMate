@@ -1,3 +1,20 @@
+/*
+This file is part of Mead Mate.
+
+Mead Mate is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Mead Mate is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 package com.dawsonsoftware.meadmate;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,10 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Establish JS to Java method access
         mWebView.addJavascriptInterface(new JavaScriptBridge(this), "Android");
-
-        // REMOTE RESOURCE
-        // mWebView.loadUrl("http://example.com");
-        // mWebView.setWebViewClient(new MyWebViewClient());
 
         // LOCAL RESOURCE
         mWebView.loadUrl("file:///android_asset/index.html");

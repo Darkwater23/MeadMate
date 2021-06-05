@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html class="no-js">
 <head>
+	<!--
+	This file is part of Mead Mate.
+
+	Mead Mate is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	Mead Mate is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
+	-->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>Mead Mate</title>
@@ -27,6 +43,7 @@
 			<li><a href="#abv">ABV Calculator</a></li>
 			<li><a href="#mead-types">Types of Mead</a></li>
 			<li><a href="#preferences">Preferences</a></li>
+			<li><a href="#about">About</a></li>
 		</ul>
 	</div>
 </div>
@@ -39,7 +56,7 @@
 	</div>
 	<div id="my-meads-navbar" data-role="navbar">
 		<ul>
-			<li><a id="toggleArchivedMeadsButton" href="#my-meads" class="ui-btn ui-btn-inline ui-mini">Show / Hide Archived</a></li>
+			<li><a id="toggleArchivedMeadsButton" href="#my-meads" class="ui-btn ui-btn-inline ui-mini">Include / Exclude Hidden Meads</a></li>
 		</ul>
 	</div>
 	<div role="main" class="ui-content">
@@ -162,6 +179,7 @@
 			<dt>Tags</dt>
 			<dd id="mead-tags"></dd>
 		</dl>
+		<span id="tag-tip">Hint: Long-press tags to delete them</span>
 	</div>
 	<div data-role="panel" id="mead-menu" data-position="right" data-display="overlay">
 		<ul data-role="listview">
@@ -290,13 +308,15 @@
 	<div role="main" class="ui-content">
 		<h2 class="content-title">Preferences</h2>
 		<h3>ABV Formula</h3>
-		<p>Mead Mate supports three common Alcohol By Volume (ABV) formulas. The Standard formula is the default.</p>
-		<p><strong>Standard Formula:</strong><br>(OG - FG) * 131.25</p>
-		<p><strong>Alternate Formula:</strong><br>76.08 * (OG - FG) / (1.775 - OG) * (FG / 0.794)</p>
-		<p><strong>Wine Formula:</strong><br>(OG - FG) / 7.36 * 1000</p>
+		<p>Mead Mate supports four common Alcohol By Volume (ABV) formulas. The Standard formula is the default.</p>
+		<p><strong>Standard Formula:</strong><br>(OG - FG) * 131.25<br>Common formula for calculating ABV.</p>
+		<p><strong>High Standard Formula:</strong><br>(OG - FG) * 135<br>Formula preferred by YouTube channel 'CS Mead and More' for ABV values higher than 7%.</p>
+		<p><strong>Alternate Formula:</strong><br>76.08 * (OG - FG) / (1.775 - OG) * (FG / 0.794)<br>Alternate formula for ABV values.</p>
+		<p><strong>Wine Formula:</strong><br>(OG - FG) / 7.36 * 1000<br>Formula commonly associated with homebrewing wine.</p>
 		<p><strong>Select Preferred Formula:</strong><br>
 			<select id="abv-formula-pref" name="abv-formula-pref">
 				<option value="std">Standard</option>
+				<option value="highstd">High Standard</option>
 				<option value="alt">Alternate</option>
 				<option value="wine">Wine</option>
 			</select>
@@ -314,6 +334,37 @@
 				<option value="byDateDesc">Mead Start Date (Newest First)</option>
 			</select>
 		</p>
+	</div>
+</div>
+<div id="about" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<h1>Mead Mate</h1>
+	</div>
+	<div role="main" class="ui-content">
+		<h2 class="content-title">About</h2>
+		<h3>What's New</h3>
+		<ul class="spaced-list">
+			<li>This page!</li>
+			<li>Added some version info to the About page</li>
+			<li>Added a new event type called 'Conditioning'</li>
+			<li>Adjusted labels related to showing and hiding mead records to make them consistent</li>
+			<li>Added tool tip that appears after a tag is added so user knows how to delete the tag</li>
+			<li>Added new formula preference based on CS Mead and More YouTube channel</li>
+			<li>Added form validation for the Split function</li>
+			<li>Project is now an open source project (<a href="https://github.com/Darkwater23/MeadMate">GitHub &raquo;</a>)</li>
+		</ul>
+		<h3>Version Info</h3>
+		<dl>
+			<dt>App Version Name</dt>
+			<dd id="app-version-name"></dd>
+			<dt>App Version Number</dt>
+			<dd id="app-version-number"></dd>
+			<dt>Database Version Number</dt>
+			<dd id="database-version-number"></dd>
+			<dt>Updated On</dt>
+			<dd id="update-date"></dd>
+		</dl>
 	</div>
 </div>
 <script src="dist/jquery-1.11.1.min.js"></script>

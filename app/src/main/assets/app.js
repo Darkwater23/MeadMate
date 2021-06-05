@@ -1,3 +1,20 @@
+/*
+This file is part of Mead Mate.
+
+Mead Mate is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Mead Mate is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 const abvPrefKeyName = 'ABVPREF';
 const sortPrefKeyName = 'SORTPREF';
 const specificGravityRange = [0.980, 1.160];
@@ -22,7 +39,6 @@ $(function() {
         if(window.Android)
         {
             var eventTypesJson = window.Android.fetchEventTypes();
-
             var eventTypes = JSON.parse(eventTypesJson);
 
             $.each(eventTypes, function (i, item) {
@@ -34,6 +50,13 @@ $(function() {
 
             var tagJson = window.Android.fetchTags();
             tagList = JSON.parse(tagJson);
+
+            var versionInfoJson = window.Android.versionInfo();
+            var versionInfo = JSON.parse(versionInfoJson);
+            $("#app-version-name").text(versionInfo.versionName);
+            $("#app-version-number").text(versionInfo.versionNumber);
+            $("#database-version-number").text(versionInfo.databaseVersion);
+            $("#update-date").text(versionInfo.dateUpdated);
         }
     }
 
@@ -51,6 +74,10 @@ $(document).on("pagebeforeshow","#abv", function(){
         case 'std':
             $("#abvFormulaPref").html("Currently using <strong>Standard</strong> formula.");
             window.Android.logDebug('abvShow',"avbPref detected as 'std'.");
+            break;
+        case 'highstd':
+            $("#abvFormulaPref").html("Currently using <strong>High Standard</strong> formula.");
+            window.Android.logDebug('abvShow',"avbPref detected as 'highstd'.");
             break;
         case 'alt':
             $("#abvFormulaPref").html("Currently using <strong>Alternate</strong> formula.");
@@ -770,6 +797,7 @@ function viewEvents(meadId)
                         var tag = $("#newTag").val();
                         window.Android.addMeadTag(meadId, tag);
                         displayTag(tag); // Update DOM so we don't have to re-fetch data
+                        displayTagTip();
                     },
                     cancel: function () {
                         // do nothing
@@ -790,20 +818,31 @@ function viewEvents(meadId)
                         '<input type="checkbox" id="splitDeleteOriginal" name="splitDeleteOriginal" checked> Delete Original' +
                         '<p id="splitDescription">Deleting the original record is recommended, but can be skipped and done later, if desired.</p>',
                 buttons: {
-                    save: function () {
-                        var meadId = $("#splitMeadId").val();
-                        var splitCount = $("#splitCount").val();
-                        var deleteOriginal = $("#splitDeleteOriginal").is(':checked')
-                        window.Android.splitMead(meadId, splitCount, deleteOriginal);
+                        formSubmit: {
+                            text: 'Save',
+                            action: function () {
+                                var count = $('#splitCount').val();
 
-                        $.mobile.navigate("#my-meads");
-                    },
-                    cancel: function () {
-                        // do nothing
-                    }
+                                if(isNaN(count) || count < 2 || count > 20){
+                                    $.alert('Please enter a valid split value');
+                                    return false;
+                                }
+
+                                var meadId = $("#splitMeadId").val();
+                                var splitCount = $("#splitCount").val();
+                                var deleteOriginal = $("#splitDeleteOriginal").is(':checked')
+                                window.Android.splitMead(meadId, splitCount, deleteOriginal);
+
+                                $.mobile.navigate("#my-meads");
+                            }
+                        },
+                        cancel: function () {
+                            //close
+                        }
                 }
             });
         });
+
         $("#archiveButton").on("tap", { meadId: meadData.id }, function(event) {
             event.preventDefault();
 
@@ -896,6 +935,7 @@ function calculateAbv(initialGravity, subsequentGravity)
     var results = new Object();
 
     results.standard = '-.--%';
+    results.highstandard = '-.--%';
     results.alternate = '-.--%';
     results.wine = '-.--%';
 
@@ -912,10 +952,12 @@ function calculateAbv(initialGravity, subsequentGravity)
     }
 
     var std = calculateAbvStandard(initialGravity, subsequentGravity);
+    var highstd = calculateAbvHighStandard(initialGravity, subsequentGravity);
     var alt = calculateAbvAlternate(initialGravity, subsequentGravity);
     var wine = calculateAbvWine(initialGravity, subsequentGravity);
 
     results.standard = std.toFixed(2) + '%';
+    results.highstandard = highstd.toFixed(2) + '%';
     results.alternate = alt.toFixed(2) + '%';
     results.wine = wine.toFixed(2) + '%';
 
@@ -936,6 +978,25 @@ function calculateAbvStandard(initialGravity, subsequentGravity)
     catch(error)
     {
         window.Android.logError('CalcAbvStd', error);
+
+        return new Decimal('0'); // Make sure the toFixed(2) method fires correctly.
+    }
+}
+
+function calculateAbvHighStandard(initialGravity, subsequentGravity)
+{
+    try
+    {
+        // ABV = (ig - sg) * 135
+        var ig = new Decimal(initialGravity);
+        var sg = new Decimal(subsequentGravity);
+        var c1 = new Decimal('135');
+
+        return ig.minus(sg).times(c1);
+    }
+    catch(error)
+    {
+        window.Android.logError('CalcAbvHighStd', error);
 
         return new Decimal('0'); // Make sure the toFixed(2) method fires correctly.
     }
@@ -1068,6 +1129,11 @@ function displayMeadTags(tagData)
     }
 }
 
+function displayTagTip()
+{
+    $("#tag-tip").show().delay(10000).fadeOut();
+}
+
 function getPreferredAbvValue(result)
 {
     var value = '';
@@ -1080,6 +1146,10 @@ function getPreferredAbvValue(result)
         case 'std':
             value = result.standard;
             window.Android.logDebug('getPreferredAbvValue',"avbPref detected as 'std'.");
+            break;
+        case 'highstd':
+            value = result.highstandard;
+            window.Android.logDebug('getPreferredAbvValue',"avbPref detected as 'highstd'.");
             break;
         case 'alt':
             value = result.alternate;
