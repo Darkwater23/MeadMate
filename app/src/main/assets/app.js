@@ -39,7 +39,6 @@ $(function() {
         if(window.Android)
         {
             var eventTypesJson = window.Android.fetchEventTypes();
-
             var eventTypes = JSON.parse(eventTypesJson);
 
             $.each(eventTypes, function (i, item) {
@@ -51,6 +50,13 @@ $(function() {
 
             var tagJson = window.Android.fetchTags();
             tagList = JSON.parse(tagJson);
+
+            var versionInfoJson = window.Android.versionInfo();
+            var versionInfo = JSON.parse(versionInfoJson);
+            $("#app-version-name").text(versionInfo.versionName);
+            $("#app-version-number").text(versionInfo.versionNumber);
+            $("#database-version-number").text(versionInfo.databaseVersion);
+            $("#update-date").text(versionInfo.dateUpdated);
         }
     }
 

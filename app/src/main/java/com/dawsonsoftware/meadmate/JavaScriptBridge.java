@@ -22,6 +22,8 @@ import android.content.pm.PackageInfo;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
+import androidx.loader.app.LoaderManager;
+
 import com.dawsonsoftware.meadmate.models.ApplicationInfo;
 import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.EventType;
@@ -30,6 +32,9 @@ import com.dawsonsoftware.meadmate.models.Reading;
 import com.dawsonsoftware.meadmate.models.Tag;
 import com.google.gson.Gson;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
@@ -468,9 +473,12 @@ public class JavaScriptBridge {
 
             PackageInfo pinfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
 
+            LocalDate updateDate = Instant.ofEpochMilli(pinfo.lastUpdateTime).atZone(ZoneId.systemDefault()).toLocalDate();
+
             model.setDatabaseVersion(MeadMateData.getDbVersion());
             model.setVersionName(pinfo.versionName);
             model.setVersionNumber(pinfo.versionCode);
+            model.setDateUpdated(updateDate.toString());
 
             Gson gson = new Gson();
             String json = gson.toJson(model);
