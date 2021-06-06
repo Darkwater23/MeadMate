@@ -29,6 +29,7 @@ import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.EventType;
 import com.dawsonsoftware.meadmate.models.Mead;
 import com.dawsonsoftware.meadmate.models.Reading;
+import com.dawsonsoftware.meadmate.models.Recipe;
 import com.dawsonsoftware.meadmate.models.Tag;
 import com.google.gson.Gson;
 
@@ -122,6 +123,40 @@ public class JavaScriptBridge {
         Gson gson = new Gson();
 
         String json = gson.toJson(meads);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
+    public String fetchRecipes()
+    {
+        Log.i("JavaScriptBridge", "Fetching recipes.");
+
+        List<Recipe> recipes = data.getRecipes();
+
+        Log.i("JavaScriptBridge", "Fetched " + recipes.size() + " records.");
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(recipes);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
+    public String fetchRecipe(String id)
+    {
+        Log.i("JavaScriptBridge", "Fetching recipe data by ID: " + id);
+
+        Recipe recipe = data.getRecipe(parseInt(id));
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(recipe);
 
         Log.d("JavaScriptBridge", json);
 
