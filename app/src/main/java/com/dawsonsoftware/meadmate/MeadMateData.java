@@ -238,6 +238,94 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    List<Recipe> getRecipes()
+    {
+        List<Recipe> model = new ArrayList<>();
+
+        String[] tableColumns = new String[] {
+                KEY_RECIPE_ID,
+                KEY_RECIPE_NAME,
+                KEY_RECIPE_DESC
+        };
+
+        String orderBy = KEY_RECIPE_NAME;
+
+        try
+        {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor c = db.query(TABLE_RECIPES, tableColumns, null, null,
+                    null, null, orderBy, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                do {
+
+                    Recipe recipe = new Recipe();
+
+                    recipe.setId(c.getInt(c.getColumnIndex(KEY_MEAD_ID)));
+                    recipe.setName(c.getString(c.getColumnIndex(KEY_MEAD_NAME)));
+                    recipe.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
+
+                    model.add(recipe);
+
+                }while(c.moveToNext());
+            }
+
+            c.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+
+        return model;
+    }
+
+    Recipe getRecipe(int recipeId)
+    {
+        Recipe model = new Recipe();
+
+        String[] tableColumns = new String[] {
+                KEY_RECIPE_ID,
+                KEY_RECIPE_NAME,
+                KEY_RECIPE_DESC
+        };
+
+        String whereClause = KEY_RECIPE_ID + " = ?";
+
+        String[] whereArgs = new String[] {
+                String.valueOf(recipeId)
+        };
+
+        try
+        {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor c = db.query(TABLE_RECIPES, tableColumns, whereClause, whereArgs,
+                    null, null, null, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                model.setId(recipeId);
+                model.setName(c.getString(c.getColumnIndex(KEY_RECIPE_NAME)));
+                model.setDescription(c.getString(c.getColumnIndex(KEY_RECIPE_DESC)));
+            }
+
+            c.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+
+        return model;
+    }
+
     void updateRecipe(Recipe recipe)
     {
         try
