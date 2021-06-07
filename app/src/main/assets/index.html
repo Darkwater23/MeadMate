@@ -40,6 +40,7 @@
 	<div role="main" class="ui-content">
 		<ul id="mainMenu" data-role="listview">
 			<li><a href="#my-meads">My Meads</a></li>
+			<li><a href="#my-recipes">My Recipes</a></li>
 			<li><a href="#abv">ABV Calculator</a></li>
 			<li><a href="#mead-types">Types of Mead</a></li>
 			<li><a href="#preferences">Preferences</a></li>
@@ -62,6 +63,44 @@
 	<div role="main" class="ui-content">
 		<ul id="mead-list" data-role="listview">
 		</ul>
+	</div>
+</div>
+
+<div id="my-recipes" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<h1>Mead Mate</h1>
+		<a id="newRecipeButton" href="#new-recipe" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+	</div>
+	<div role="main" class="ui-content">
+		<ul id="recipe-list" data-role="listview">
+		</ul>
+	</div>
+</div>
+
+<div id="new-recipe" data-role="page">
+	<div data-role="header" data-position="fixed" data-add-back-btn="true">
+		<h1>Mead Mate</h1>
+	</div>
+	<div role="main" class="ui-content">
+		<h2 id="new-mead-content-title" class="content-title">Add New Mead</h2>
+		<form id="new-mead-form">
+			<ul id="messageList"></ul>
+			<input type="hidden" name="meadId" id="meadId" value="0">
+			<label for="newMeadName">Mead Name:</label>
+			<input type="text" name="newMeadName" id="newMeadName" value="">
+
+			<label for="newMeadStartDate">Start Date:</label>
+			<input type="date" name="newMeadStartDate" id="newMeadStartDate" value="">
+
+			<label for="newMeadOriginalGravity">Original Specific Gravity:</label>
+			<input type="number" name="newMeadOriginalGravity" pattern="[0-1]+\.[0-9]{3}" id="newMeadOriginalGravity" value="1.000">
+
+			<label for="newMeadDescription">Description:</label>
+			<textarea name="newMeadDescription" id="newMeadDescription"></textarea>
+
+			<input type="button" value="Save" name="saveMeadButton" id="saveMeadButton">
+		</form>
 	</div>
 </div>
 
