@@ -83,23 +83,17 @@
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
-		<h2 id="new-mead-content-title" class="content-title">Add New Mead</h2>
-		<form id="new-mead-form">
-			<ul id="messageList"></ul>
-			<input type="hidden" name="meadId" id="meadId" value="0">
-			<label for="newMeadName">Mead Name:</label>
-			<input type="text" name="newMeadName" id="newMeadName" value="">
+		<h2 id="new-recipe-content-title" class="content-title">Add New Recipe</h2>
+		<form id="new-recipe-form">
+			<ul id="recipeMessageList"></ul>
+			<input type="hidden" name="recipeId" id="recipeId" value="0">
+			<label for="newRecipeName">Recipe Name:</label>
+			<input type="text" name="newRecipeName" id="newRecipeName" value="">
 
-			<label for="newMeadStartDate">Start Date:</label>
-			<input type="date" name="newMeadStartDate" id="newMeadStartDate" value="">
+			<label for="newRecipeDescription">Description:</label>
+			<textarea name="newRecipeDescription" id="newRecipeDescription"></textarea>
 
-			<label for="newMeadOriginalGravity">Original Specific Gravity:</label>
-			<input type="number" name="newMeadOriginalGravity" pattern="[0-1]+\.[0-9]{3}" id="newMeadOriginalGravity" value="1.000">
-
-			<label for="newMeadDescription">Description:</label>
-			<textarea name="newMeadDescription" id="newMeadDescription"></textarea>
-
-			<input type="button" value="Save" name="saveMeadButton" id="saveMeadButton">
+			<input type="button" value="Save" name="saveRecipeButton" id="saveRecipeButton">
 		</form>
 	</div>
 </div>
@@ -229,6 +223,29 @@
 			<li><a id="splitButton" href="#my-meads" class="ui-btn ui-icon-grid ui-btn-icon-left">Split Batch</a></li>
 			<li><a id="archiveButton" href="#my-meads" class="ui-btn ui-icon-eye ui-btn-icon-left">Show/Hide Mead</a></li>
 			<li><a id="deleteMeadButton" href="#my-meads" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
+			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
+		</ul>
+	</div>
+</div>
+
+<div id="recipe-view" data-role="page">
+	<div data-role="header" data-position="fixed">
+		<a href="#my-recipes" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">My Recipes</a>
+		<h1>Mead Mate</h1>
+		<a href="#recipe-menu" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-bars" id="recipeMenuButton">Menu</a>
+	</div>
+	<div role="main" class="ui-content">
+		<h2 id="recipe-name" class="content-title"></h2>
+		<dl>
+			<dt>Description</dt>
+			<dd id="recipe-description" class="description"></dd>
+		</dl>
+	</div>
+	<div data-role="panel" id="recipe-menu" data-position="right" data-display="overlay">
+		<ul data-role="listview">
+			<li><a id="editRecipeButton" href="#new-recipe" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
+			<li><a id="createBatchButton" href="#my-recipes" class="ui-btn ui-icon-action ui-btn-icon-left">Create Batch</a></li>
+			<li><a id="deleteRecipeButton" href="#my-recipes" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
 			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
 	</div>

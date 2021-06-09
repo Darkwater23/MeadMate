@@ -103,7 +103,11 @@ $(document).on("pagebeforeshow","#my-meads",function() {
 
 });
 
-$(document).on("pagebeforeshow","#mead-view",function() { });
+$(document).on("pagebeforeshow","#my-recipes",function() {
+
+    loadMyRecipesListView();
+
+});
 
 $(document).on("pagebeforeshow","#new-mead",function() {
 
@@ -123,6 +127,25 @@ $(document).on("pagebeforeshow","#new-mead",function() {
         $("#newMeadStartDate").val('');
         $("#newMeadOriginalGravity").val('');
         $("#newMeadDescription").val('');
+    }
+});
+
+$(document).on("pagebeforeshow","#new-recipe",function() {
+
+    // use hidden field as the trigger for the form mode
+
+    var recipeId = $("#recipeId").val();
+
+    if(recipeId)
+    {
+        // Field values should already be set from invoking function
+        $("#new-recipe-content-title").text("Edit Recipe");
+    }
+    else
+    {
+        $("#new-recipe-content-title").text("Add New Recipe");
+        $("#newRecipeName").val('');
+        $("#newRecipeDescription").val('');
     }
 });
 
@@ -191,6 +214,19 @@ $("#new-mead-form").validate({
     }
 });
 
+$("#new-recipe-form").validate({
+    errorLabelContainer: "#recipeMessageList",
+    wrapper: "li",
+    rules: {
+        newRecipeName: {
+            required: true
+        }
+    },
+    messages: {
+        newRecipeName: "Recipe Name is required."
+    }
+});
+
 $("#new-reading-form").validate({
     errorLabelContainer: "#newReadingMessageList",
     wrapper: "li",
@@ -255,6 +291,15 @@ $("#newMeadButton").on("tap", function(event) {
     $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
 });
 
+$("#newRecipeButton").on("tap", function(event) {
+
+    event.preventDefault();
+
+    // Set hidden field value so form switches to correct mode
+    $("#recipeId").val('');
+    $(":mobile-pagecontainer").pagecontainer("change", "#new-recipe");
+});
+
 $("#toggleArchivedMeadsButton").on("tap", function(event) {
     var includeArchivedString = localStorage.getItem(archivePrefKeyName) ?? "false";
 
@@ -267,44 +312,85 @@ $("#toggleArchivedMeadsButton").on("tap", function(event) {
 
 $("#saveMeadButton").on("tap", function(event){
 
-event.preventDefault();
+    event.preventDefault();
 
-if(window.Android)
-{
-    if($("#new-mead-form").valid()){
+    if(window.Android)
+    {
+        if($("#new-mead-form").valid()){
 
-        // Grab form inputs
-        var mId = $("#meadId").val();
-        var mName = $("#newMeadName").val();
-        var mDate = $("#newMeadStartDate").val();
-        var mGravity = $("#newMeadOriginalGravity").val();
-        var mDesc = $("#newMeadDescription").val();
+            // Grab form inputs
+            var mId = $("#meadId").val();
+            var mName = $("#newMeadName").val();
+            var mDate = $("#newMeadStartDate").val();
+            var mGravity = $("#newMeadOriginalGravity").val();
+            var mDesc = $("#newMeadDescription").val();
 
-        if(mId)
-        {
-            window.Android.updateMead(mId, mName, mDate, mGravity, mDesc);
-            window.Android.logInfo('MainActivity', 'Mead ' + mId + ' updated!');
-        }
-        else
-        {
-            window.Android.addMead(mName, mDate, mGravity, mDesc);
-            window.Android.logInfo('MainActivity', 'New mead saved!');
-        }
+            if(mId)
+            {
+                window.Android.updateMead(mId, mName, mDate, mGravity, mDesc);
+                window.Android.logInfo('MainActivity', 'Mead ' + mId + ' updated!');
+            }
+            else
+            {
+                window.Android.addMead(mName, mDate, mGravity, mDesc);
+                window.Android.logInfo('MainActivity', 'New mead saved!');
+            }
 
-        if(mId)
-        {
-            viewMead(mId);
-        }
-        else
-        {
-            $.mobile.navigate("#my-meads");
+            if(mId)
+            {
+                viewMead(mId);
+            }
+            else
+            {
+                $.mobile.navigate("#my-meads");
+            }
         }
     }
-}
-else
-{
-    $.alert('Android Javascript bridge is not available');
-}
+    else
+    {
+        $.alert('Android Javascript bridge is not available');
+    }
+
+});
+
+$("#saveRecipeButton").on("tap", function(event){
+
+    event.preventDefault();
+
+    if(window.Android)
+    {
+        if($("#new-recipe-form").valid()){
+
+            // Grab form inputs
+            var rId = $("#recipeId").val();
+            var rName = $("#newRecipeName").val();
+            var rDesc = $("#newRecipeDescription").val();
+
+            if(rId)
+            {
+                window.Android.updateRecipe(rId, rName, rDesc);
+                window.Android.logInfo('MainActivity', 'Recipe ' + rId + ' updated!');
+            }
+            else
+            {
+                window.Android.addRecipe(rName, rDesc);
+                window.Android.logInfo('MainActivity', 'New recipe saved!');
+            }
+
+            if(rId)
+            {
+                viewRecipe(rId);
+            }
+            else
+            {
+                $.mobile.navigate("#my-recipes");
+            }
+        }
+    }
+    else
+    {
+        $.alert('Android Javascript bridge is not available');
+    }
 
 });
 
@@ -477,6 +563,42 @@ function loadMyMeadsListView()
     }
 }
 
+function loadMyRecipesListView()
+{
+    if(window.Android)
+    {
+        window.Android.logInfo('MainActivity','JS Bridge available. Starting data fetch for recipe list.');
+
+        // Clear list
+        $("#recipe-list").empty();
+
+        // Fetch data from database
+        var recipesJson = window.Android.fetchRecipes();
+        var recipesData = JSON.parse(recipesJson);
+
+        window.Android.logDebug('MainActivity', 'Fetched JSON: ' + recipesJson);
+
+        // Append to list
+        for (var i = 0; i < recipesData.length; i++) {
+
+            var recipeName = recipesData[i].name;
+
+            $("#recipe-list").append('<li><a href="javascript:viewRecipe(' + recipesData[i].id + ');" data-ajax="false">' + recipeName + '</a></li>');
+        }
+
+        $("#recipe-list").listview("refresh");
+
+        window.Android.logInfo('MainActivity','Recipe list loaded and refreshed.');
+    }
+    else
+    {
+        // Insert mock item for layout testing
+        $("#recipe-list").empty();
+        $("#recipe-list").append('<li><a href="javascript:viewRecipe(0);" data-ajax="false">My First Recipe</a></li>');
+        $("#recipe-list").append('<li><a href="javascript:viewRecipe(0);" data-ajax="false">My Second Recipe</a></li>');
+        $("#recipe-list").listview("refresh");
+    }
+}
 
  function viewReadings(meadId)
  {
@@ -895,6 +1017,78 @@ function viewEvents(meadId)
     }
 
     $(":mobile-pagecontainer").pagecontainer("change", "#mead-view");
+ }
+
+function viewRecipe(id)
+ {
+    if(window.Android && id > 0)
+    {
+        window.Android.logInfo('MainActivity', 'Fetching Recipe by ID: ' + id);
+
+        // Fetch data from database
+        var recipeJson = window.Android.fetchRecipe(id);
+        var recipeData = JSON.parse(recipeJson);
+
+        window.Android.logDebug('MainActivity', recipeJson);
+
+        // Populate fields
+        $("#recipe-name").text(recipeData.name);
+        $("#recipe-description").text(recipeData.description);
+
+        // add event handlers for buttons
+        $("#deleteRecipeButton").off("tap"); // clear existing event handlers
+        $("#editRecipeButton").off("tap"); // clear existing event handlers
+        $("#createBatchButton").off("tap"); //clear existing event handlers
+
+        $("#deleteRecipeButton").on("tap", { value: id }, function(event) {
+            event.preventDefault();
+
+            var id = event.data.value;
+
+            $.confirm({
+                title: 'Delete Recipe Entry',
+                content: 'Are you sure?',
+                animation: 'top',
+                closeAnimation: 'top',
+                buttons: {
+                    confirm: function () {
+                        window.Android.deleteRecipe(id);
+
+                        $.mobile.navigate("#my-recipes");
+                    },
+                    cancel: function () {
+                        // do nothing
+                    }
+                }
+            });
+        });
+
+        $("#editRecipeButton").on("tap", { recipeId: recipeData.id, recipeName: recipeData.name, recipeDescription: recipeData.description }, function(event) {
+
+            // Populate data
+            $("#recipeId").val(event.data.recipeId);
+            $("#newRecipeName").val(event.data.recipeName);
+            $("#newRecipeDescription").val(event.data.recipeDescription);
+
+            $(":mobile-pagecontainer").pagecontainer("change", "#new-recipe");
+        });
+
+        $("#createBatchButton").on("tap", function(event) {
+
+            event.preventDefault();
+
+            $.alert("Not implemented yet.");
+
+        });
+    }
+    else
+    {
+        // Populate sample data
+        $("#recipe-name").text("My First Recipe");
+        $("#recipe-description").text("Sample data");
+    }
+
+    $(":mobile-pagecontainer").pagecontainer("change", "#recipe-view");
  }
 
 function editEvent(eventId)
