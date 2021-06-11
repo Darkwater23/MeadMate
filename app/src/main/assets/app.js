@@ -118,7 +118,15 @@ $(document).on("pagebeforeshow","#new-mead",function() {
     if(meadId)
     {
         // Field values should already be set from invoking function
-        $("#new-mead-content-title").text("Edit Mead");
+        if(meadId == "FromRecipe")
+        {
+            $("#meadId").val(""); // reset form field for new mead
+            $("#new-mead-content-title").text("Add New Mead from Recipe");
+        }
+        else
+        {
+            $("#new-mead-content-title").text("Edit Mead");
+        }
     }
     else
     {
@@ -1073,12 +1081,22 @@ function viewRecipe(id)
             $(":mobile-pagecontainer").pagecontainer("change", "#new-recipe");
         });
 
-        $("#createBatchButton").on("tap", function(event) {
+        $("#createBatchButton").on("tap", { recipeName: recipeData.name, recipeDescription: recipeData.description }, function(event) {
 
             event.preventDefault();
 
-            $.alert("Not implemented yet.");
+            var now = new Date();
+            var today = now.toISOString().slice(0, 10);
 
+            window.Android.logInfo('MainActivity', 'Formatted batch date: ' + today);
+
+            $("#meadId").val("FromRecipe"); // Used as trigger
+            $("#newMeadName").val(event.data.recipeName);
+            $("#newMeadStartDate").val(today);
+            $("#newMeadOriginalGravity").val("");
+            $("#newMeadDescription").val(event.data.recipeDescription);
+
+            $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
         });
     }
     else
