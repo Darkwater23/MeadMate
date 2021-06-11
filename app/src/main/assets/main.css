@@ -118,7 +118,7 @@ hr
     user-select: none; /* Non-prefixed version, currently */
 }
 
-#mead-menu
+#mead-menu, #recipe-menu
 {
     background-color: #F49F05;
 }

@@ -29,6 +29,7 @@ import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.EventType;
 import com.dawsonsoftware.meadmate.models.Mead;
 import com.dawsonsoftware.meadmate.models.Reading;
+import com.dawsonsoftware.meadmate.models.Recipe;
 import com.dawsonsoftware.meadmate.models.Tag;
 import com.google.gson.Gson;
 
@@ -122,6 +123,40 @@ public class JavaScriptBridge {
         Gson gson = new Gson();
 
         String json = gson.toJson(meads);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
+    public String fetchRecipes()
+    {
+        Log.i("JavaScriptBridge", "Fetching recipes.");
+
+        List<Recipe> recipes = data.getRecipes();
+
+        Log.i("JavaScriptBridge", "Fetched " + recipes.size() + " records.");
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(recipes);
+
+        Log.d("JavaScriptBridge", json);
+
+        return json;
+    }
+
+    @JavascriptInterface
+    public String fetchRecipe(String id)
+    {
+        Log.i("JavaScriptBridge", "Fetching recipe data by ID: " + id);
+
+        Recipe recipe = data.getRecipe(parseInt(id));
+
+        Gson gson = new Gson();
+
+        String json = gson.toJson(recipe);
 
         Log.d("JavaScriptBridge", json);
 
@@ -254,7 +289,7 @@ public class JavaScriptBridge {
         mead.setDescription(description);
         mead.setOriginalGravity(originalGravity);
 
-        Integer meadId = data.addMead(mead);
+        int meadId = data.addMead(mead);
 
         // Create primary fermentation event
         if(meadId > 0)
@@ -268,6 +303,19 @@ public class JavaScriptBridge {
 
             data.addEvent(event);
         }
+    }
+
+    @JavascriptInterface
+    public void addRecipe(String name, String description) {
+
+        Log.d("JavaScriptBridge", "Adding recipe record for recipe: " + name);
+
+        Recipe model = new Recipe();
+
+        model.setName(name);
+        model.setDescription(description);
+
+        data.addRecipe(model);
     }
 
     @JavascriptInterface
@@ -312,6 +360,20 @@ public class JavaScriptBridge {
         mead.setOriginalGravity(originalGravity);
 
         data.updateMead(mead);
+    }
+
+    @JavascriptInterface
+    public void updateRecipe(String id, String name, String description)
+    {
+        Log.d("JavaScriptBridge", "Updating recipe record for recipe: " + name);
+
+        Recipe model = new Recipe();
+
+        model.setId(parseInt(id));
+        model.setName(name);
+        model.setDescription(description);
+
+        data.updateRecipe(model);
     }
 
     @JavascriptInterface
@@ -391,6 +453,14 @@ public class JavaScriptBridge {
         Log.i("JavaScriptBridge", "Deleting mead by id: " + id);
 
         data.deleteMead(parseInt(id));
+    }
+
+    @JavascriptInterface
+    public void deleteRecipe(String id)
+    {
+        Log.i("JavaScriptBridge", "Deleting recipe by id: " + id);
+
+        data.deleteRecipe(parseInt(id));
     }
 
     @JavascriptInterface

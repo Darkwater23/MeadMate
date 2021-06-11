@@ -27,6 +27,7 @@ import android.util.Log;
 import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.EventType;
 import com.dawsonsoftware.meadmate.models.Mead;
+import com.dawsonsoftware.meadmate.models.Recipe;
 import com.dawsonsoftware.meadmate.models.Reading;
 import com.dawsonsoftware.meadmate.models.Tag;
 
@@ -35,7 +36,7 @@ import java.util.List;
 
 public class MeadMateData extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 5;
+    private static final int DB_VERSION = 6;
     private static final String DB_NAME = "appdata";
 
     // Meads table fields
@@ -77,6 +78,12 @@ public class MeadMateData extends SQLiteOpenHelper {
     private static final String KEY_MEAD_TAGS_ID = "_ID";
     private static final String KEY_MEAD_TAGS_MEAD_ID = "MEAD_ID";
     private static final String KEY_MEAD_TAGS_TAG_ID = "TAG_ID";
+
+    // Recipes table fields
+    private static final String TABLE_RECIPES = "RECIPES";
+    private static final String KEY_RECIPE_ID = "_ID";
+    private static final String KEY_RECIPE_NAME = "NAME";
+    private static final String KEY_RECIPE_DESC = "DESCRIPTION";
 
     // Table creation strings
     String CREATE_MEAD_TABLE = "CREATE TABLE " + TABLE_MEADS + " (" +
@@ -137,6 +144,11 @@ public class MeadMateData extends SQLiteOpenHelper {
     String ALTER_MEAD_TABLE = "ALTER TABLE " + TABLE_MEADS +
             " ADD COLUMN " + KEY_MEAD_ARCHIVED + " INTEGER NOT NULL DEFAULT 0";
 
+    String CREATE_RECIPES_TABLE = "CREATE TABLE " + TABLE_RECIPES + " (" +
+            KEY_RECIPE_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
+            KEY_RECIPE_NAME + " TEXT NOT NULL," +
+            KEY_RECIPE_DESC + " TEXT NOT NULL)";
+
     public MeadMateData(Context context){
         super(context,DB_NAME, null, DB_VERSION);
     }
@@ -151,6 +163,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         db.execSQL(CREATE_READINGS_TABLE);
         db.execSQL(CREATE_TAGS_TABLE);
         db.execSQL(CREATE_MEAD_TAGS_TABLE);
+        db.execSQL(CREATE_RECIPES_TABLE);
     }
 
     @Override
@@ -170,6 +183,8 @@ public class MeadMateData extends SQLiteOpenHelper {
                 db.execSQL(ALTER_MEAD_TABLE);
             case 4:
                 db.execSQL(ADD_NEW_EVENT_TYPE_REL6);
+            case 5:
+                db.execSQL(CREATE_RECIPES_TABLE);
                 break;
             default:
                 //log no update applied
@@ -182,6 +197,189 @@ public class MeadMateData extends SQLiteOpenHelper {
     }
 
     // **** CRUD (Create, Read, Update, Delete) Operations ***** //
+    int addRecipe(Recipe recipe)
+    {
+        try
+        {
+            if(recipe == null)
+            {
+                throw new IllegalArgumentException("Recipe object cannot be null");
+            }
+
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_RECIPE_NAME, recipe.getName());
+            values.put(KEY_RECIPE_DESC, recipe.getDescription());
+
+            // Inserting Row
+            db.insert(TABLE_RECIPES, null, values);
+
+            // Query for new mead ID
+            int recipeId = 0;
+            Cursor c = db.rawQuery ("SELECT LAST_INSERT_ROWID()", null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                recipeId = c.getInt(0);
+            }
+
+            c.close();
+
+            return recipeId;
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+
+            return 0;
+        }
+    }
+
+    List<Recipe> getRecipes()
+    {
+        List<Recipe> model = new ArrayList<>();
+
+        String[] tableColumns = new String[] {
+                KEY_RECIPE_ID,
+                KEY_RECIPE_NAME,
+                KEY_RECIPE_DESC
+        };
+
+        String orderBy = KEY_RECIPE_NAME;
+
+        try
+        {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor c = db.query(TABLE_RECIPES, tableColumns, null, null,
+                    null, null, orderBy, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                do {
+
+                    Recipe recipe = new Recipe();
+
+                    recipe.setId(c.getInt(c.getColumnIndex(KEY_MEAD_ID)));
+                    recipe.setName(c.getString(c.getColumnIndex(KEY_MEAD_NAME)));
+                    recipe.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
+
+                    model.add(recipe);
+
+                }while(c.moveToNext());
+            }
+
+            c.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+
+        return model;
+    }
+
+    Recipe getRecipe(int recipeId)
+    {
+        Recipe model = new Recipe();
+
+        String[] tableColumns = new String[] {
+                KEY_RECIPE_ID,
+                KEY_RECIPE_NAME,
+                KEY_RECIPE_DESC
+        };
+
+        String whereClause = KEY_RECIPE_ID + " = ?";
+
+        String[] whereArgs = new String[] {
+                String.valueOf(recipeId)
+        };
+
+        try
+        {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor c = db.query(TABLE_RECIPES, tableColumns, whereClause, whereArgs,
+                    null, null, null, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                model.setId(recipeId);
+                model.setName(c.getString(c.getColumnIndex(KEY_RECIPE_NAME)));
+                model.setDescription(c.getString(c.getColumnIndex(KEY_RECIPE_DESC)));
+            }
+
+            c.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+
+        return model;
+    }
+
+    void updateRecipe(Recipe recipe)
+    {
+        try
+        {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_RECIPE_NAME, recipe.getName());
+            values.put(KEY_RECIPE_DESC, recipe.getDescription());
+
+            String whereClause = KEY_RECIPE_ID + " = ?";
+
+            // Update row
+            db.update(TABLE_RECIPES, values, whereClause, new String[]{ recipe.getId().toString() });
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+    }
+
+    void deleteRecipe(int recipeId)
+    {
+        String whereClause = KEY_RECIPE_ID + "=?";
+        String[] whereArgs = new String[] { String.valueOf(recipeId) };
+
+        SQLiteDatabase db = null;
+
+        try
+        {
+            db = this.getWritableDatabase();
+
+            db.beginTransaction();
+
+            Log.i(MeadMateData.class.getTypeName(),"Deleting recipe record " + recipeId);
+            db.delete(TABLE_RECIPES, whereClause, whereArgs);
+
+            db.setTransactionSuccessful();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+        finally
+        {
+            if(db != null)
+            {
+                db.endTransaction();
+            }
+        }
+    }
+
+
+
     int addMead(Mead mead) {
 
         try
