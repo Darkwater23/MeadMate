@@ -61,6 +61,7 @@ $(function() {
     }
 
     $("#newEventType").selectmenu();
+    $("#newCalendarEventDescription").selectmenu();
 });
 
 // Page Transition events
@@ -493,6 +494,42 @@ $("#calcButton").on("tap", function(event) {
 
 });
 
+$("#saveCalendarEventButton").on("tap", function(event){
+    event.preventDefault();
+
+    if(window.Android)
+    {
+        // craft message strings and call JS bridge with data
+        // set field values
+        var title = $("#newCalendarEventTitle").val();
+        var desc = $("#newCalendarEventDescription").val(); // selected option
+        var notes = $("#newCalendarEventNotes").val();
+        var linebreaks = "\r\n\r\n";
+
+        if(desc == 'Other')
+        {
+            // Not useful to include in description
+            desc = '';
+            linebreaks = '';
+        }
+
+        var fullDescription = desc + linebreaks + notes;
+
+        var result = window.Android.createEvent(title, fullDescription);
+
+        if(!result)
+        {
+            $.alert('An error occurred while trying to send event to calendar app.');
+        }
+    }
+    else
+    {
+        $.alert('Android Javascript bridge is not available');
+    }
+});
+
+
+
 // Select change events
 $("#abv-formula-pref").change(function() {
     localStorage.setItem(abvPrefKeyName,this.value);
@@ -866,6 +903,7 @@ function viewEvents(meadId)
         $("#readingsButton").off("tap"); // clear existing event handlers
         $("#eventsButton").off("tap"); // clear existing event handlers
         $("#editMeadButton").off("tap"); // clear existing event handlers
+        $("#calendarEventButton").off("tap"); // clear existing event handlers
         $("#tagsButton").off("tap"); //clear existing event handlers
         $("#splitButton").off("tap"); //clear existing event handlers
         $("#archiveButton").off("tap"); //clear existing event handlers
@@ -913,6 +951,22 @@ function viewEvents(meadId)
             $("#newMeadDescription").val(event.data.meadDescription);
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
+        });
+        $("#calendarEventButton").on("tap", { meadId: meadData.id, meadName: meadData.name }, function(event) {
+
+            event.preventDefault();
+
+            // set field values
+            $("#newCalendarEventMeadId").val(event.data.meadId);
+            $("#newCalendarEventMeadName").val(event.data.meadName);
+
+            $("#newCalendarEventTitle").val("Mead Mate Reminder");
+            $("#newCalendarEventDescription").prop("selectedIndex", -1);
+            $("#newCalendarEventNotes").val("For mead batch '" + event.data.meadName + "'.");
+
+            // transition to view
+            //$.mobile.navigate("#calendar-event");
+            $(":mobile-pagecontainer").pagecontainer("change", "#calendar-event", {changeHash:false});
         });
         $("#tagsButton").on("tap", { meadId: meadData.id }, function(event) {
 

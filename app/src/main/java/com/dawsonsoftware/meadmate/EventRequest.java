@@ -1,5 +1,7 @@
 package com.dawsonsoftware.meadmate;
 
+import java.util.Date;
+
 public class EventRequest
 {
     private String title;

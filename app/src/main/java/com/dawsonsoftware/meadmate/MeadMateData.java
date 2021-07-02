@@ -339,7 +339,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             String whereClause = KEY_RECIPE_ID + " = ?";
 
             // Update row
-            db.update(TABLE_RECIPES, values, whereClause, new String[]{ recipe.getId().toString() });
+            db.update(TABLE_RECIPES, values, whereClause, new String[]{ String.valueOf(recipe.getId()) });
         }
         catch(Exception ex)
         {
@@ -440,7 +440,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             String whereClause = KEY_MEAD_ID + " = ?";
 
             // Update row
-            db.update(TABLE_MEADS, values, whereClause, new String[]{ mead.getId().toString() });
+            db.update(TABLE_MEADS, values, whereClause, new String[]{ String.valueOf(mead.getId()) });
         }
         catch(Exception ex)
         {
@@ -500,7 +500,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
             String whereClause = KEY_EVENT_ID + " = ?";
 
-            db.update(TABLE_EVENTS, values, whereClause, new String[]{ event.getId().toString() });
+            db.update(TABLE_EVENTS, values, whereClause, new String[]{ String.valueOf(event.getId()) });
         }
         catch(Exception ex)
         {

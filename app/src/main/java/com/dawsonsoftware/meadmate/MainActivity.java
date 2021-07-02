@@ -23,6 +23,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -66,19 +67,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void requestEvent(EventRequest request)
+    public boolean requestEvent(EventRequest request)
     {
-        Intent intent = new Intent(Intent.ACTION_INSERT);
-        intent.setData(CalendarContract.Events.CONTENT_URI);
-        intent.putExtra(CalendarContract.Events.TITLE, request.getTitle());
-        intent.putExtra(CalendarContract.Events.DESCRIPTION, request.getDescription());
-        intent.putExtra(CalendarContract.Events.ALL_DAY, false);
-        intent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
+        try
+        {
+            Intent intent = new Intent(Intent.ACTION_INSERT);
+            intent.setData(CalendarContract.Events.CONTENT_URI);
+            intent.putExtra(CalendarContract.Events.TITLE, request.getTitle());
+            intent.putExtra(CalendarContract.Events.DESCRIPTION, request.getDescription());
+            intent.putExtra(CalendarContract.Events.ALL_DAY, false);
+            intent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
+            intent.putExtra(CalendarContract.Events.DTSTART, 0);
+            intent.putExtra(CalendarContract.Events.DTEND, 0);
 
-        if(intent.resolveActivity(getPackageManager()) != null){
+            Log.d("MainActivity", "Attempting to start activity...");
+
             startActivity(intent);
-        }else{
-            //log it
+
+            return true;
+        }
+        catch(Exception ex)
+        {
+            Log.e("MainActivity", ex.toString());
+
+            return false;
         }
     }
 }

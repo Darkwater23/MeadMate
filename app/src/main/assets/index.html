@@ -119,6 +119,40 @@
 	</div>
 </div>
 
+<div id="calendar-event" data-role="page">
+	<div data-role="header" data-position="fixed" data-add-back-btn="true">
+		<h1>Mead Mate</h1>
+	</div>
+	<div role="main" class="ui-content">
+		<h2 class="content-title">Create Calendar Event</h2>
+		<form id="calendar-event-form">
+			<ul id="calendarEventMessageList"></ul>
+
+			<input type="hidden" name="newCalendarEventMeadId" id="newCalendarEventMeadId" value="">
+			<input type="hidden" name="newCalendarEventMeadName" id="newCalendarEventMeadName" value="">
+
+			<label for="newCalendarEventTitle">Event Title:</label>
+			<input type="text" name="newCalendarEventTitle" id="newCalendarEventTitle" value="">
+
+			<label for="newCalendarEventDescription">Event Description:</label>
+			<select id="newCalendarEventDescription">
+				<option>Take A Reading</option>
+				<option>Rack Batch</option>
+				<option>Add Ingredients</option>
+				<option>Remove Ingredients</option>
+				<option>Bottle Batch</option>
+				<option>Split Batch</option>
+				<option>Other</option>
+			</select>
+
+			<label for="newCalendarEventNotes">Additional Notes:</label>
+			<textarea name="newCalendarEventNotes" id="newCalendarEventNotes"></textarea>
+
+			<input type="button" value="Save" name="saveCalendarEventButton" id="saveCalendarEventButton">
+		</form>
+	</div>
+</div>
+
 <div id="new-event" data-role="page">
 	<div data-role="header" data-position="fixed" data-add-back-btn="true">
 		<h1>Mead Mate</h1>
@@ -219,6 +253,7 @@
 			<li><a id="editMeadButton" href="#new-mead" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
 			<li><a id="eventsButton" href="#events" class="ui-btn ui-icon-calendar ui-btn-icon-left">Events</a></li>
 			<li><a id="readingsButton" href="#readings" class="ui-btn ui-icon-plus ui-btn-icon-left">Readings</a></li>
+			<li><a id="calendarEventButton" href="#calendar-event" class="ui-btn ui-icon-action ui-btn-icon-left">Add Reminder</a></li>
 			<li><a id="tagsButton" href="#mead-view" class="ui-btn ui-icon-tag ui-btn-icon-left">Tags</a></li>
 			<li><a id="splitButton" href="#my-meads" class="ui-btn ui-icon-grid ui-btn-icon-left">Split Batch</a></li>
 			<li><a id="archiveButton" href="#my-meads" class="ui-btn ui-icon-eye ui-btn-icon-left">Show/Hide Mead</a></li>
