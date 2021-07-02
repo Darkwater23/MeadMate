@@ -18,7 +18,9 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 package com.dawsonsoftware.meadmate;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.provider.CalendarContract;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
@@ -570,5 +572,17 @@ public class JavaScriptBridge {
 
             return json;
         }
+    }
+
+    @JavascriptInterface
+    public void createEvent(String title, String description)
+    {
+        EventRequest request = new EventRequest();
+        request.setTitle(title);
+        request.setDescription(description);
+
+        MainActivity mainActivity = (MainActivity) this.activity;
+
+        mainActivity.requestEvent(request);
     }
 }

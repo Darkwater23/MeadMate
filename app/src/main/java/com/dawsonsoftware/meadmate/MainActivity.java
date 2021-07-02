@@ -20,7 +20,9 @@ package com.dawsonsoftware.meadmate;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -61,6 +63,22 @@ public class MainActivity extends AppCompatActivity {
             mWebView.goBack();
         } else {
             super.onBackPressed();
+        }
+    }
+
+    public void requestEvent(EventRequest request)
+    {
+        Intent intent = new Intent(Intent.ACTION_INSERT);
+        intent.setData(CalendarContract.Events.CONTENT_URI);
+        intent.putExtra(CalendarContract.Events.TITLE, request.getTitle());
+        intent.putExtra(CalendarContract.Events.DESCRIPTION, request.getDescription());
+        intent.putExtra(CalendarContract.Events.ALL_DAY, false);
+        intent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
+
+        if(intent.resolveActivity(getPackageManager()) != null){
+            startActivity(intent);
+        }else{
+            //log it
         }
     }
 }

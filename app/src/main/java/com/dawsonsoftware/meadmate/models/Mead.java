@@ -26,7 +26,7 @@ public class Mead {
     private String originalGravity;
     private boolean archived;
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 

@@ -23,7 +23,7 @@ public class Recipe {
     private String name;
     private String description;
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
