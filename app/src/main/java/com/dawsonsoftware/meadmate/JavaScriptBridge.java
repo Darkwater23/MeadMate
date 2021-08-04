@@ -575,16 +575,18 @@ public class JavaScriptBridge {
     }
 
     @JavascriptInterface
-    public boolean createEvent(String title, String description)
+    public void createEvent(String title, String description, String date)
     {
-        Log.d("JavaScriptBridge", "Calendar Event: " + title);
+        Log.d("JavaScriptBridge", "Calendar Event: " + date + ", " + title + ", " + description);
 
         EventRequest request = new EventRequest();
         request.setTitle(title);
         request.setDescription(description);
+        request.setDate(date);
+        //request.setMeadId(Integer.parseInt(meadId));
 
         MainActivity mainActivity = (MainActivity) this.activity;
 
-        return mainActivity.requestEvent(request);
+        mainActivity.requestEvent(request);
     }
 }
