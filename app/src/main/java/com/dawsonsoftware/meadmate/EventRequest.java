@@ -6,6 +6,7 @@ public class EventRequest
 {
     private String title;
     private String description;
+    private String date;
 
     public String getTitle() {
         return title;
@@ -22,4 +23,8 @@ public class EventRequest
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getDate() { return date; }
+
+    public void setDate(String date) { this.date = date; }
 }

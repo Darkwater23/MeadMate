@@ -20,6 +20,8 @@ package com.dawsonsoftware.meadmate;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -28,6 +30,14 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,30 +77,66 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public boolean requestEvent(EventRequest request)
+    public void requestEvent(EventRequest request)
     {
         try
         {
+            LocalDate localDate = LocalDate.parse(request.getDate(),
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+            long millis = localDate.atStartOfDay()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant().toEpochMilli();
+
+            Log.d("MainActivity", request.getDate());
+            Log.d("MainActivity", "millis: " + millis);
+
+            LocalDate date = LocalDate.parse(request.getDate());
             Intent intent = new Intent(Intent.ACTION_INSERT);
             intent.setData(CalendarContract.Events.CONTENT_URI);
             intent.putExtra(CalendarContract.Events.TITLE, request.getTitle());
             intent.putExtra(CalendarContract.Events.DESCRIPTION, request.getDescription());
-            intent.putExtra(CalendarContract.Events.ALL_DAY, false);
-            intent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
-            intent.putExtra(CalendarContract.Events.DTSTART, 0);
-            intent.putExtra(CalendarContract.Events.DTEND, 0);
+            intent.putExtra(CalendarContract.Events.ALL_DAY, true);
+            //intent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
+            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, millis);
+            //intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, millis);
 
             Log.d("MainActivity", "Attempting to start activity...");
 
-            startActivity(intent);
+            ComponentName componentName = intent.resolveActivity(this.getPackageManager());
 
-            return true;
+            if(componentName == null)
+            {
+                Context context = getApplicationContext();
+                CharSequence text = "No scheduling app found";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+
+                return;
+            }
+
+            startActivityForResult(intent, 1);
         }
         catch(Exception ex)
         {
             Log.e("MainActivity", ex.toString());
+        }
+    }
 
-            return false;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 1)
+        {
+            Log.d("MainActivity", "ResultCode: " + resultCode);
+
+            String functionSig = "calendarEventCallback(" + resultCode + ")";
+
+            mWebView.loadUrl("javascript:" + functionSig);
         }
     }
 }
