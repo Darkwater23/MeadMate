@@ -61,6 +61,7 @@ $(function() {
     }
 
     $("#newEventType").selectmenu();
+    $("#newCalendarEventDescription").selectmenu();
 });
 
 // Page Transition events
@@ -289,6 +290,27 @@ $("#abv-form").validate({
     }
 });
 
+$("#calendar-event-form").validate({
+   errorLabelContainer: "#calendarEventMessageList",
+   wrapper: "li",
+   rules: {
+       newCalendarEventTitle: {
+           required: true
+       },
+       newCalendarEventDescription: {
+           required: true
+       },
+       newCalendarEventDate: {
+           required: true
+       }
+   },
+   messages: {
+       newCalendarEventTitle: "Event Title is required.",
+       newCalendarEventDescription: "Event Description is required.",
+       newCalendarEventDate: "Event Date is required.",
+   }
+});
+
 // Button tap events
 $("#newMeadButton").on("tap", function(event) {
 
@@ -492,6 +514,43 @@ $("#calcButton").on("tap", function(event) {
     }
 
 });
+
+$("#saveCalendarEventButton").on("tap", function(event){
+    event.preventDefault();
+
+    if(window.Android)
+    {
+        if($("#calendar-event-form").valid()){
+            // craft message strings and call JS bridge with data
+            // set field values
+            //var meadId = $("#newCalendarEventMeadId").val();
+            var title = $("#newCalendarEventTitle").val();
+            var desc = $("#newCalendarEventDescription option:selected").text(); // selected option
+            var date = $("#newCalendarEventDate").val();
+            var notes = $("#newCalendarEventNotes").val();
+            var linebreaks = "\r\n\r\n";
+
+            if(desc == 'Other')
+            {
+                // Not useful to include in description
+                desc = '';
+                linebreaks = '';
+            }
+
+            var fullDescription = "It's Time to " + desc + linebreaks + notes;
+
+            window.Android.logDebug("Calendar Event", title + " - " + fullDescription);
+
+            window.Android.createEvent(title, fullDescription, date);
+        }
+    }
+    else
+    {
+        $.alert('Android Javascript bridge is not available');
+    }
+});
+
+
 
 // Select change events
 $("#abv-formula-pref").change(function() {
@@ -866,6 +925,7 @@ function viewEvents(meadId)
         $("#readingsButton").off("tap"); // clear existing event handlers
         $("#eventsButton").off("tap"); // clear existing event handlers
         $("#editMeadButton").off("tap"); // clear existing event handlers
+        $("#calendarEventButton").off("tap"); // clear existing event handlers
         $("#tagsButton").off("tap"); //clear existing event handlers
         $("#splitButton").off("tap"); //clear existing event handlers
         $("#archiveButton").off("tap"); //clear existing event handlers
@@ -905,6 +965,8 @@ function viewEvents(meadId)
         });
         $("#editMeadButton").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity, meadDescription: meadData.description }, function(event) {
 
+            event.preventDefault();
+
             // Populate data
             $("#meadId").val(event.data.meadId);
             $("#newMeadName").val(event.data.meadName);
@@ -913,6 +975,21 @@ function viewEvents(meadId)
             $("#newMeadDescription").val(event.data.meadDescription);
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
+        });
+        $("#calendarEventButton").on("tap", { meadId: meadData.id, meadName: meadData.name }, function(event) {
+
+            event.preventDefault();
+
+            // set field values
+            $("#newCalendarEventMeadId").val(event.data.meadId);
+            $("#newCalendarEventMeadName").val(event.data.meadName);
+
+            $("#newCalendarEventTitle").val("Mead Mate: '" + event.data.meadName + "'");
+            $("#newCalendarEventDescription").prop("selectedIndex", 0);
+            $("#newCalendarEventNotes").val("");
+
+            // transition to view
+            $(":mobile-pagecontainer").pagecontainer("change", "#calendar-event");
         });
         $("#tagsButton").on("tap", { meadId: meadData.id }, function(event) {
 
@@ -1377,4 +1454,19 @@ function getPreferredAbvValue(result)
     }
 
     return value;
+}
+
+function calendarEventCallback(resultValue)
+{
+    if(resultValue == -1)
+    {
+        // Intent call for scheduling reminder doesn't return extra values
+        // Needed to pull meadId from form that invoked the new activity
+        var meadId = parseInt($("#newCalendarEventMeadId").val());
+
+        if(meadId)
+        {
+            viewMead(meadId);
+        }
+    }
 }

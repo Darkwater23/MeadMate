@@ -19,24 +19,24 @@ package com.dawsonsoftware.meadmate.models;
 
 public class Reading {
 
-    private Integer id;
-    private Integer meadId;
+    private int id;
+    private int meadId;
     private String date;
     private String specificGravity;
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public Integer getMeadId() {
+    public int getMeadId() {
         return meadId;
     }
 
-    public void setMeadId(Integer meadId) {
+    public void setMeadId(int meadId) {
         this.meadId = meadId;
     }
 

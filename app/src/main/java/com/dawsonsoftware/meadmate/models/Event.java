@@ -18,26 +18,26 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 package com.dawsonsoftware.meadmate.models;
 
 public class Event {
-    private Integer id;
-    private Integer meadId;
+    private int id;
+    private int meadId;
     private String date;
-    private Integer typeId;
+    private int typeId;
     private String typeName;
     private String description;
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public Integer getMeadId() {
+    public int getMeadId() {
         return meadId;
     }
 
-    public void setMeadId(Integer meadId) {
+    public void setMeadId(int meadId) {
         this.meadId = meadId;
     }
 
@@ -45,11 +45,11 @@ public class Event {
 
     public void setDate(String date) { this.date = date; }
 
-    public Integer getTypeId() {
+    public int getTypeId() {
         return typeId;
     }
 
-    public void setTypeId(Integer typeId) { this.typeId = typeId; }
+    public void setTypeId(int typeId) { this.typeId = typeId; }
 
     public String getDescription() {
         return description;
