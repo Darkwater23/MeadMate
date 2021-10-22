@@ -199,6 +199,17 @@ $(document).on("pagebeforeshow","#preferences",function(){
 
 });
 
+$(document).on("pagebeforeshow","#about",function(){
+
+    var doc = fetchFeedDocument();
+
+    if(doc)
+    {
+
+    }
+
+});
+
 // Form validation events
 
 $("#new-mead-form").validate({
