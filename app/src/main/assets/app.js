@@ -1328,22 +1328,57 @@ function calculateAbvAlternate(initialGravity, subsequentGravity)
 {
     try
     {
-        // ABV = 76.08 * (ig - sg) / (1.775 - ig) * (sg / 0.794)
+        //OE = –668.962 + 1262.45 OG – 776.43 OG^2 + 182.94 OG^3
+        //AE = –668.962 + 1262.45 FG – 776.43 FG^2 + 182.94 FG^3
+        //q = 0.22 + 0.001 OE
+        //RE = (q OE + AE) / (1 + q)
+        //A%w = (OE – RE) /  (2.0665 – 0.010665 OE)
+        //A%v = A%w (FG / 0.794)
 
         var ig = new Decimal(initialGravity);
         var sg = new Decimal(subsequentGravity);
-        var c1 = new Decimal('76.08');
-        var c2 = new Decimal('1.775');
-        var c3 = new Decimal('0.794');
 
-        //var result = ig.minus(sg).times('131.25');
+        const c1 = new Decimal('-668.962');
+        const c2 = new Decimal('1262.45');
+        const c3 = new Decimal('776.43');
+        const c4 = new Decimal('182.94');
+        const c5 = new Decimal('0.22');
+        const c6 = new Decimal('0.001');
+        const c7 = new Decimal('2.0665');
+        const c8 = new Decimal('0.010665');
+        const c9 = new Decimal('0.794');
 
-        var gravdiff = ig.minus(sg);
-        var c2diff = c2.minus(ig);
-        var sgratio = sg.dividedBy(c3);
-        var lowerval = c2diff.times(sgratio);
+        var oe = c1.add(c2.times(ig)).minus(c3.times(ig.pow(2))).add(c4.times(ig.pow(3)));
+        window.Android.logDebug('CalcAbvAlt', 'oe: ' + oe);
 
-        return c1.times(gravdiff).dividedBy(lowerval);
+        var ae = c1.add(c2.times(sg)).minus(c3.times(sg.pow(2))).add(c4.times(sg.pow(3)));
+        window.Android.logDebug('CalcAbvAlt', 'ae: ' + ae);
+
+        var q = c5.add(c6.times(oe));
+        window.Android.logDebug('CalcAbvAlt', 'q: ' + q);
+
+        var re1 = q.times(oe).add(ae);
+        window.Android.logDebug('CalcAbvAlt', 're1: ' + re1);
+
+        var re2 = q.add(1);
+        window.Android.logDebug('CalcAbvAlt', 're2: ' + re2);
+
+        var re = re1.div(re2);
+        window.Android.logDebug('CalcAbvAlt', 're: ' + re);
+
+        var abw1 = oe.minus(re);
+        window.Android.logDebug('CalcAbvAlt', 'abw1: ' + abw1);
+
+        var abw2 = c7.minus(c8.times(oe));
+        window.Android.logDebug('CalcAbvAlt', 'abw2: ' + abw2);
+
+        var abw = abw1.div(abw2);
+        window.Android.logDebug('CalcAbvAlt', 'abw: ' + abw);
+
+        var abv = abw.times(sg.div(c9));
+        window.Android.logDebug('CalcAbvAlt', 'abv: ' + abv);
+
+        return abv;
     }
     catch(error)
     {
