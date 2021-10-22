@@ -603,22 +603,36 @@ public class JavaScriptBridge {
     @JavascriptInterface
     public String fetchFeedDocument() throws IOException {
 
-        //TODO: extract URL to settings
-        //TODO: add exception handling
-        String sURL = "http://127.0.0.1:8080/"; //just a string
+        String document;
 
-        // Connect to the URL using java's native library
-        URL url = new URL(sURL);
-        URLConnection request = url.openConnection();
-        request.connect();
+        try
+        {
+            Log.d("JavaScriptBridge", "Fetching feed doc...");
 
-        InputStreamReader reader = new InputStreamReader((InputStream) request.getContent());
-        //Creating a character array
-        char charArray[] = new char[request.getContentLength()];
-        //Reading the contents of the reader
-        reader.read(charArray);
-        //Converting character array to a String
-        String document = new String(charArray);
+            //TODO: extract URL to settings (not sure where, though)
+            String sURL = "http://127.0.0.1:8080/"; //just a string
+
+            // Connect to the URL using java's native library
+            URL url = new URL(sURL);
+            URLConnection conn = url.openConnection();
+            conn.connect();
+
+            InputStreamReader reader = new InputStreamReader((InputStream) conn.getContent());
+            //Creating a character array
+            char charArray[] = new char[conn.getContentLength()];
+
+            //Reading the contents of the reader
+            reader.read(charArray);
+
+            //Converting character array to a String
+            document = new String(charArray);
+        }
+        catch(Exception ex)
+        {
+            Log.e("JavascriptBridge", ex.toString());
+
+            document = null;
+        }
 
         return document;
     }
