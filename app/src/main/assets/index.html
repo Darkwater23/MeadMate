@@ -408,7 +408,16 @@
 		<p>Mead Mate supports four common Alcohol By Volume (ABV) formulas. The Standard formula is the default.</p>
 		<p><strong>Standard Formula:</strong><br>(OG - FG) * 131.25<br>Common formula for calculating ABV.</p>
 		<p><strong>High Standard Formula:</strong><br>(OG - FG) * 135<br>Formula preferred by YouTube channel 'CS Mead and More' for ABV values higher than 7%.</p>
-		<p><strong>Alternate Formula:</strong><br>76.08 * (OG - FG) / (1.775 - OG) * (FG / 0.794)<br>Alternate formula for ABV values.</p>
+		<p><strong>Alternate Formula:</strong><br>
+			Provided by Dr. Michael Hall<br>
+			Tends to land between the Standard and High Standard simplified formulas and considered to be the most accurate.<br><br>
+			OE = –668.962 + 1262.45 OG – 776.43 OG^2 + 182.94 OG^3<br>
+			AE = –668.962 + 1262.45 FG – 776.43 FG^2 + 182.94 FG^3<br>
+			q = 0.22 + 0.001 OE<br>
+			RE = (q OE + AE) / (1 + q)<br>
+			A%w = (OE – RE) /  (2.0665 – 0.010665 OE)<br>
+			A%v = A%w (FG / 0.794)<br>
+			<br>Alternate formula for ABV values.</p>
 		<p><strong>Wine Formula:</strong><br>(OG - FG) / 7.36 * 1000<br>Formula commonly associated with homebrewing wine.</p>
 		<p><strong>Select Preferred Formula:</strong><br>
 			<select id="abv-formula-pref" name="abv-formula-pref">
