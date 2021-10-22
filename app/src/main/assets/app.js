@@ -201,13 +201,35 @@ $(document).on("pagebeforeshow","#preferences",function(){
 
 $(document).on("pagebeforeshow","#about",function(){
 
+    window.Android.logInfo('MainActivity', 'Fetching json doc from cloud.');
+
     var doc = fetchFeedDocument();
+
+    $("#feed-content").empty();
 
     if(doc)
     {
+        var html = [
+            '<h3>' + doc.Title + '<br /><small>' + doc.ReleaseDate + ' / ' + doc.Author + '</small></h3>',
+            '<p>' + doc.Summary + '</p>'
+        ].join("\n");
 
+        for (var key in doc.TopicMessages) {
+            if (doc.TopicMessages.hasOwnProperty(key)) {
+                //console.log(key + " -> " + p[key]);
+
+                html += '<h3>' + key + '</h3><ul>';
+
+                doc.TopicMessages[key].forEach(function (item, index) {
+                  html += '<li>' + item + '</li>';
+                });
+
+                html += '</ul>';
+            }
+        }
+
+        $("#feed-content").append(html);
     }
-
 });
 
 // Form validation events
@@ -1493,4 +1515,6 @@ function fetchFeedDocument()
             return JSON.parse(feedDoc);
         }
     }
+
+    return null;
 }

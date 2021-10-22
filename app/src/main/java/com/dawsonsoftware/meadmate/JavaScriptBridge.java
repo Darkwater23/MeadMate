@@ -610,7 +610,7 @@ public class JavaScriptBridge {
             Log.d("JavaScriptBridge", "Fetching feed doc...");
 
             //TODO: extract URL to settings (not sure where, though)
-            String sURL = "http://127.0.0.1:8080/"; //just a string
+            String sURL = "https://us-central1-dawson-software.cloudfunctions.net/meadmate-feed";
 
             // Connect to the URL using java's native library
             URL url = new URL(sURL);
