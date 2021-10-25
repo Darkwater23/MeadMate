@@ -938,7 +938,7 @@ function viewEvents(meadId)
 
             var abvDisplayValue = getPreferredAbvValue(result);
 
-            lastReadingDisplayValue = abvDisplayValue + " as of " + lastReading.date;
+            lastReadingDisplayValue = lastReading.specificGravity + " (" + abvDisplayValue + ") as of " + lastReading.date;
         }
 
         // Populate fields
