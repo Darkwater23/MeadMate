@@ -21,8 +21,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.util.Log;
@@ -32,11 +35,16 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
@@ -81,27 +89,27 @@ public class MainActivity extends AppCompatActivity {
     {
         try
         {
-            LocalDate localDate = LocalDate.parse(request.getDate(),
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            TimeZone defaultTimeZone = TimeZone.getDefault();
 
-            long millis = localDate.atStartOfDay()
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant().toEpochMilli();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate startDate = LocalDate.parse(request.getDate(), formatter);
+            LocalDate endDate = startDate.plusDays(1);
 
-            Log.d("MainActivity", request.getDate());
-            Log.d("MainActivity", "millis: " + millis);
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+            LocalDateTime endDateTime = endDate.atStartOfDay();
 
-            LocalDate date = LocalDate.parse(request.getDate());
             Intent intent = new Intent(Intent.ACTION_INSERT);
+            intent.setType("vnd.android.cursor.dir/event");
+            Log.d("MainActivity", "Attempting to start activity...");
+
             intent.setData(CalendarContract.Events.CONTENT_URI);
+            intent.putExtra(CalendarContract.Events.CALENDAR_ID, 1);
             intent.putExtra(CalendarContract.Events.TITLE, request.getTitle());
             intent.putExtra(CalendarContract.Events.DESCRIPTION, request.getDescription());
             intent.putExtra(CalendarContract.Events.ALL_DAY, true);
-            //intent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
-            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, millis);
-            //intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, millis);
-
-            Log.d("MainActivity", "Attempting to start activity...");
+            intent.putExtra(CalendarContract.Events.EVENT_TIMEZONE, defaultTimeZone.getID());
+            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startDateTime.atZone(defaultTimeZone.toZoneId()).toInstant().toEpochMilli());
+            intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDateTime.atZone(defaultTimeZone.toZoneId()).toInstant().toEpochMilli());
 
             ComponentName componentName = intent.resolveActivity(this.getPackageManager());
 
