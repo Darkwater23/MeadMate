@@ -34,7 +34,17 @@ import com.dawsonsoftware.meadmate.models.Reading;
 import com.dawsonsoftware.meadmate.models.Recipe;
 import com.dawsonsoftware.meadmate.models.Tag;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -588,5 +598,42 @@ public class JavaScriptBridge {
         MainActivity mainActivity = (MainActivity) this.activity;
 
         mainActivity.requestEvent(request);
+    }
+
+    @JavascriptInterface
+    public String fetchFeedDocument() throws IOException {
+
+        String document;
+
+        try
+        {
+            Log.d("JavaScriptBridge", "Fetching feed doc...");
+
+            //TODO: extract URL to settings (not sure where, though)
+            String sURL = "https://us-central1-dawson-software.cloudfunctions.net/meadmate-feed";
+
+            // Connect to the URL using java's native library
+            URL url = new URL(sURL);
+            URLConnection conn = url.openConnection();
+            conn.connect();
+
+            InputStreamReader reader = new InputStreamReader((InputStream) conn.getContent());
+            //Creating a character array
+            char charArray[] = new char[conn.getContentLength()];
+
+            //Reading the contents of the reader
+            reader.read(charArray);
+
+            //Converting character array to a String
+            document = new String(charArray);
+        }
+        catch(Exception ex)
+        {
+            Log.e("JavascriptBridge", ex.toString());
+
+            document = null;
+        }
+
+        return document;
     }
 }
