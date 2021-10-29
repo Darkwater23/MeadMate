@@ -1505,18 +1505,3 @@ function calendarEventCallback(resultValue)
         }
     }
 }
-
-function fetchFeedDocument()
-{
-    if(window.Android)
-    {
-        var feedDoc = window.Android.fetchFeedDocument();
-
-        if(feedDoc)
-        {
-            return JSON.parse(feedDoc);
-        }
-    }
-
-    return null;
-}
