@@ -986,6 +986,7 @@ function viewEvents(meadId)
 
             $("#newCalendarEventTitle").val("Mead Mate: '" + event.data.meadName + "'");
             $("#newCalendarEventDescription").prop("selectedIndex", 0);
+            $("#newCalendarEventDate").val("");
             $("#newCalendarEventNotes").val("");
 
             // transition to view
