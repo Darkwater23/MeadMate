@@ -1,5 +1,11 @@
 package com.dawsonsoftware.meadmate;
 
+import android.content.Context;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -7,34 +13,120 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 public final class WebResourceCache {
 
-    private WebResourceCache()
-    {
+    private static File _cacheDir;
 
+    public WebResourceCache(Context context)
+    {
+        if(context == null)
+        {
+            throw new IllegalArgumentException("The context is required for this class to function.");
+        }
+
+        _cacheDir = context.getCacheDir();
     }
 
-    public static String RetrieveWebContent(String resource, int maxAgeSeconds) throws IOException
+    public static String RetrieveWebContent(String sUrl, int maxAgeSeconds)
     {
-        return ""; //TODO: not even close to done
+        if(sUrl.isEmpty())
+        {
+            Log.e("Retrieve", "RetrieveWebContent: sUrl cannot be empty");
+            return null;
+        }
 
-        // Connect to the URL using java's native library
-        URL url = new URL(resource);
-        URLConnection conn = url.openConnection();
-        conn.connect();
+        int maxAge = (maxAgeSeconds >= 0) ? maxAgeSeconds : 300; // 5 minutes
 
-        InputStreamReader reader = new InputStreamReader((InputStream) conn.getContent());
-        //Creating a character array
-        char charArray[] = new char[conn.getContentLength()];
+        String fileContents = fetchCachedFileContents(sUrl, maxAge);
 
-        //Reading the contents of the reader
-        reader.read(charArray);
+        if(fileContents == null || fileContents.isEmpty())
+        {
+            fileContents = fetchOnlineFileContents(sUrl);
+        }
 
-        //Converting character array to a String
-        return new String(charArray);
+        if(fileContents == null || fileContents.isEmpty())
+        {
+            return null;
+        }
+
+        return fileContents;
+    }
+
+    private static String fetchOnlineFileContents(String sUrl)
+    {
+        try
+        {
+            // Connect to the URL using java's native library
+            URL url = new URL(sUrl);
+            URLConnection conn = url.openConnection();
+            conn.connect();
+
+            InputStreamReader reader = new InputStreamReader((InputStream) conn.getContent());
+            //Creating a character array
+            char charArray[] = new char[conn.getContentLength()];
+
+            //Reading the contents of the reader
+            reader.read(charArray);
+
+            //Converting character array to a String
+            return new String(charArray);
+        }
+        catch (Exception ex)
+        {
+
+        }
+
+        return null;
+    }
+
+    private static String fetchCachedFileContents(String sUrl, int maxAge)
+    {
+        // Calculate checksum on sUrl
+        long checksum = getChecksum(sUrl.getBytes());
+
+        // Convert checksum to string, add expected extension
+        String filename = checksum + ".json";
+
+        // Create absolute path to possible cached file
+        Path path = Paths.get(_cacheDir.toString(), filename);
+
+        // Check if local cache file exists with that name
+        File file = path.toFile();
+
+        //TODO: Add age check
+        if(file.exists())
+        {
+            try
+            {
+                return new String (Files.readAllBytes(file.toPath()));
+            }
+            catch (IOException e)
+            {
+                //TODO: log error
+            }
+        }
+
+        return null;
+    }
+
+    private static long getChecksum(@NonNull byte[] bytes) {
+
+        Log.d("getChecksum", "Calculating checksum for " + bytes.length + " byte array.");
+
+        Checksum crc32 = new CRC32();
+        crc32.update(bytes, 0, bytes.length);
+
+        long value = crc32.getValue();
+
+        Log.d("getChecksum", "Checksum: " + value);
+
+        return value;
     }
 
 }
