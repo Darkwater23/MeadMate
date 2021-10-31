@@ -16,6 +16,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
@@ -55,7 +57,32 @@ public final class WebResourceCache {
             return null;
         }
 
+        cacheOnlineFileContents(sUrl, fileContents);
+
         return fileContents;
+    }
+
+    private static void cacheOnlineFileContents(String sUrl, String fileContents)
+    {
+        try
+        {
+            // Calculate checksum on sUrl
+            long checksum = getChecksum(sUrl.getBytes());
+
+            // Convert checksum to string, add expected extension
+            String filename = checksum + ".json";
+
+            // Create absolute path to possible cached file
+            Path path = Paths.get(_cacheDir.getPath(), filename);
+
+            byte[] strToBytes = fileContents.getBytes();
+
+            Files.write(path, strToBytes);
+        }
+        catch(Exception ex)
+        {
+            //TODO: log error
+        }
     }
 
     private static String fetchOnlineFileContents(String sUrl)
@@ -94,17 +121,23 @@ public final class WebResourceCache {
         String filename = checksum + ".json";
 
         // Create absolute path to possible cached file
-        Path path = Paths.get(_cacheDir.toString(), filename);
+        Path path = Paths.get(_cacheDir.getPath(), filename);
 
         // Check if local cache file exists with that name
         File file = path.toFile();
 
-        //TODO: Add age check
         if(file.exists())
         {
             try
             {
-                return new String (Files.readAllBytes(file.toPath()));
+                long fileAge = file.lastModified();
+
+                long now = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+
+                if((now - fileAge) < maxAge)
+                {
+                    return new String (Files.readAllBytes(path));
+                }
             }
             catch (IOException e)
             {
