@@ -24,6 +24,9 @@ import java.util.zip.Checksum;
 public final class WebResourceCache {
 
     private static File _cacheDir;
+    private final static String _cacheFileExtension = ".data";
+    private final Checksum _crc32 = new CRC32();
+    private final int _defaultCacheTimeout = 500;
 
     public WebResourceCache(Context context)
     {
@@ -35,42 +38,49 @@ public final class WebResourceCache {
         _cacheDir = context.getCacheDir();
     }
 
-    public static String RetrieveWebContent(String sUrl, int maxAgeSeconds)
+    public String retrieveWebContent(String sUrl, int maxAgeSeconds)
     {
         if(sUrl.isEmpty())
         {
-            Log.e("Retrieve", "RetrieveWebContent: sUrl cannot be empty");
+            Log.e("WebCache", "RetrieveWebContent: sUrl cannot be empty");
             return null;
         }
 
-        int maxAge = (maxAgeSeconds >= 0) ? maxAgeSeconds : 300; // 5 minutes
+        int maxAge = (maxAgeSeconds >= 0) ? maxAgeSeconds : _defaultCacheTimeout; // 5 minutes
+
+        Log.d("WebCache", "MaxAge set to: " + maxAge);
 
         String fileContents = fetchCachedFileContents(sUrl, maxAge);
 
         if(fileContents == null || fileContents.isEmpty())
         {
+            Log.d("WebCache", "File not present in cache. Fetching from host.");
             fileContents = fetchOnlineFileContents(sUrl);
         }
 
         if(fileContents == null || fileContents.isEmpty())
         {
+            Log.d("WebCache", "File not found on host. URL: " + sUrl);
             return null;
         }
-
-        cacheOnlineFileContents(sUrl, fileContents);
+        else
+        {
+            Log.d("WebCache", "File retrieved from host. Writing to local app cache.");
+            cacheOnlineFileContents(sUrl, fileContents);
+        }
 
         return fileContents;
     }
 
-    private static void cacheOnlineFileContents(String sUrl, String fileContents)
+    private void cacheOnlineFileContents(String sUrl, String fileContents)
     {
         try
         {
             // Calculate checksum on sUrl
             long checksum = getChecksum(sUrl.getBytes());
 
-            // Convert checksum to string, add expected extension
-            String filename = checksum + ".json";
+            // Convert checksum to string, add generic extension
+            String filename = checksum + _cacheFileExtension;
 
             // Create absolute path to possible cached file
             Path path = Paths.get(_cacheDir.getPath(), filename);
@@ -78,14 +88,16 @@ public final class WebResourceCache {
             byte[] strToBytes = fileContents.getBytes();
 
             Files.write(path, strToBytes);
+
+            Log.d("WebCache", "Cached web content to: " + path.toString());
         }
         catch(Exception ex)
         {
-            //TODO: log error
+            Log.e("WebCache", ex.toString());
         }
     }
 
-    private static String fetchOnlineFileContents(String sUrl)
+    private String fetchOnlineFileContents(String sUrl)
     {
         try
         {
@@ -106,19 +118,19 @@ public final class WebResourceCache {
         }
         catch (Exception ex)
         {
-
+            Log.e("WebCache", ex.toString());
         }
 
         return null;
     }
 
-    private static String fetchCachedFileContents(String sUrl, int maxAge)
+    private String fetchCachedFileContents(String sUrl, int maxAge)
     {
         // Calculate checksum on sUrl
         long checksum = getChecksum(sUrl.getBytes());
 
         // Convert checksum to string, add expected extension
-        String filename = checksum + ".json";
+        String filename = checksum + _cacheFileExtension;
 
         // Create absolute path to possible cached file
         Path path = Paths.get(_cacheDir.getPath(), filename);
@@ -134,30 +146,34 @@ public final class WebResourceCache {
 
                 long now = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
 
+                Log.d("WebCache", "FileAge: " + String.valueOf(fileAge));
+                Log.d("WebCache", "Now: " + String.valueOf(now));
+                Log.d("WebCache", "MaxAge: " + String.valueOf(maxAge));
+
                 if((now - fileAge) < maxAge)
                 {
+                    Log.d("WebCache", "Returned file from cache. " + path.toString());
                     return new String (Files.readAllBytes(path));
                 }
             }
-            catch (IOException e)
+            catch (IOException ex)
             {
-                //TODO: log error
+                Log.e("WebCache", ex.toString());
             }
         }
 
         return null;
     }
 
-    private static long getChecksum(@NonNull byte[] bytes) {
+    private long getChecksum(@NonNull byte[] bytes) {
 
-        Log.d("getChecksum", "Calculating checksum for " + bytes.length + " byte array.");
+        Log.d("WebCache", "Calculating checksum for " + bytes.length + " byte array.");
 
-        Checksum crc32 = new CRC32();
-        crc32.update(bytes, 0, bytes.length);
+        _crc32.update(bytes, 0, bytes.length);
 
-        long value = crc32.getValue();
+        long value = _crc32.getValue();
 
-        Log.d("getChecksum", "Checksum: " + value);
+        Log.d("WebCache", "Checksum: " + value);
 
         return value;
     }
