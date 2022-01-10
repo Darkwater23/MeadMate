@@ -36,16 +36,22 @@
 <div id="home" data-role="page">
 	<div data-role="header" data-position="fixed">
 		<h1>Mead Mate</h1>
+		<a href="#main-menu" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-bars" id="mainMenuButton">Menu</a>
 	</div>
 	<div role="main" class="ui-content">
-		<ul id="mainMenu" data-role="listview">
-			<li><a href="#my-meads">My Meads</a></li>
-			<li><a href="#my-recipes">My Recipes</a></li>
-			<li><a href="#abv">ABV Calculator</a></li>
-			<li><a href="#mead-types">Types of Mead</a></li>
-			<li><a href="#preferences">Preferences</a></li>
-			<li><a href="#privacy-policy">Privacy Policy</a></li>
-			<li><a href="#about">About</a></li>
+		<ul id="mainMenu">
+			<li><a href="#my-meads" class="ui-btn ui-shadow ui-corner-all">My Meads</a></li>
+			<li><a href="#my-recipes" class="ui-btn ui-shadow ui-corner-all">My Recipes</a></li>
+			<li><a href="#abv" class="ui-btn ui-shadow ui-corner-all">ABV Calculator</a></li>
+		</ul>
+	</div>
+	<div data-role="panel" id="main-menu" data-position="right" data-display="overlay">
+		<ul data-role="listview">
+			<li><a href="#mead-types" class="ui-btn ui-icon-info ui-btn-icon-left">Types of Mead</a></li>
+			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Preferences</a></li>
+			<li><a href="#privacy-policy" class="ui-btn ui-icon-eye ui-btn-icon-left">Privacy Policy</a></li>
+			<li><a href="#about" class="ui-btn ui-icon-info ui-btn-icon-left">About</a></li>
+			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
 	</div>
 </div>
@@ -247,9 +253,11 @@
 			<dd id="mead-original-gravity"></dd>
 			<dt>Last Specific Gravity Reading</dt>
 			<dd id="mead-last-reading"></dd>
+			<dt>Last Event</dt>
+			<dd id="mead-last-event"></dd>
 			<dt>Recipe & Notes</dt>
 			<dd id="mead-description" class="description"></dd>
-			<dt>Tags</dt>
+			<dt id="mead-tags-label">Tags</dt>
 			<dd id="mead-tags"></dd>
 		</dl>
 		<span id="tag-tip">Hint: Long-press tags to delete them</span>
@@ -569,13 +577,16 @@
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">About</h2>
-
 		<h3>Mead Mate Release 10</h3>
-		<p>TBD</p>
+		<p>With this release, the About page was restored to static content. I experimented with having the content be cloud-hosted. It worked fine, but isn't really necessary.</p>
+		<p>The experiment helped me learn how to do cloud-integration and will pave the way for other features, like establishing a mead recipe feed.</p>
 		<p><strong>What's New</strong></p>
 		<ul>
-			<li>Fix 1</li>
-			<li>Fix 2</li>
+			<li>Reformatted the Main Menu</li>
+			<li>Added Last Event to Mead View</li>
+			<li>Tags section is hidden when no tags are present</li>
+			<li>Fixed Reminder form to clear date field between uses</li>
+			<li>Restored About page to static content instead of from the web</li>
 		</ul>
 
 		<h3>Open Source Project Information</h3>
