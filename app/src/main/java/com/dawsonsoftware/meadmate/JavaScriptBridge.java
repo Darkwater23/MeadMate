@@ -79,7 +79,7 @@ public class JavaScriptBridge {
 
         String result = "Not implemented yet.";
 
-        //TODO: Add method for exporting data
+        //TODO: Add method for importing data
 
         Log.i("JavaScriptBridge", "Import complete!");
 
@@ -598,42 +598,5 @@ public class JavaScriptBridge {
         MainActivity mainActivity = (MainActivity) this.activity;
 
         mainActivity.requestEvent(request);
-    }
-
-    @JavascriptInterface
-    public String fetchFeedDocument() throws IOException {
-
-        String document;
-
-        try
-        {
-            Log.d("JavaScriptBridge", "Fetching feed doc...");
-
-            //TODO: extract URL to settings (not sure where, though)
-            String sURL = "https://us-central1-dawson-software.cloudfunctions.net/meadmate-feed";
-
-            // Connect to the URL using java's native library
-            URL url = new URL(sURL);
-            URLConnection conn = url.openConnection();
-            conn.connect();
-
-            InputStreamReader reader = new InputStreamReader((InputStream) conn.getContent());
-            //Creating a character array
-            char charArray[] = new char[conn.getContentLength()];
-
-            //Reading the contents of the reader
-            reader.read(charArray);
-
-            //Converting character array to a String
-            document = new String(charArray);
-        }
-        catch(Exception ex)
-        {
-            Log.e("JavascriptBridge", ex.toString());
-
-            document = null;
-        }
-
-        return document;
     }
 }

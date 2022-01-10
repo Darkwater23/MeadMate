@@ -199,39 +199,6 @@ $(document).on("pagebeforeshow","#preferences",function(){
 
 });
 
-$(document).on("pagebeforeshow","#about",function(){
-
-    window.Android.logInfo('MainActivity', 'Fetching json doc from cloud.');
-
-    var doc = fetchFeedDocument();
-
-    $("#feed-content").empty();
-
-    if(doc)
-    {
-        var html = [
-            '<h3>' + doc.Title + '<br /><small>' + doc.ReleaseDate + ' / ' + doc.Author + '</small></h3>',
-            '<p>' + doc.Summary + '</p>'
-        ].join("\n");
-
-        for (var key in doc.TopicMessages) {
-            if (doc.TopicMessages.hasOwnProperty(key)) {
-                //console.log(key + " -> " + p[key]);
-
-                html += '<h3>' + key + '</h3><ul>';
-
-                doc.TopicMessages[key].forEach(function (item, index) {
-                  html += '<li>' + item + '</li>';
-                });
-
-                html += '</ul>';
-            }
-        }
-
-        $("#feed-content").append(html);
-    }
-});
-
 // Form validation events
 
 $("#new-mead-form").validate({
@@ -1019,6 +986,7 @@ function viewEvents(meadId)
 
             $("#newCalendarEventTitle").val("Mead Mate: '" + event.data.meadName + "'");
             $("#newCalendarEventDescription").prop("selectedIndex", 0);
+            $("#newCalendarEventDate").val("");
             $("#newCalendarEventNotes").val("");
 
             // transition to view
@@ -1537,19 +1505,4 @@ function calendarEventCallback(resultValue)
             viewMead(meadId);
         }
     }
-}
-
-function fetchFeedDocument()
-{
-    if(window.Android)
-    {
-        var feedDoc = window.Android.fetchFeedDocument();
-
-        if(feedDoc)
-        {
-            return JSON.parse(feedDoc);
-        }
-    }
-
-    return null;
 }
