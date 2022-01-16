@@ -212,7 +212,7 @@ $("#new-mead-form").validate({
             required: true
         },
         newMeadOriginalGravity: {
-            required: true,
+            required: false,
             range: specificGravityRange
         }
     },
