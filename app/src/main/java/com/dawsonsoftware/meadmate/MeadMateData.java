@@ -91,7 +91,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             KEY_MEAD_NAME + " TEXT NOT NULL," +
             KEY_MEAD_START_DATE + " TEXT NOT NULL," +
             KEY_MEAD_DESC + " TEXT," +
-            KEY_MEAD_ORIG_GRAV + " TEXT NOT NULL DEFAULT 0.0," +
+            KEY_MEAD_ORIG_GRAV + " TEXT NOT NULL DEFAULT '0.0'," +
             KEY_MEAD_ARCHIVED + " INTEGER NOT NULL DEFAULT 0)";
 
     String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + " (" +
@@ -107,25 +107,25 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     String LOAD_EVENT_TYPES_TABLE = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
-            "(1,\"Primary Fermentation\")," +
-            "(2,\"Secondary Fermentation\")," +
-            "(3,\"Racked\")," +
-            "(4,\"Bottled\")," +
-            "(5,\"Discarded\")," +
-            "(6,\"Tasting\")," +
-            "(7,\"Backsweetened\")," +
-            "(8,\"Note\")," +
-            "(9,\"Conditioning\")," +
-            "(10,\"Feeding\")";
+            "(1,'Primary Fermentation')," +
+            "(2,'Secondary Fermentation')," +
+            "(3,'Racked')," +
+            "(4,'Bottled')," +
+            "(5,'Discarded')," +
+            "(6,'Tasting')," +
+            "(7,'Backsweetened')," +
+            "(8,'Note')," +
+            "(9,'Conditioning')," +
+            "(10,'Feeding')";
 
     String ADD_NEW_EVENT_TYPES = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
-            "(7,\"Backsweetened\")," +
-            "(8,\"Note\")";
+            "(7,'Backsweetened')," +
+            "(8,'Note')";
 
     String ADD_NEW_EVENT_TYPE_REL6 = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
-            "(9,\"Conditioning\")";
+            "(9,'Conditioning')";
 
     String CREATE_READINGS_TABLE = "CREATE TABLE " + TABLE_READINGS + " (" +
             KEY_READINGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
@@ -152,7 +152,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     String ADD_NEW_EVENT_TYPE_REL8 = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
-            "(10,\"Feeding\")";
+            "(10,'Feeding')";
 
     public MeadMateData(Context context){
         super(context,DB_NAME, null, DB_VERSION);
@@ -160,6 +160,8 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+
+        Log.i(MeadMateData.class.getTypeName(), "Creating database...");
 
         db.execSQL(CREATE_MEAD_TABLE);
         db.execSQL(CREATE_EVENTS_TABLE);
@@ -169,6 +171,8 @@ public class MeadMateData extends SQLiteOpenHelper {
         db.execSQL(CREATE_TAGS_TABLE);
         db.execSQL(CREATE_MEAD_TAGS_TABLE);
         db.execSQL(CREATE_RECIPES_TABLE);
+
+        Log.i(MeadMateData.class.getTypeName(), "Database created successfully.");
     }
 
     @Override

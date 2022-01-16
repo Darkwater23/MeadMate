@@ -17,7 +17,7 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 const abvPrefKeyName = 'ABVPREF';
 const sortPrefKeyName = 'SORTPREF';
-const specificGravityRange = [0.980, 1.160];
+const specificGravityRange = [0.700, 2.000];
 const archivePrefKeyName = 'INCLUDE_ARCHIVED';
 
 // One-time code executions
@@ -212,7 +212,7 @@ $("#new-mead-form").validate({
             required: true
         },
         newMeadOriginalGravity: {
-            required: true,
+            required: false,
             range: specificGravityRange
         }
     },
