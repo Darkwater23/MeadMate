@@ -891,11 +891,16 @@ function viewEvents(meadId)
         var readingsJson = window.Android.fetchReadings(id);
         var readingsData = JSON.parse(readingsJson);
 
+        var eventsJson = window.Android.fetchEvents(id);
+        var eventsData = JSON.parse(eventsJson);
+
         window.Android.logDebug('MainActivity', meadJson);
         window.Android.logDebug('MainActivity', tagsJson);
         window.Android.logDebug('MainActivity', readingsJson);
+        window.Android.logDebug('MainActivity', eventsJson);
 
         var lastReadingDisplayValue = "N/A";
+        var lastEventDisplayValue = "N/A";
 
         if(readingsData.length > 0)
         {
@@ -908,6 +913,12 @@ function viewEvents(meadId)
             lastReadingDisplayValue = lastReading.specificGravity + " (" + abvDisplayValue + ") as of " + lastReading.date;
         }
 
+        if(eventsData.length > 0)
+        {
+            var lastEvent = eventsData[eventsData.length - 1];
+            lastEventDisplayValue = lastEvent.typeName + " on " + lastEvent.date;
+        }
+
         // Populate fields
         //$("#mead-id").text(meadData.id); was used for debugging; not really useful for the user
         $("#mead-name").text(meadData.name);
@@ -915,6 +926,7 @@ function viewEvents(meadId)
         $("#mead-description").text(meadData.description);
         $("#mead-original-gravity").text(meadData.originalGravity);
         $("#mead-last-reading").text(lastReadingDisplayValue);
+        $("#mead-last-event").text(lastEventDisplayValue);
 
         // Clear & update tags
         $("#mead-tags span").remove();
@@ -1438,19 +1450,28 @@ function displayTag(tag)
         if(length === 0)
         {
             $("#mead-tags").append("<span>" + $.trim(tag) + "</span>");
+
+            /* Just in case the tags part of the UI is hidden, show it upon adding */
+            $("#mead-tags-label").show();
+            $("#mead-tags").show();
         }
     }
 }
 
 function displayMeadTags(tagData)
 {
-    if(Array.isArray(tagData))
+    if(Array.isArray(tagData) && tagData.length > 0)
     {
         window.Android.logDebug('displayMeadTags', 'Adding tags to view.');
 
         $.each(tagData, function (i, item) {
             displayTag(item.name);
         });
+    }
+    else
+    {
+        $("#mead-tags-label").hide();
+        $("#mead-tags").hide();
     }
 }
 
