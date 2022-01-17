@@ -907,10 +907,13 @@ function viewEvents(meadId)
             var lastReading = readingsData[readingsData.length - 1];
 
             var result = calculateAbv(meadData.originalGravity,lastReading.specificGravity);
+            var expResult = calculateAbvByReadings(meadData.originalGravity, readingsData);
 
             var abvDisplayValue = getPreferredAbvValue(result);
+            var expAbvDisplayValue = getPreferredAbvValue(expResult);
 
-            lastReadingDisplayValue = lastReading.specificGravity + " (" + abvDisplayValue + ") as of " + lastReading.date;
+            lastReadingDisplayValue = lastReading.specificGravity + " (" + abvDisplayValue + ") as of " + lastReading.date + "\r\n" +
+                "Experimental ABV: " + expAbvDisplayValue;
         }
 
         if(eventsData.length > 0)
@@ -1229,6 +1232,77 @@ function editEvent(eventId)
     {
         $.alert('Android Javascript bridge is not available');
     }
+}
+
+function calculateAbvByReadings(initialGravity, batchReadings)
+{
+    // Initial model error result first
+    var results = new Object();
+
+    results.standard = '-.--%';
+    results.highstandard = '-.--%';
+    results.alternate = '-.--%';
+    results.wine = '-.--%';
+
+    if(isNaN(parseFloat(initialGravity)))
+    {
+        // return error result
+        return results;
+    }
+
+    if(!Array.isArray(batchReadings) || batchReadings.length == 0)
+    {
+        // return error result
+        return results;
+    }
+
+    // hold initial value
+    // start loop, hold first value
+    // compare each value to previous
+    // if current is higher than previous, add difference to initial
+    // calculate ABV from modified initial and final gravities
+    var ig = new Decimal(initialGravity);
+    var prevReading = new Decimal('0');
+
+    window.Android.logInfo('MainActivity', 'Readings count: ' + batchReadings.length);
+
+    for (let i = 0; i < batchReadings.length; i++) {
+
+        var sg = new Decimal(batchReadings[i].specificGravity);
+
+        window.Android.logInfo('MainActivity', 'Reading this pass: ' + sg.toFixed(3));
+
+        if(i === 0)
+        {
+            prevReading = prevReading.plus(sg);
+            window.Android.logInfo('MainActivity', 'First reading: ' + sg.toFixed(3));
+            window.Android.logInfo('MainActivity', 'First pass: ' + prevReading.toFixed(3));
+        }
+
+        if(sg.greaterThan(prevReading))
+        {
+            window.Android.logInfo('MainActivity', 'Previous gravity reading: ' + prevReading.toFixed(3));
+            window.Android.logInfo('MainActivity', 'Larger gravity reading found: ' + sg.toFixed(3));
+
+            // A reading was found that is greater than the previous
+            // This indicates that more sugar was added to the batch
+            var diff = sg.minus(prevReading);
+
+            // Add the difference to the initial gravity
+            ig = ig.plus(diff);
+        }
+
+        // Overwrite the previous reading with the current reading
+        prevReading = sg;
+    }
+
+    // Now, if sugar was added, the initial value should be higher and we can do a normal ABV calc
+    window.Android.logInfo('MainActivity', 'Initial Gravity: ' + ig.toFixed(3));
+    window.Android.logInfo('MainActivity', 'Last Gravity: ' + prevReading.toFixed(3));
+
+    results = calculateAbv(ig.toFixed(3), prevReading.toFixed(3));
+
+    return results;
 }
 
 function calculateAbv(initialGravity, subsequentGravity)
