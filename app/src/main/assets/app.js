@@ -1264,6 +1264,8 @@ function calculateAbvByReadings(initialGravity, batchReadings)
     var ig = new Decimal(initialGravity);
     var prevReading = new Decimal('0');
 
+    window.Android.logInfo('MainActivity', 'Initial Gravity: ' + ig.toFixed(3));
+
     window.Android.logInfo('MainActivity', 'Readings count: ' + batchReadings.length);
 
     for (let i = 0; i < batchReadings.length; i++) {
@@ -1272,24 +1274,20 @@ function calculateAbvByReadings(initialGravity, batchReadings)
 
         window.Android.logInfo('MainActivity', 'Reading this pass: ' + sg.toFixed(3));
 
-        if(i === 0)
-        {
-            prevReading = prevReading.plus(sg);
-            window.Android.logInfo('MainActivity', 'First reading: ' + sg.toFixed(3));
-            window.Android.logInfo('MainActivity', 'First pass: ' + prevReading.toFixed(3));
-        }
-
         if(sg.greaterThan(prevReading))
         {
             window.Android.logInfo('MainActivity', 'Previous gravity reading: ' + prevReading.toFixed(3));
             window.Android.logInfo('MainActivity', 'Larger gravity reading found: ' + sg.toFixed(3));
 
-            // A reading was found that is greater than the previous
-            // This indicates that more sugar was added to the batch
-            var diff = sg.minus(prevReading);
+            if(i > 0) // We're not on the first reading anymore
+            {
+                // A reading was found that is greater than the previous
+                // This indicates that more sugar was added to the batch
+                var diff = sg.minus(prevReading);
 
-            // Add the difference to the initial gravity
-            ig = ig.plus(diff);
+                // Add the difference to the initial gravity
+                ig = ig.plus(diff);
+            }
         }
 
         // Overwrite the previous reading with the current reading
@@ -1297,7 +1295,7 @@ function calculateAbvByReadings(initialGravity, batchReadings)
     }
 
     // Now, if sugar was added, the initial value should be higher and we can do a normal ABV calc
-    window.Android.logInfo('MainActivity', 'Initial Gravity: ' + ig.toFixed(3));
+    window.Android.logInfo('MainActivity', 'Modified Initial Gravity: ' + ig.toFixed(3));
     window.Android.logInfo('MainActivity', 'Last Gravity: ' + prevReading.toFixed(3));
 
     results = calculateAbv(ig.toFixed(3), prevReading.toFixed(3));
