@@ -19,6 +19,7 @@ const abvPrefKeyName = 'ABVPREF';
 const sortPrefKeyName = 'SORTPREF';
 const specificGravityRange = [0.700, 2.000];
 const archivePrefKeyName = 'INCLUDE_ARCHIVED';
+const dateFormatPrefKeyName = 'DATEFORMATPREF';
 
 // One-time code executions
 var tagList;
@@ -196,6 +197,9 @@ $(document).on("pagebeforeshow","#preferences",function(){
 
     $("#sort-pref").val(sortPref);
     $("#sort-pref").selectmenu("refresh", true);
+
+    $("#date-format-pref").val(dateFormatPref);
+    $("#date-format-pref").selectmenu("refresh", true);
 
 });
 
@@ -563,6 +567,11 @@ $("#sort-pref").change(function() {
     window.Android.logDebug('ChangeEvent','Sort preference set to: ' + this.value);
 });
 
+$("#date-format-pref").change(function() {
+    localStorage.setItem(dateFormatPrefKeyName,this.value);
+    window.Android.logDebug('ChangeEvent','Date Format preference set to: ' + this.value);
+});
+
 // Custom app functions
 function loadMyMeadsListView()
 {
@@ -667,8 +676,8 @@ function loadMyRecipesListView()
     }
 }
 
- function viewReadings(meadId)
- {
+function viewReadings(meadId)
+{
     if(window.Android && meadId > 0)
     {
         window.Android.logInfo('MainActivity', 'Fetching Readings for mead ID ' + meadId);
@@ -738,7 +747,7 @@ function loadMyRecipesListView()
  }
 
 function viewEvents(meadId)
- {
+{
     if(window.Android && meadId > 0)
     {
         window.Android.logInfo('MainActivity', 'Fetching Events for mead ID ' + meadId);
@@ -809,8 +818,8 @@ function viewEvents(meadId)
     $(":mobile-pagecontainer").pagecontainer("change", "#events");
  }
 
- function deleteReading(meadId, readingId)
- {
+function deleteReading(meadId, readingId)
+{
     window.Android.logDebug('MainActivity', 'Delete Reading Button pressed. Mead ID: ' + meadId);
     window.Android.logDebug('MainActivity', 'Reading ID: ' + readingId);
 
@@ -842,8 +851,8 @@ function viewEvents(meadId)
     return false;
  }
 
- function deleteEvent(meadId, eventId)
-  {
+function deleteEvent(meadId, eventId)
+{
      window.Android.logDebug('MainActivity', 'Delete Event Button pressed. Mead ID: ' + meadId);
      window.Android.logDebug('MainActivity', 'Log Entry ID: ' + eventId);
 
@@ -875,8 +884,8 @@ function viewEvents(meadId)
      return false;
   }
 
- function viewMead(id)
- {
+function viewMead(id)
+{
     if(window.Android && id > 0)
     {
         window.Android.logInfo('MainActivity', 'Fetching Mead by ID: ' + id);
@@ -1121,7 +1130,7 @@ function viewEvents(meadId)
  }
 
 function viewRecipe(id)
- {
+{
     if(window.Android && id > 0)
     {
         window.Android.logInfo('MainActivity', 'Fetching Recipe by ID: ' + id);
@@ -1598,4 +1607,40 @@ function calendarEventCallback(resultValue)
             viewMead(meadId);
         }
     }
+}
+
+function formatDisplayDate(dateString, userPref)
+{
+    // I'm very concerned about converting a known string format to a date for reformatting.
+    // The UTC vs local thing is currently haunting the app in other ways.
+    // I'm going to do this as an explicit string manipulation
+
+    // We know the date has dashes in it from the database, we only need to switch the string
+    // if the user preference is freedom units
+
+    // This a helper function and not a library function, so I'm not going to make this bulletproof
+    // right now.
+
+    if(dateString && userPref)
+    {
+        if(userPref === "ISO")
+        {
+            // Database dates will already be in this format
+            return dateString;
+        }
+
+        if(userPref === "US")
+        {
+            // Database dates will have dashes in them
+            const [year, month, day] = dateString.split('-');
+
+            // if the split was clean, reassemble date to preferred format
+            if(year && month && day)
+            {
+                return month + '/' + day + '/' + year;
+            }
+        }
+    }
+
+    return dateString;
 }
