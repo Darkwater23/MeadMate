@@ -57,7 +57,7 @@ $(function() {
             $("#app-version-name").text(versionInfo.versionName);
             $("#app-version-number").text(versionInfo.versionNumber);
             $("#database-version-number").text(versionInfo.databaseVersion);
-            $("#update-date").text(versionInfo.dateUpdated);
+            $("#update-date").text(formatDisplayDate(versionInfo.dateUpdated));
         }
     }
 
@@ -701,7 +701,7 @@ function viewReadings(meadId)
         $("#reading-list tbody").empty();
 
         // Append original gravity reading to list
-        $("#reading-list tbody").append('<tr><td>' + meadData.startDate + '</td><td>' + meadData.originalGravity + '</td><td>N/A</td><td>&nbsp;</td></tr>');
+        $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(meadData.startDate) + '</td><td>' + meadData.originalGravity + '</td><td>N/A</td><td>&nbsp;</td></tr>');
 
         // Holding variable for original or previous gravity
         var og = meadData.originalGravity;
@@ -715,7 +715,7 @@ function viewReadings(meadId)
 
             var abvDisplayValue = getPreferredAbvValue(result);
 
-            $("#reading-list tbody").append('<tr><td>' + readingsData[i].date + '</td><td>' + sg + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
+            $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + sg + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
         }
 
         $("#newReadingButton").off("tap"); // clear existing event handlers
@@ -790,8 +790,8 @@ function viewEvents(meadId)
             }
 
             // Append data to list
-            $("#events-list tbody").append('<tr><td style="white-space: nowrap; text-align: center;">' + eventsData[i].date + '<br>' + daysAgoOutput + '</td><td>' + eventsData[i].typeName + '</td><td style="white-space: nowrap; text-align: center;">' +
-                '<a href="javascript:showEventDescription(' + eventsData[i].id + ',\'' + eventsData[i].date + '\');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
+            $("#events-list tbody").append('<tr><td style="white-space: nowrap; text-align: center;">' + formatDisplayDate(eventsData[i].date) + '<br>' + daysAgoOutput + '</td><td>' + eventsData[i].typeName + '</td><td style="white-space: nowrap; text-align: center;">' +
+                '<a href="javascript:showEventDescription(' + eventsData[i].id + ',\'' + formatDisplayDate(eventsData[i].date) + '\');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
                 '<a href="javascript:editEvent(' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-edit ui-btn-icon-notext">Edit</a>' +
                 '<a href="javascript:deleteEvent(' + meadId + ',' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a>' +
                 '</td></tr>');
@@ -922,20 +922,20 @@ function viewMead(id)
             var abvDisplayValue = getPreferredAbvValue(result);
             var expAbvDisplayValue = getPreferredAbvValue(expResult);
 
-            lastReadingDisplayValue = lastReading.specificGravity + " (" + abvDisplayValue + ") as of " + lastReading.date + "\r\n" +
+            lastReadingDisplayValue = lastReading.specificGravity + " (" + abvDisplayValue + ") as of " + formatDisplayDate(lastReading.date) + "\r\n" +
                 "Experimental ABV: " + expAbvDisplayValue;
         }
 
         if(eventsData.length > 0)
         {
             var lastEvent = eventsData[eventsData.length - 1];
-            lastEventDisplayValue = lastEvent.typeName + " on " + lastEvent.date;
+            lastEventDisplayValue = lastEvent.typeName + " on " + formatDisplayDate(lastEvent.date);
         }
 
         // Populate fields
         //$("#mead-id").text(meadData.id); was used for debugging; not really useful for the user
         $("#mead-name").text(meadData.name);
-        $("#mead-start-date").text(meadData.startDate);
+        $("#mead-start-date").text(formatDisplayDate(meadData.startDate));
         $("#mead-description").text(meadData.description);
         $("#mead-original-gravity").text(meadData.originalGravity);
         $("#mead-last-reading").text(lastReadingDisplayValue);
@@ -1122,7 +1122,7 @@ function viewMead(id)
         // Populate sample data
         //$("#mead-id").text("0");
         $("#mead-name").text("My First Mead");
-        $("#mead-start-date").text("01/01/2021");
+        $("#mead-start-date").text(formatDisplayDate("2022-01-01"));
         $("#mead-description").text("Sample data");
         $("#mead-original-gravity").text("1.000");
     }
@@ -1610,7 +1610,7 @@ function calendarEventCallback(resultValue)
     }
 }
 
-function formatDisplayDate(dateString, userPref)
+function formatDisplayDate(dateString)
 {
     // I'm very concerned about converting a known string format to a date for reformatting.
     // The UTC vs local thing is currently haunting the app in other ways.
@@ -1622,15 +1622,12 @@ function formatDisplayDate(dateString, userPref)
     // This a helper function and not a library function, so I'm not going to make this bulletproof
     // right now.
 
-    if(dateString && userPref)
-    {
-        if(userPref === "ISO")
-        {
-            // Database dates will already be in this format
-            return dateString;
-        }
+    // Fetch ABV formula preference
+    var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
 
-        if(userPref === "US")
+    if(dateString && dateFormatPref)
+    {
+        if(dateFormatPref === "US")
         {
             // Database dates will have dashes in them
             const [year, month, day] = dateString.split('-');
