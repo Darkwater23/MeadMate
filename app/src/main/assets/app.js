@@ -191,6 +191,7 @@ $(document).on("pagebeforeshow","#preferences",function(){
 
     var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
     var sortPref = localStorage.getItem(sortPrefKeyName) ?? 'byId';
+    var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
 
     $("#abv-formula-pref").val(abvPref);
     $("#abv-formula-pref").selectmenu("refresh", true);
