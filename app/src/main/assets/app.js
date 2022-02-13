@@ -775,7 +775,7 @@ function viewEvents(meadId)
 
             var disableButtonFlag = 'ui-state-disabled';
             var daysAgoOutput = '';
-            var daysAgo = Math.floor(daysSince(eventsData[i].date));
+            var daysAgo = daysSince(eventsData[i].date);
 
             // Showing 45 days, 60 days, 120 days starts to seem weird.
             // Adding more logic to switch to weeks might be ok, but dates should be fine for now
@@ -1506,21 +1506,33 @@ function showEventDescription(id, dateString)
     return false;
 }
 
-function daysSince(date)
+function daysSince(strDate)
 {
-    var now = new Date(); // This includes date and time UTC. Most methods called will localize the time.
-    var prevDate = new Date(date);
+    var result = 0;
 
-    // Only the date part is needed; cutting off the time part to prevent temporary off-by-one errors.
-    var today = new Date(now.toISOString().substring(0, 10));
+    if(strDate)
+    {
+        try
+        {
+            var now = new Date()
+            now.setHours(0,0,0,0);
+            var nowTime = now.getTime();
 
-    // To calculate the time difference of two dates
-    var Difference_In_Time = today.getTime() - prevDate.getTime();
+            var date = new Date(strDate);
+            var dateTime = date.getTime();
 
-    // To calculate the no. of days between two dates
-    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+            var diff = (nowTime - dateTime)/(24*60*60*1000);
 
-    return Difference_In_Days;
+            result = Math.floor(diff);
+        }
+        catch(error)
+        {
+            window.Android.logError('daysSince', 'Parameter: ' + strDate);
+            window.Android.logError('daysSince', error);
+        }
+    }
+
+    return result;
 }
 
 function displayTag(tag)
