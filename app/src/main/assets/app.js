@@ -1631,7 +1631,7 @@ function formatDisplayDate(dateString)
     // We know the date has dashes in it from the database, we only need to switch the string
     // if the user preference is freedom units
 
-    // This a helper function and not a library function, so I'm not going to make this bulletproof
+    // This is a helper function and not a library function, so I'm not going to make this bulletproof
     // right now.
 
     // Fetch ABV formula preference
