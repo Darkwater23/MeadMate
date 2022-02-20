@@ -83,19 +83,15 @@ $(document).on("pagebeforeshow","#abv", function(){
     {
         case 'std':
             $("#abvFormulaPref").html("Currently using <strong>Standard</strong> formula.");
-            window.Android.logDebug('abvShow',"avbPref detected as 'std'.");
             break;
         case 'highstd':
             $("#abvFormulaPref").html("Currently using <strong>High Standard</strong> formula.");
-            window.Android.logDebug('abvShow',"avbPref detected as 'highstd'.");
             break;
         case 'alt':
             $("#abvFormulaPref").html("Currently using <strong>Alternate</strong> formula.");
-            window.Android.logDebug('calcButton',"avbPref detected as 'alt'.");
             break;
         case 'wine':
             $("#abvFormulaPref").html("Currently using <strong>Wine</strong> formula.");
-            window.Android.logDebug('calcButton',"avbPref detected as 'wine'.");
             break;
         default:
             $("#abvFormulaPref").html("Preference not found. Using <strong>Standard</strong> formula.");
