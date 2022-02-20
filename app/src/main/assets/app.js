@@ -1286,11 +1286,11 @@ function calculateAbvByReadings(initialGravity, batchReadings)
 
         if(sg.greaterThan(prevReading))
         {
-            window.Android.logInfo('MainActivity', 'Previous gravity reading: ' + prevReading.toFixed(3));
-            window.Android.logInfo('MainActivity', 'Larger gravity reading found: ' + sg.toFixed(3));
-
             if(i > 0) // We're not on the first reading anymore
             {
+                window.Android.logInfo('MainActivity', 'Previous gravity reading: ' + prevReading.toFixed(3));
+                window.Android.logInfo('MainActivity', 'Larger gravity reading found: ' + sg.toFixed(3));
+
                 // A reading was found that is greater than the previous
                 // This indicates that more sugar was added to the batch
                 var diff = sg.minus(prevReading);
