@@ -65,6 +65,14 @@ $(function() {
     $("#newCalendarEventDescription").selectmenu();
 });
 
+// Object definitions
+function AbvResultSet() {
+    this.standard = '-.--%';
+    this.highstandard = '-.--%';
+    this.alternate = '-.--%';
+    this.wine = '-.--%';
+};
+
 // Page Transition events
 
 $(document).on("pagebeforeshow","#abv", function(){
@@ -706,16 +714,15 @@ function viewReadings(meadId)
         // Holding variable for original or previous gravity
         var og = meadData.originalGravity;
 
+        // This array will be the same length as the readings array
+        var results = calculateAbvByReadings(og, readingsData);
+
         // Append to list
         for (var i = 0; i < readingsData.length; i++) {
 
-            var sg = readingsData[i].specificGravity;
+            var abvDisplayValue = getPreferredAbvValue(results[i]);
 
-            var result = calculateAbv(og,sg);
-
-            var abvDisplayValue = getPreferredAbvValue(result);
-
-            $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + sg + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
+            $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
         }
 
         $("#newReadingButton").off("tap"); // clear existing event handlers
@@ -916,14 +923,14 @@ function viewMead(id)
         {
             var lastReading = readingsData[readingsData.length - 1];
 
-            var result = calculateAbv(meadData.originalGravity,lastReading.specificGravity);
-            var expResult = calculateAbvByReadings(meadData.originalGravity, readingsData);
+            //var result = calculateAbv(meadData.originalGravity,lastReading.specificGravity);
 
-            var abvDisplayValue = getPreferredAbvValue(result);
-            var expAbvDisplayValue = getPreferredAbvValue(expResult);
+            // This now returns an array of ABV results
+            var expResults = calculateAbvByReadings(meadData.originalGravity, readingsData);
 
-            lastReadingDisplayValue = lastReading.specificGravity + " (" + abvDisplayValue + ") as of " + formatDisplayDate(lastReading.date) + "\r\n" +
-                "Experimental ABV: " + expAbvDisplayValue;
+            var abvDisplayValue = getPreferredAbvValue(expResults[expResults.length - 1]);
+
+            lastReadingDisplayValue = lastReading.specificGravity + " (" + abvDisplayValue + ") as of " + formatDisplayDate(lastReading.date);
         }
 
         if(eventsData.length > 0)
@@ -1244,26 +1251,20 @@ function editEvent(eventId)
     }
 }
 
+// This method takes added sugar into consideration and returns
+// the ABV value across all readings.
 function calculateAbvByReadings(initialGravity, batchReadings)
 {
-    // Initial model error result first
-    var results = new Object();
-
-    results.standard = '-.--%';
-    results.highstandard = '-.--%';
-    results.alternate = '-.--%';
-    results.wine = '-.--%';
-
     if(isNaN(parseFloat(initialGravity)))
     {
-        // return error result
-        return results;
+        // return array with single object
+        return new Array().push(new AbvResultSet());
     }
 
     if(!Array.isArray(batchReadings) || batchReadings.length == 0)
     {
-        // return error result
-        return results;
+        // return array with single object
+        return new Array().push(new AbvResultSet());
     }
 
     // hold initial value
@@ -1274,8 +1275,10 @@ function calculateAbvByReadings(initialGravity, batchReadings)
     var ig = new Decimal(initialGravity);
     var prevReading = new Decimal('0');
 
-    window.Android.logInfo('MainActivity', 'Initial Gravity: ' + ig.toFixed(3));
+    // Initial array for holding results objects
+    var results = new Array();
 
+    window.Android.logInfo('MainActivity', 'Initial Gravity: ' + ig.toFixed(3));
     window.Android.logInfo('MainActivity', 'Readings count: ' + batchReadings.length);
 
     for (let i = 0; i < batchReadings.length; i++) {
@@ -1300,6 +1303,9 @@ function calculateAbvByReadings(initialGravity, batchReadings)
             }
         }
 
+        // Calculate ABV at this step, add to array
+        results.push(calculateAbv(ig, sg));
+
         // Overwrite the previous reading with the current reading
         prevReading = sg;
     }
@@ -1308,31 +1314,24 @@ function calculateAbvByReadings(initialGravity, batchReadings)
     window.Android.logInfo('MainActivity', 'Modified Initial Gravity: ' + ig.toFixed(3));
     window.Android.logInfo('MainActivity', 'Last Gravity: ' + prevReading.toFixed(3));
 
-    results = calculateAbv(ig.toFixed(3), prevReading.toFixed(3));
-
     return results;
 }
 
 function calculateAbv(initialGravity, subsequentGravity)
 {
     // Initial model error result first
-    var results = new Object();
-
-    results.standard = '-.--%';
-    results.highstandard = '-.--%';
-    results.alternate = '-.--%';
-    results.wine = '-.--%';
+    var result = new AbvResultSet();
 
     if(isNaN(parseFloat(initialGravity)))
     {
         // return error result
-        return results;
+        return result;
     }
 
     if(isNaN(parseFloat(subsequentGravity)))
     {
         // return error result
-        return results;
+        return result;
     }
 
     var std = calculateAbvStandard(initialGravity, subsequentGravity);
@@ -1340,12 +1339,12 @@ function calculateAbv(initialGravity, subsequentGravity)
     var alt = calculateAbvAlternate(initialGravity, subsequentGravity);
     var wine = calculateAbvWine(initialGravity, subsequentGravity);
 
-    results.standard = std.toFixed(2) + '%';
-    results.highstandard = highstd.toFixed(2) + '%';
-    results.alternate = alt.toFixed(2) + '%';
-    results.wine = wine.toFixed(2) + '%';
+    result.standard = std.toFixed(2) + '%';
+    result.highstandard = highstd.toFixed(2) + '%';
+    result.alternate = alt.toFixed(2) + '%';
+    result.wine = wine.toFixed(2) + '%';
 
-    return results;
+    return result;
 }
 
 function calculateAbvStandard(initialGravity, subsequentGravity)
