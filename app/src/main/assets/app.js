@@ -718,6 +718,11 @@ function viewReadings(meadId)
 
             var abvDisplayValue = getPreferredAbvValue(results[i]);
 
+            if(results[i].specificGravityDifference)
+            {
+                abvDisplayValue = "+" + results[i].specificGravityDifference.toFixed(3);
+            }
+
             $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
         }
 
@@ -1269,7 +1274,7 @@ function calculateAbvByReadings(initialGravity, batchReadings)
     // if current is higher than previous, add difference to initial
     // calculate ABV from modified initial and final gravities
     var ig = new Decimal(initialGravity);
-    var prevReading = new Decimal('0');
+    var prevReading = ig;
 
     // Initial array for holding results objects
     var results = new Array();
@@ -1280,27 +1285,33 @@ function calculateAbvByReadings(initialGravity, batchReadings)
     for (let i = 0; i < batchReadings.length; i++) {
 
         var sg = new Decimal(batchReadings[i].specificGravity);
+        var diff = null;
 
         window.Android.logInfo('MainActivity', 'Reading this pass: ' + sg.toFixed(3));
 
         if(sg.greaterThan(prevReading))
         {
-            if(i > 0) // We're not on the first reading anymore
-            {
-                window.Android.logInfo('MainActivity', 'Previous gravity reading: ' + prevReading.toFixed(3));
-                window.Android.logInfo('MainActivity', 'Larger gravity reading found: ' + sg.toFixed(3));
+            window.Android.logInfo('MainActivity', 'Previous gravity reading: ' + prevReading.toFixed(3));
+            window.Android.logInfo('MainActivity', 'Larger gravity reading found: ' + sg.toFixed(3));
 
-                // A reading was found that is greater than the previous
-                // This indicates that more sugar was added to the batch
-                var diff = sg.minus(prevReading);
+            // A reading was found that is greater than the previous
+            // This indicates that more sugar was added to the batch
+            diff = sg.minus(prevReading);
 
-                // Add the difference to the initial gravity
-                ig = ig.plus(diff);
-            }
+            // Add the difference to the initial gravity
+            ig = ig.plus(diff);
         }
 
         // Calculate ABV at this step, add to array
-        results.push(calculateAbv(ig, sg));
+        var abvResult = calculateAbv(ig, sg);
+
+        // Appending property to object when there's a positive difference
+        if(diff)
+        {
+            abvResult.specificGravityDifference = diff;
+        }
+
+        results.push(abvResult);
 
         // Overwrite the previous reading with the current reading
         prevReading = sg;
