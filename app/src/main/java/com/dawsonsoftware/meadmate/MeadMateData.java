@@ -36,7 +36,7 @@ import java.util.List;
 
 public class MeadMateData extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 7;
+    private static final int DB_VERSION = 8;
     private static final String DB_NAME = "appdata";
 
     // Meads table fields
@@ -116,7 +116,8 @@ public class MeadMateData extends SQLiteOpenHelper {
             "(7,'Backsweetened')," +
             "(8,'Note')," +
             "(9,'Conditioning')," +
-            "(10,'Feeding')";
+            "(10,'Feeding')," +
+            "(11,'Cold Crashing')";
 
     String ADD_NEW_EVENT_TYPES = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
@@ -153,6 +154,10 @@ public class MeadMateData extends SQLiteOpenHelper {
     String ADD_NEW_EVENT_TYPE_REL8 = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
             "(10,'Feeding')";
+
+    String ADD_NEW_EVENT_TYPE_REL12 = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
+            KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
+            "(11,'Cold Crashing')";
 
     public MeadMateData(Context context){
         super(context,DB_NAME, null, DB_VERSION);
@@ -196,6 +201,8 @@ public class MeadMateData extends SQLiteOpenHelper {
                 db.execSQL(CREATE_RECIPES_TABLE);
             case 6:
                 db.execSQL(ADD_NEW_EVENT_TYPE_REL8);
+            case 7:
+                db.execSQL(ADD_NEW_EVENT_TYPE_REL12);
                 break;
             default:
                 //log no update applied

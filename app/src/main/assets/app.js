@@ -19,6 +19,7 @@ const abvPrefKeyName = 'ABVPREF';
 const sortPrefKeyName = 'SORTPREF';
 const specificGravityRange = [0.700, 2.000];
 const archivePrefKeyName = 'INCLUDE_ARCHIVED';
+const dateFormatPrefKeyName = 'DATEFORMATPREF';
 
 // One-time code executions
 var tagList;
@@ -56,13 +57,21 @@ $(function() {
             $("#app-version-name").text(versionInfo.versionName);
             $("#app-version-number").text(versionInfo.versionNumber);
             $("#database-version-number").text(versionInfo.databaseVersion);
-            $("#update-date").text(versionInfo.dateUpdated);
+            $("#update-date").text(formatDisplayDate(versionInfo.dateUpdated));
         }
     }
 
     $("#newEventType").selectmenu();
     $("#newCalendarEventDescription").selectmenu();
 });
+
+// Object definitions
+function AbvResultSet() {
+    this.standard = '-.--%';
+    this.highstandard = '-.--%';
+    this.alternate = '-.--%';
+    this.wine = '-.--%';
+};
 
 // Page Transition events
 
@@ -74,19 +83,15 @@ $(document).on("pagebeforeshow","#abv", function(){
     {
         case 'std':
             $("#abvFormulaPref").html("Currently using <strong>Standard</strong> formula.");
-            window.Android.logDebug('abvShow',"avbPref detected as 'std'.");
             break;
         case 'highstd':
             $("#abvFormulaPref").html("Currently using <strong>High Standard</strong> formula.");
-            window.Android.logDebug('abvShow',"avbPref detected as 'highstd'.");
             break;
         case 'alt':
             $("#abvFormulaPref").html("Currently using <strong>Alternate</strong> formula.");
-            window.Android.logDebug('calcButton',"avbPref detected as 'alt'.");
             break;
         case 'wine':
             $("#abvFormulaPref").html("Currently using <strong>Wine</strong> formula.");
-            window.Android.logDebug('calcButton',"avbPref detected as 'wine'.");
             break;
         default:
             $("#abvFormulaPref").html("Preference not found. Using <strong>Standard</strong> formula.");
@@ -190,12 +195,16 @@ $(document).on("pagebeforeshow","#preferences",function(){
 
     var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
     var sortPref = localStorage.getItem(sortPrefKeyName) ?? 'byId';
+    var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
 
     $("#abv-formula-pref").val(abvPref);
     $("#abv-formula-pref").selectmenu("refresh", true);
 
     $("#sort-pref").val(sortPref);
     $("#sort-pref").selectmenu("refresh", true);
+
+    $("#date-format-pref").val(dateFormatPref);
+    $("#date-format-pref").selectmenu("refresh", true);
 
 });
 
@@ -563,6 +572,11 @@ $("#sort-pref").change(function() {
     window.Android.logDebug('ChangeEvent','Sort preference set to: ' + this.value);
 });
 
+$("#date-format-pref").change(function() {
+    localStorage.setItem(dateFormatPrefKeyName,this.value);
+    window.Android.logDebug('ChangeEvent','Date Format preference set to: ' + this.value);
+});
+
 // Custom app functions
 function loadMyMeadsListView()
 {
@@ -667,8 +681,8 @@ function loadMyRecipesListView()
     }
 }
 
- function viewReadings(meadId)
- {
+function viewReadings(meadId)
+{
     if(window.Android && meadId > 0)
     {
         window.Android.logInfo('MainActivity', 'Fetching Readings for mead ID ' + meadId);
@@ -691,21 +705,25 @@ function loadMyRecipesListView()
         $("#reading-list tbody").empty();
 
         // Append original gravity reading to list
-        $("#reading-list tbody").append('<tr><td>' + meadData.startDate + '</td><td>' + meadData.originalGravity + '</td><td>N/A</td><td>&nbsp;</td></tr>');
+        $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(meadData.startDate) + '</td><td>' + meadData.originalGravity + '</td><td>N/A</td><td>&nbsp;</td></tr>');
 
         // Holding variable for original or previous gravity
         var og = meadData.originalGravity;
 
+        // This array will be the same length as the readings array
+        var results = calculateAbvByReadings(og, readingsData);
+
         // Append to list
         for (var i = 0; i < readingsData.length; i++) {
 
-            var sg = readingsData[i].specificGravity;
+            var abvDisplayValue = getPreferredAbvValue(results[i]);
 
-            var result = calculateAbv(og,sg);
+            if(results[i] && results[i].specificGravityDifference)
+            {
+                abvDisplayValue = "+" + results[i].specificGravityDifference.toFixed(3);
+            }
 
-            var abvDisplayValue = getPreferredAbvValue(result);
-
-            $("#reading-list tbody").append('<tr><td>' + readingsData[i].date + '</td><td>' + sg + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
+            $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
         }
 
         $("#newReadingButton").off("tap"); // clear existing event handlers
@@ -738,7 +756,7 @@ function loadMyRecipesListView()
  }
 
 function viewEvents(meadId)
- {
+{
     if(window.Android && meadId > 0)
     {
         window.Android.logInfo('MainActivity', 'Fetching Events for mead ID ' + meadId);
@@ -765,7 +783,7 @@ function viewEvents(meadId)
 
             var disableButtonFlag = 'ui-state-disabled';
             var daysAgoOutput = '';
-            var daysAgo = Math.floor(daysSince(eventsData[i].date));
+            var daysAgo = daysSince(eventsData[i].date);
 
             // Showing 45 days, 60 days, 120 days starts to seem weird.
             // Adding more logic to switch to weeks might be ok, but dates should be fine for now
@@ -780,8 +798,8 @@ function viewEvents(meadId)
             }
 
             // Append data to list
-            $("#events-list tbody").append('<tr><td style="white-space: nowrap; text-align: center;">' + eventsData[i].date + '<br>' + daysAgoOutput + '</td><td>' + eventsData[i].typeName + '</td><td style="white-space: nowrap; text-align: center;">' +
-                '<a href="javascript:showEventDescription(' + eventsData[i].id + ',\'' + eventsData[i].date + '\');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
+            $("#events-list tbody").append('<tr><td style="white-space: nowrap; text-align: center;">' + formatDisplayDate(eventsData[i].date) + '<br>' + daysAgoOutput + '</td><td>' + eventsData[i].typeName + '</td><td style="white-space: nowrap; text-align: center;">' +
+                '<a href="javascript:showEventDescription(' + eventsData[i].id + ',\'' + formatDisplayDate(eventsData[i].date) + '\');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
                 '<a href="javascript:editEvent(' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-edit ui-btn-icon-notext">Edit</a>' +
                 '<a href="javascript:deleteEvent(' + meadId + ',' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a>' +
                 '</td></tr>');
@@ -809,8 +827,8 @@ function viewEvents(meadId)
     $(":mobile-pagecontainer").pagecontainer("change", "#events");
  }
 
- function deleteReading(meadId, readingId)
- {
+function deleteReading(meadId, readingId)
+{
     window.Android.logDebug('MainActivity', 'Delete Reading Button pressed. Mead ID: ' + meadId);
     window.Android.logDebug('MainActivity', 'Reading ID: ' + readingId);
 
@@ -842,8 +860,8 @@ function viewEvents(meadId)
     return false;
  }
 
- function deleteEvent(meadId, eventId)
-  {
+function deleteEvent(meadId, eventId)
+{
      window.Android.logDebug('MainActivity', 'Delete Event Button pressed. Mead ID: ' + meadId);
      window.Android.logDebug('MainActivity', 'Log Entry ID: ' + eventId);
 
@@ -875,8 +893,8 @@ function viewEvents(meadId)
      return false;
   }
 
- function viewMead(id)
- {
+function viewMead(id)
+{
     if(window.Android && id > 0)
     {
         window.Android.logInfo('MainActivity', 'Fetching Mead by ID: ' + id);
@@ -906,23 +924,26 @@ function viewEvents(meadId)
         {
             var lastReading = readingsData[readingsData.length - 1];
 
-            var result = calculateAbv(meadData.originalGravity,lastReading.specificGravity);
+            //var result = calculateAbv(meadData.originalGravity,lastReading.specificGravity);
 
-            var abvDisplayValue = getPreferredAbvValue(result);
+            // This now returns an array of ABV results
+            var expResults = calculateAbvByReadings(meadData.originalGravity, readingsData);
 
-            lastReadingDisplayValue = lastReading.specificGravity + " (" + abvDisplayValue + ") as of " + lastReading.date;
+            var abvDisplayValue = getPreferredAbvValue(expResults[expResults.length - 1]);
+
+            lastReadingDisplayValue = lastReading.specificGravity + " (" + abvDisplayValue + ") as of " + formatDisplayDate(lastReading.date);
         }
 
         if(eventsData.length > 0)
         {
             var lastEvent = eventsData[eventsData.length - 1];
-            lastEventDisplayValue = lastEvent.typeName + " on " + lastEvent.date;
+            lastEventDisplayValue = lastEvent.typeName + " on " + formatDisplayDate(lastEvent.date);
         }
 
         // Populate fields
         //$("#mead-id").text(meadData.id); was used for debugging; not really useful for the user
         $("#mead-name").text(meadData.name);
-        $("#mead-start-date").text(meadData.startDate);
+        $("#mead-start-date").text(formatDisplayDate(meadData.startDate));
         $("#mead-description").text(meadData.description);
         $("#mead-original-gravity").text(meadData.originalGravity);
         $("#mead-last-reading").text(lastReadingDisplayValue);
@@ -1109,7 +1130,7 @@ function viewEvents(meadId)
         // Populate sample data
         //$("#mead-id").text("0");
         $("#mead-name").text("My First Mead");
-        $("#mead-start-date").text("01/01/2021");
+        $("#mead-start-date").text(formatDisplayDate("2022-01-01"));
         $("#mead-description").text("Sample data");
         $("#mead-original-gravity").text("1.000");
     }
@@ -1118,7 +1139,7 @@ function viewEvents(meadId)
  }
 
 function viewRecipe(id)
- {
+{
     if(window.Android && id > 0)
     {
         window.Android.logInfo('MainActivity', 'Fetching Recipe by ID: ' + id);
@@ -1231,26 +1252,97 @@ function editEvent(eventId)
     }
 }
 
+// This method takes added sugar into consideration and returns
+// the ABV value across all readings.
+function calculateAbvByReadings(initialGravity, batchReadings)
+{
+    // Initial array for holding results objects
+    var results = new Array();
+
+    if(isNaN(parseFloat(initialGravity)))
+    {
+        // return array with single object
+        results.push(new AbvResultSet());
+        return results;
+    }
+
+    if(!Array.isArray(batchReadings) || batchReadings.length == 0)
+    {
+        // return array with single object
+        results.push(new AbvResultSet());
+        return results;
+    }
+
+    window.Android.logInfo('MainActivity', 'calculateAbvByReadings Params: ' + initialGravity + ', ' + batchReadings.length);
+
+    // hold initial value
+    // start loop, hold first value
+    // compare each value to previous
+    // if current is higher than previous, add difference to initial
+    // calculate ABV from modified initial and final gravities
+    var ig = new Decimal(initialGravity);
+    var prevReading = ig;
+
+    window.Android.logInfo('MainActivity', 'Initial Gravity: ' + ig.toFixed(3));
+    window.Android.logInfo('MainActivity', 'Readings count: ' + batchReadings.length);
+
+    for (let i = 0; i < batchReadings.length; i++) {
+
+        var sg = new Decimal(batchReadings[i].specificGravity);
+        var diff = null;
+
+        window.Android.logInfo('MainActivity', 'Reading this pass: ' + sg.toFixed(3));
+
+        if(sg.greaterThan(prevReading))
+        {
+            window.Android.logInfo('MainActivity', 'Previous gravity reading: ' + prevReading.toFixed(3));
+            window.Android.logInfo('MainActivity', 'Larger gravity reading found: ' + sg.toFixed(3));
+
+            // A reading was found that is greater than the previous
+            // This indicates that more sugar was added to the batch
+            diff = sg.minus(prevReading);
+
+            // Add the difference to the initial gravity
+            ig = ig.plus(diff);
+        }
+
+        // Calculate ABV at this step, add to array
+        var abvResult = calculateAbv(ig, sg);
+
+        // Appending property to object when there's a positive difference
+        if(diff)
+        {
+            abvResult.specificGravityDifference = diff;
+        }
+
+        results.push(abvResult);
+
+        // Overwrite the previous reading with the current reading
+        prevReading = sg;
+    }
+
+    // Now, if sugar was added, the initial value should be higher and we can do a normal ABV calc
+    window.Android.logInfo('MainActivity', 'Modified Initial Gravity: ' + ig.toFixed(3));
+    window.Android.logInfo('MainActivity', 'Last Gravity: ' + prevReading.toFixed(3));
+
+    return results;
+}
+
 function calculateAbv(initialGravity, subsequentGravity)
 {
     // Initial model error result first
-    var results = new Object();
-
-    results.standard = '-.--%';
-    results.highstandard = '-.--%';
-    results.alternate = '-.--%';
-    results.wine = '-.--%';
+    var result = new AbvResultSet();
 
     if(isNaN(parseFloat(initialGravity)))
     {
         // return error result
-        return results;
+        return result;
     }
 
     if(isNaN(parseFloat(subsequentGravity)))
     {
         // return error result
-        return results;
+        return result;
     }
 
     var std = calculateAbvStandard(initialGravity, subsequentGravity);
@@ -1258,12 +1350,12 @@ function calculateAbv(initialGravity, subsequentGravity)
     var alt = calculateAbvAlternate(initialGravity, subsequentGravity);
     var wine = calculateAbvWine(initialGravity, subsequentGravity);
 
-    results.standard = std.toFixed(2) + '%';
-    results.highstandard = highstd.toFixed(2) + '%';
-    results.alternate = alt.toFixed(2) + '%';
-    results.wine = wine.toFixed(2) + '%';
+    result.standard = std.toFixed(2) + '%';
+    result.highstandard = highstd.toFixed(2) + '%';
+    result.alternate = alt.toFixed(2) + '%';
+    result.wine = wine.toFixed(2) + '%';
 
-    return results;
+    return result;
 }
 
 function calculateAbvStandard(initialGravity, subsequentGravity)
@@ -1424,21 +1516,33 @@ function showEventDescription(id, dateString)
     return false;
 }
 
-function daysSince(date)
+function daysSince(strDate)
 {
-    var now = new Date(); // This includes date and time UTC. Most methods called will localize the time.
-    var prevDate = new Date(date);
+    var result = 0;
 
-    // Only the date part is needed; cutting off the time part to prevent temporary off-by-one errors.
-    var today = new Date(now.toISOString().substring(0, 10));
+    if(strDate)
+    {
+        try
+        {
+            var now = new Date()
+            now.setHours(0,0,0,0);
+            var nowTime = now.getTime();
 
-    // To calculate the time difference of two dates
-    var Difference_In_Time = today.getTime() - prevDate.getTime();
+            var date = new Date(strDate);
+            var dateTime = date.getTime();
 
-    // To calculate the no. of days between two dates
-    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+            var diff = (nowTime - dateTime)/(24*60*60*1000);
 
-    return Difference_In_Days;
+            result = Math.floor(diff);
+        }
+        catch(error)
+        {
+            window.Android.logError('daysSince', 'Parameter: ' + strDate);
+            window.Android.logError('daysSince', error);
+        }
+    }
+
+    return result;
 }
 
 function displayTag(tag)
@@ -1484,6 +1588,13 @@ function getPreferredAbvValue(result)
 {
     var value = '';
 
+    if(!result)
+    {
+        window.Android.logDebug('getPreferredAbvValue',"Result parameter is null or undefined.");
+        var errorResult = new AbvResultSet();
+        return errorResult.standard;
+    }
+
     // Fetch ABV formula preference
     var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
 
@@ -1526,4 +1637,37 @@ function calendarEventCallback(resultValue)
             viewMead(meadId);
         }
     }
+}
+
+function formatDisplayDate(dateString)
+{
+    // I'm very concerned about converting a known string format to a date for reformatting.
+    // The UTC vs local thing is currently haunting the app in other ways.
+    // I'm going to do this as an explicit string manipulation
+
+    // We know the date has dashes in it from the database, we only need to switch the string
+    // if the user preference is freedom units
+
+    // This is a helper function and not a library function, so I'm not going to make this bulletproof
+    // right now.
+
+    // Fetch ABV formula preference
+    var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
+
+    if(dateString && dateFormatPref)
+    {
+        if(dateFormatPref === "US")
+        {
+            // Database dates will have dashes in them
+            const [year, month, day] = dateString.split('-');
+
+            // if the split was clean, reassemble date to preferred format
+            if(year && month && day)
+            {
+                return month + '/' + day + '/' + year;
+            }
+        }
+    }
+
+    return dateString;
 }
