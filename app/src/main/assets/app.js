@@ -718,7 +718,7 @@ function viewReadings(meadId)
 
             var abvDisplayValue = getPreferredAbvValue(results[i]);
 
-            if(results[i].specificGravityDifference)
+            if(results[i] && results[i].specificGravityDifference)
             {
                 abvDisplayValue = "+" + results[i].specificGravityDifference.toFixed(3);
             }
@@ -1256,17 +1256,24 @@ function editEvent(eventId)
 // the ABV value across all readings.
 function calculateAbvByReadings(initialGravity, batchReadings)
 {
+    // Initial array for holding results objects
+    var results = new Array();
+
     if(isNaN(parseFloat(initialGravity)))
     {
         // return array with single object
-        return new Array().push(new AbvResultSet());
+        results.push(new AbvResultSet());
+        return results;
     }
 
     if(!Array.isArray(batchReadings) || batchReadings.length == 0)
     {
         // return array with single object
-        return new Array().push(new AbvResultSet());
+        results.push(new AbvResultSet());
+        return results;
     }
+
+    window.Android.logInfo('MainActivity', 'calculateAbvByReadings Params: ' + initialGravity + ', ' + batchReadings.length);
 
     // hold initial value
     // start loop, hold first value
@@ -1275,9 +1282,6 @@ function calculateAbvByReadings(initialGravity, batchReadings)
     // calculate ABV from modified initial and final gravities
     var ig = new Decimal(initialGravity);
     var prevReading = ig;
-
-    // Initial array for holding results objects
-    var results = new Array();
 
     window.Android.logInfo('MainActivity', 'Initial Gravity: ' + ig.toFixed(3));
     window.Android.logInfo('MainActivity', 'Readings count: ' + batchReadings.length);
@@ -1583,6 +1587,13 @@ function displayTagTip()
 function getPreferredAbvValue(result)
 {
     var value = '';
+
+    if(!result)
+    {
+        window.Android.logDebug('getPreferredAbvValue',"Result parameter is null or undefined.");
+        var errorResult = new AbvResultSet();
+        return errorResult.standard;
+    }
 
     // Fetch ABV formula preference
     var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
