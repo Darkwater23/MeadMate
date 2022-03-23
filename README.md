@@ -12,3 +12,5 @@ The Event entities are used to indicate steps in the mead making process, like p
 The Reading entity represents a specific gravity reading on a particular date. Readings are many-to-one Mead entity.
 
 There is also a tagging feature under development. Tags are simple strings that are related many-to-many Meads and will be used for filtering and other features later.
+
+Wanna buy me a cup of coffee? [Buy Me a Coffee](https://www.buymeacoffee.com/dougdawson)
