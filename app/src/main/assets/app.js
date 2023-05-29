@@ -20,6 +20,7 @@ const sortPrefKeyName = 'SORTPREF';
 const specificGravityRange = [0.700, 2.000];
 const archivePrefKeyName = 'INCLUDE_ARCHIVED';
 const dateFormatPrefKeyName = 'DATEFORMATPREF';
+const themeModePrefKeyName = 'THEMEPREF';
 
 // One-time code executions
 var tagList;
@@ -63,6 +64,7 @@ $(function() {
 
     $("#newEventType").selectmenu();
     $("#newCalendarEventDescription").selectmenu();
+    $("#theme-pref").selectmenu();
 });
 
 // Object definitions
@@ -196,6 +198,7 @@ $(document).on("pagebeforeshow","#preferences",function(){
     var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
     var sortPref = localStorage.getItem(sortPrefKeyName) ?? 'byId';
     var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
+    var themePref = localStorage.getItem(themeModePrefKeyName) ?? 'light';
 
     $("#abv-formula-pref").val(abvPref);
     $("#abv-formula-pref").selectmenu("refresh", true);
@@ -205,6 +208,9 @@ $(document).on("pagebeforeshow","#preferences",function(){
 
     $("#date-format-pref").val(dateFormatPref);
     $("#date-format-pref").selectmenu("refresh", true);
+
+    $("#theme-pref").val(themePref);
+    $("#theme-pref").selectmenu("refresh", true);
 
 });
 
@@ -575,6 +581,11 @@ $("#sort-pref").change(function() {
 $("#date-format-pref").change(function() {
     localStorage.setItem(dateFormatPrefKeyName,this.value);
     window.Android.logDebug('ChangeEvent','Date Format preference set to: ' + this.value);
+});
+
+$("#theme-pref").change(function() {
+    localStorage.setItem(themeModePrefKeyName,this.value);
+    window.Android.logDebug('ChangeEvent','Theme preference set to: ' + this.value);
 });
 
 // Custom app functions
