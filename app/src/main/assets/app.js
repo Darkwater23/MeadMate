@@ -65,6 +65,11 @@ $(function() {
     $("#newEventType").selectmenu();
     $("#newCalendarEventDescription").selectmenu();
     $("#theme-pref").selectmenu();
+
+    // Set theme from preferences
+    var themePref = localStorage.getItem(themeModePrefKeyName) ?? 'a';
+    //$('div[data-role="page"]').attr('data-theme', themePref);
+    changeGlobalTheme(themePref);
 });
 
 // Object definitions
@@ -198,7 +203,7 @@ $(document).on("pagebeforeshow","#preferences",function(){
     var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
     var sortPref = localStorage.getItem(sortPrefKeyName) ?? 'byId';
     var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
-    var themePref = localStorage.getItem(themeModePrefKeyName) ?? 'light';
+    var themePref = localStorage.getItem(themeModePrefKeyName) ?? 'a';
 
     $("#abv-formula-pref").val(abvPref);
     $("#abv-formula-pref").selectmenu("refresh", true);
@@ -212,6 +217,9 @@ $(document).on("pagebeforeshow","#preferences",function(){
     $("#theme-pref").val(themePref);
     $("#theme-pref").selectmenu("refresh", true);
 
+    // Change theme immediately
+    //$('div[data-role="page"]').attr('data-theme', themePref);
+    changeGlobalTheme(themePref);
 });
 
 // Form validation events
@@ -1681,4 +1689,29 @@ function formatDisplayDate(dateString)
     }
 
     return dateString;
+}
+
+function changeGlobalTheme(theme)
+{
+    // These themes will be cleared, add more
+    // swatch letters as needed.
+    var themes = " a b c d e";
+
+    // Updates the theme for all elements that match the
+    // CSS selector with the specified theme class.
+    function setTheme(cssSelector, themeClass, theme)
+    {
+        $(cssSelector)
+                .removeClass(themes.split(" ").join(" " + themeClass + "-"))
+                .addClass(themeClass + "-" + theme)
+                .attr("data-theme", theme);
+    }
+
+    // Add more selectors/theme classes as needed.
+    setTheme(".ui-mobile-viewport", "ui-overlay", theme);
+    setTheme("[data-role='page']", "ui-page-theme", theme);
+    setTheme("[data-role='header']", "ui-bar", theme);
+    setTheme("[data-role='listview'] > li", "ui-bar", theme);
+    setTheme(".ui-btn", "ui-btn-up", theme);
+    setTheme(".ui-btn", "ui-btn-hover", theme);
 }
