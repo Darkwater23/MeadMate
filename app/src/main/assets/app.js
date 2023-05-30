@@ -65,11 +65,6 @@ $(function() {
     $("#newEventType").selectmenu();
     $("#newCalendarEventDescription").selectmenu();
     $("#theme-pref").selectmenu();
-
-    // Set theme from preferences
-    var themePref = localStorage.getItem(themeModePrefKeyName) ?? 'a';
-    //$('div[data-role="page"]').attr('data-theme', themePref);
-    changeGlobalTheme(themePref);
 });
 
 // Object definitions
@@ -449,32 +444,32 @@ $("#saveRecipeButton").on("tap", function(event){
 
 $("#saveReadingButton").on("tap", function(event){
 
-event.preventDefault();
+    event.preventDefault();
 
-if(window.Android)
-{
-    if($("#new-reading-form").valid()){
+    if(window.Android)
+    {
+        if($("#new-reading-form").valid()){
 
-        // Persist data
-        var meadId = $("#newReadingMeadId").val();
-        var date = $("#newReadingDate").val();
-        var gravity = $("#newReadingGravity").val();
+            // Persist data
+            var meadId = $("#newReadingMeadId").val();
+            var date = $("#newReadingDate").val();
+            var gravity = $("#newReadingGravity").val();
 
-        window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
-        window.Android.logDebug('MainActivity', 'Date: ' + date);
-        window.Android.logDebug('MainActivity', 'Gravity: ' + gravity);
+            window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
+            window.Android.logDebug('MainActivity', 'Date: ' + date);
+            window.Android.logDebug('MainActivity', 'Gravity: ' + gravity);
 
-        window.Android.addReading(meadId, date, gravity);
+            window.Android.addReading(meadId, date, gravity);
 
-        window.Android.logInfo('MainActivity', 'New mead reading saved!');
+            window.Android.logInfo('MainActivity', 'New mead reading saved!');
 
-        viewReadings(meadId);
+            viewReadings(meadId);
+        }
     }
-}
-else
-{
-    $.alert('Android Javascript bridge is not available');
-}
+    else
+    {
+        $.alert('Android Javascript bridge is not available');
+    }
 
 });
 
@@ -594,6 +589,9 @@ $("#date-format-pref").change(function() {
 $("#theme-pref").change(function() {
     localStorage.setItem(themeModePrefKeyName,this.value);
     window.Android.logDebug('ChangeEvent','Theme preference set to: ' + this.value);
+    // This function is special. It will cause the webview to load a new file.
+    // Testing this method since switching the theme is JS was harder than it should have been.
+    window.Android.activateTheme(this.value);
 });
 
 // Custom app functions

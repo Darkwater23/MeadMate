@@ -55,6 +55,7 @@ dd {
 }
 
 label.error {
+    color: #C00;
     font-weight: bold;
 }
 
@@ -68,9 +69,18 @@ table {
   width: 100%;
 }
 
+thead
+{
+    background-color: #B5651D;
+}
+
+tbody
+{
+    background-color: #F3CD05;
+}
+
 td, th {
-  border-width: 1px;
-  border-style: solid;
+  border: 1px solid #333;
   padding: 0.5rem;
   text-align: left;
 }
@@ -87,8 +97,7 @@ td, th {
 
 hr
 {
-    border-width: 4px;
-    border-style: solid;
+    border: 4px solid #b5651d;
     border-radius: 3px;
 }
 
@@ -98,8 +107,8 @@ hr
     padding: 0.5em 1em;
     margin: 0.5em 0.25em 0 0;
     border-radius: 5px;
-    border-width: 1px;
-    border-style: solid;
+    border: 1px solid #B5651D;
+    background-color: #F3CD05;
     white-space: nowrap;
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -107,6 +116,11 @@ hr
     -moz-user-select: none; /* Old versions of Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently */
+}
+
+#mead-menu, #recipe-menu, #main-menu
+{
+    background-color: #F49F05;
 }
 
 #my-meads-navbar
@@ -123,12 +137,16 @@ hr
 }
 
 #toggleArchivedMeadsButton.ui-btn-active {
+    background-color: #F3CD05 /*{a-bup-background-color}*/;
+    border-color: #b5651d /*{a-bup-border}*/;
+    color: #000000 /*{a-bup-color}*/;
     text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #88888888 /*{a-bup-shadow-color}*/;
 }
 
 span.archived
 {
     font-style: italic;
+    color: #444;
 }
 
 #tag-tip

@@ -42,9 +42,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
@@ -72,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         mWebView.addJavascriptInterface(new JavaScriptBridge(this), "Android");
 
         // LOCAL RESOURCE
-        mWebView.loadUrl("file:///android_asset/index.html");
+        mWebView.loadUrl(getString(R.string.base_url));
     }
 
     // Prevent the back-button from closing the app
@@ -145,6 +147,31 @@ public class MainActivity extends AppCompatActivity {
             String functionSig = "calendarEventCallback(" + resultCode + ")";
 
             mWebView.loadUrl("javascript:" + functionSig);
+        }
+    }
+
+    public void changeTheme(String themeCode)
+    {
+        if(themeCode == null)
+        {
+            Log.e("changeTheme", "Null theme code. Ignoring.");
+            return;
+        }
+
+        Log.i("changeTheme", "Theme change requested to themeCode: '" + themeCode + "'.");
+
+        mWebView = findViewById(R.id.activity_main_webview);
+
+        if(themeCode.equals("a"))
+        {
+            mWebView.post(() -> mWebView.loadUrl(getString(R.string.theme_a_url)));
+            return;
+        }
+
+        if(themeCode.equals("b"))
+        {
+            mWebView.post(() -> mWebView.loadUrl(getString(R.string.theme_b_url)));
+            return;
         }
     }
 }
