@@ -404,7 +404,7 @@ $("#saveMeadButton").on("tap", function(event){
     else
     {
         $.alert({
-            theme: themePref,
+            theme: confirmTheme,
             title: 'Alert',
             content:'Android Javascript bridge is not available'
         });
@@ -449,7 +449,7 @@ $("#saveRecipeButton").on("tap", function(event){
     else
     {
         $.alert({
-            theme: themePref,
+            theme: confirmTheme,
             title: 'Alert',
             content:'Android Javascript bridge is not available'
         });
@@ -484,7 +484,7 @@ $("#saveReadingButton").on("tap", function(event){
     else
     {
         $.alert({
-            theme: themePref,
+            theme: confirmTheme,
             title: 'Alert',
             content:'Android Javascript bridge is not available'
         });
@@ -530,7 +530,7 @@ $("#saveEventButton").on("tap", function(event){
  else
  {
      $.alert({
-         theme: themePref,
+         theme: confirmTheme,
          title: 'Alert',
          content:'Android Javascript bridge is not available'
      });
@@ -588,7 +588,7 @@ $("#saveCalendarEventButton").on("tap", function(event){
     else
     {
         $.alert({
-            theme: themePref,
+            theme: confirmTheme,
             title: 'Alert',
             content:'Android Javascript bridge is not available'
         });
@@ -899,7 +899,7 @@ function deleteReading(meadId, readingId)
     else
     {
         $.alert({
-            theme: themePref,
+            theme: confirmTheme,
             title: 'Alert',
             content:'Android Javascript bridge is not available'
         });
@@ -937,7 +937,7 @@ function deleteEvent(meadId, eventId)
      else
      {
          $.alert({
-             theme: themePref,
+             theme: confirmTheme,
              title: 'Alert',
              content:'Android Javascript bridge is not available'
          });
@@ -1124,7 +1124,7 @@ function viewMead(id)
                                 if(isNaN(count) || count < 2 || count > 20){
 
                                     $.alert({
-                                        theme: themePref,
+                                        theme: confirmTheme,
                                         title: 'Error',
                                         content: 'Please enter a valid split value (2 - 20)'
                                     });
@@ -1314,7 +1314,7 @@ function editEvent(eventId)
     else
     {
         $.alert({
-            theme: themePref,
+            theme: confirmTheme,
             title: 'Alert',
             content: 'Android Javascript bridge is not available'
         });
@@ -1565,7 +1565,7 @@ function showEventDescription(id, dateString)
         window.Android.logDebug('MainActivity', description);
 
         $.alert({
-            theme: themePref,
+            theme: confirmTheme,
             title: dateString,
             content: '<span class="description">' + description + '</span>',
             animation: 'top',
@@ -1580,7 +1580,7 @@ function showEventDescription(id, dateString)
     else
     {
         $.alert({
-            theme: themePref,
+            theme: confirmTheme,
             title: 'Alert',
             content: 'Android Javascript bridge is not available'
         });
