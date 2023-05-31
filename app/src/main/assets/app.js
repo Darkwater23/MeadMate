@@ -403,7 +403,11 @@ $("#saveMeadButton").on("tap", function(event){
     }
     else
     {
-        $.alert('Android Javascript bridge is not available');
+        $.alert({
+            theme: themePref,
+            title: 'Alert',
+            content:'Android Javascript bridge is not available'
+        });
     }
 
 });
@@ -444,7 +448,11 @@ $("#saveRecipeButton").on("tap", function(event){
     }
     else
     {
-        $.alert('Android Javascript bridge is not available');
+        $.alert({
+            theme: themePref,
+            title: 'Alert',
+            content:'Android Javascript bridge is not available'
+        });
     }
 
 });
@@ -475,7 +483,11 @@ $("#saveReadingButton").on("tap", function(event){
     }
     else
     {
-        $.alert('Android Javascript bridge is not available');
+        $.alert({
+            theme: themePref,
+            title: 'Alert',
+            content:'Android Javascript bridge is not available'
+        });
     }
 
 });
@@ -517,7 +529,11 @@ $("#saveEventButton").on("tap", function(event){
  }
  else
  {
-     $.alert('Android Javascript bridge is not available');
+     $.alert({
+         theme: themePref,
+         title: 'Alert',
+         content:'Android Javascript bridge is not available'
+     });
  }
 
 });
@@ -571,7 +587,11 @@ $("#saveCalendarEventButton").on("tap", function(event){
     }
     else
     {
-        $.alert('Android Javascript bridge is not available');
+        $.alert({
+            theme: themePref,
+            title: 'Alert',
+            content:'Android Javascript bridge is not available'
+        });
     }
 });
 
@@ -878,7 +898,11 @@ function deleteReading(meadId, readingId)
     }
     else
     {
-        $.alert('Android Javascript bridge is not available');
+        $.alert({
+            theme: themePref,
+            title: 'Alert',
+            content:'Android Javascript bridge is not available'
+        });
     }
 
     // Keep link from doing anything
@@ -912,7 +936,11 @@ function deleteEvent(meadId, eventId)
      }
      else
      {
-         $.alert('Android Javascript bridge is not available');
+         $.alert({
+             theme: themePref,
+             title: 'Alert',
+             content:'Android Javascript bridge is not available'
+         });
      }
 
      // Keep link from doing anything
@@ -1094,7 +1122,13 @@ function viewMead(id)
                                 var count = $('#splitCount').val();
 
                                 if(isNaN(count) || count < 2 || count > 20){
-                                    $.alert('Please enter a valid split value');
+
+                                    $.alert({
+                                        theme: themePref,
+                                        title: 'Error',
+                                        content: 'Please enter a valid split value (2 - 20)'
+                                    });
+
                                     return false;
                                 }
 
@@ -1279,7 +1313,11 @@ function editEvent(eventId)
     }
     else
     {
-        $.alert('Android Javascript bridge is not available');
+        $.alert({
+            theme: themePref,
+            title: 'Alert',
+            content: 'Android Javascript bridge is not available'
+        });
     }
 }
 
@@ -1527,6 +1565,7 @@ function showEventDescription(id, dateString)
         window.Android.logDebug('MainActivity', description);
 
         $.alert({
+            theme: themePref,
             title: dateString,
             content: '<span class="description">' + description + '</span>',
             animation: 'top',
@@ -1540,7 +1579,11 @@ function showEventDescription(id, dateString)
     }
     else
     {
-        $.alert('Android Javascript Bridge is not available.');
+        $.alert({
+            theme: themePref,
+            title: 'Alert',
+            content: 'Android Javascript bridge is not available'
+        });
     }
 
     // Tell browser not to activate link
