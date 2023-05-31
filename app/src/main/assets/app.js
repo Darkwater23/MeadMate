@@ -22,8 +22,11 @@ const archivePrefKeyName = 'INCLUDE_ARCHIVED';
 const dateFormatPrefKeyName = 'DATEFORMATPREF';
 const themeModePrefKeyName = 'THEMEPREF';
 
+
+
 // One-time code executions
 var tagList;
+var confirmTheme = 'light'; // default value;
 
 $(function() {
 
@@ -65,6 +68,10 @@ $(function() {
     $("#newEventType").selectmenu();
     $("#newCalendarEventDescription").selectmenu();
     $("#theme-pref").selectmenu();
+
+    var themePref = localStorage.getItem(themeModePrefKeyName);
+
+    if(themePref == 'b') confirmTheme = 'dark';
 });
 
 // Object definitions
@@ -852,6 +859,7 @@ function deleteReading(meadId, readingId)
     if(window.Android && meadId > 0 && readingId > 0)
     {
         $.confirm({
+            theme: confirmTheme,
             title: 'Delete Reading',
             content: 'Are you sure?',
             animation: 'top',
@@ -885,6 +893,7 @@ function deleteEvent(meadId, eventId)
      if(window.Android && meadId > 0 && eventId > 0)
      {
          $.confirm({
+             theme: confirmTheme,
              title: 'Delete Event',
              content: 'Are you sure?',
              animation: 'top',
@@ -987,6 +996,7 @@ function viewMead(id)
             var id = event.data.value;
 
             $.confirm({
+                theme: confirmTheme,
                 title: 'Delete Mead Entry',
                 content: 'Are you sure?',
                 animation: 'top',
@@ -1047,6 +1057,7 @@ function viewMead(id)
             event.preventDefault();
 
             $.confirm({
+                theme: confirmTheme,
                 title: 'Add Tag',
                 content: '<input id="newTagMeadId" name="newTagMeadId" type="hidden" value="' + event.data.meadId + '"><input id="newTag" name="newTag" type="text">',
                 buttons: {
@@ -1068,6 +1079,7 @@ function viewMead(id)
             event.preventDefault();
 
             $.confirm({
+                theme: confirmTheme,
                 title: 'Split Mead Batch',
                 content: '<label for="splitCount">Split into how many batches? (2 to 20)</label><br>' +
                         '<input id="splitMeadId" name="splitMeadId" type="hidden" value="' + event.data.meadId + '">' +
@@ -1126,6 +1138,7 @@ function viewMead(id)
                 var tagName = $(event.target).text();
 
                 $.confirm({
+                    theme: confirmTheme,
                     title: "Remove Tag '" + tagName + "'",
                     content: 'Are you sure?',
                     animation: 'top',
@@ -1182,6 +1195,7 @@ function viewRecipe(id)
             var id = event.data.value;
 
             $.confirm({
+                theme: confirmTheme,
                 title: 'Delete Recipe Entry',
                 content: 'Are you sure?',
                 animation: 'top',

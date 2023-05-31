@@ -14,162 +14,47 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 */
-
-body
-{
-	font-family: Verdana, Geneva, sans-serif;
-}
-
-.content-title
-{
-    font-size: 1.25em;
-    margin: 0 0 1em 0;
-    line-height: 1.25em;
-    text-align: center;
-
-}
-
-dl{
-    /*border: 2px solid #333;*/
-    padding: 0.5em;
-}
-
-dt {
-    font-weight: bold;
-}
-
-dt::after {
-    content: ":";
-}
-
-dd {
-    font-size: 1.2em;
-    margin: 0.25em 0 1em 0;
-}
-
-#abvResult {
-    font-weight: bold;
-    font-size: 2em;
-    text-align: center;
-    display: block;
-}
-
 label.error {
-    color: #C00;
-    font-weight: bold;
-}
-
-p.button-container
-{
-    text-align: right;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
+    color: #F00;
 }
 
 thead
 {
-    background-color: #B5651D;
+    background-color: #383838;
 }
 
 tbody
 {
-    background-color: #F3CD05;
+    background-color: #4F4F4F;
 }
 
 td, th {
-  border: 1px solid #333;
-  padding: 0.5rem;
-  text-align: left;
-}
-
-.ui-btn
-{
-    font-size: 18px;  /* Make button text a touch bigger */
-}
-
-.description
-{
-    white-space: pre-line;
+  border-color: #000;
 }
 
 hr
 {
-    border: 4px solid #b5651d;
-    border-radius: 3px;
+    border-color: #CCC;
 }
 
 #mead-tags span
 {
-    display: inline-block;
-    padding: 0.5em 1em;
-    margin: 0.5em 0.25em 0 0;
-    border-radius: 5px;
-    border: 1px solid #B5651D;
-    background-color: #F3CD05;
-    white-space: nowrap;
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Old versions of Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently */
+    border-color: #CCC;
+    background-color: #4F4F4F;
 }
 
 #mead-menu, #recipe-menu, #main-menu
 {
-    background-color: #F49F05;
-}
-
-#my-meads-navbar
-{
-  width: 100%;
-}
-
-#toggleArchivedMeadsButton
-{
-    border-width: 0;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
+    background-color: #000;
 }
 
 #toggleArchivedMeadsButton.ui-btn-active {
-    background-color: #F3CD05 /*{a-bup-background-color}*/;
-    border-color: #b5651d /*{a-bup-border}*/;
-    color: #000000 /*{a-bup-color}*/;
-    text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #88888888 /*{a-bup-shadow-color}*/;
+    background-color: #4D4D4D /*{a-bup-background-color}*/;
+    border-color: #000 /*{a-bup-border}*/;
+    color: #FFF /*{a-bup-color}*/;
 }
 
 span.archived
 {
-    font-style: italic;
-    color: #444;
-}
-
-#tag-tip
-{
-    display: none;
-}
-
-ul.spaced-list li
-{
-    margin: 0 0 0.5em 0;
-    font-size: 1.1em;
-}
-
-#mainMenu
-{
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-#mainMenu li
-{
-    margin: 0 0 20px 0;
-    padding: 0;
-    display: block;
+    color: #EEE;
 }
