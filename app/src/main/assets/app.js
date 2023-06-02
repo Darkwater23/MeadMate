@@ -26,7 +26,7 @@ const themeModePrefKeyName = 'THEMEPREF';
 
 // One-time code executions
 var tagList;
-var confirmTheme = 'light'; // default value;
+var confirmTheme = 'light'; // default value
 
 $(function() {
 
@@ -70,7 +70,6 @@ $(function() {
     $("#theme-pref").selectmenu();
 
     var themePref = localStorage.getItem(themeModePrefKeyName);
-
     if(themePref == 'b') confirmTheme = 'dark';
 });
 
@@ -127,8 +126,10 @@ $(document).on("pagebeforeshow","#my-recipes",function() {
 $(document).on("pagebeforeshow","#new-mead",function() {
 
     // use hidden field as the trigger for the form mode
-
     var meadId = $("#meadId").val();
+
+    //var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
+    //var dateFormatString = (dateFormatPref === 'ISO') ? 'ISO_8601' : 'mm/dd/yy';
 
     if(meadId)
     {
