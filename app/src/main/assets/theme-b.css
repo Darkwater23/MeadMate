@@ -58,3 +58,7 @@ span.archived
 {
     color: #EEE;
 }
+
+a:link, a:visited, a:hover, a:active {
+  color: yellow;
+}
