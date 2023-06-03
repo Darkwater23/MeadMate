@@ -128,8 +128,8 @@ $(document).on("pagebeforeshow","#new-mead",function() {
     // use hidden field as the trigger for the form mode
     var meadId = $("#meadId").val();
 
-    //var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
-    //var dateFormatString = (dateFormatPref === 'ISO') ? 'ISO_8601' : 'mm/dd/yy';
+    var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
+    var dateFormatString = (dateFormatPref === 'ISO') ? 'ISO_8601' : 'mm/dd/yy';
 
     if(meadId)
     {
