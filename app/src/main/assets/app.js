@@ -22,8 +22,6 @@ const archivePrefKeyName = 'INCLUDE_ARCHIVED';
 const dateFormatPrefKeyName = 'DATEFORMATPREF';
 const themeModePrefKeyName = 'THEMEPREF';
 
-
-
 // One-time code executions
 var tagList;
 var confirmTheme = 'light'; // default value
@@ -71,6 +69,24 @@ $(function() {
 
     var themePref = localStorage.getItem(themeModePrefKeyName);
     if(themePref == 'b') confirmTheme = 'dark';
+
+    // Datepicker
+    moment.locale('en');
+
+    var meadFormDatepicker = new mdDateTimePicker.default({
+      type: 'date',
+      orientation: 'PORTRAIT'
+    });
+
+    $("#newMeadStartDate").on("tap", function(event){
+        meadFormDatepicker.toggle();
+    });
+
+    meadFormDatepicker.trigger = document.getElementById('newMeadStartDate');
+
+    document.getElementById('newMeadStartDate').addEventListener('onOk', function() {
+        this.value = meadFormDatepicker.time.toString();
+    });
 });
 
 // Object definitions
