@@ -25,7 +25,7 @@
   	<link rel="stylesheet" href="dist/jquery.mobile.structure-1.4.5.min.css" />
 	<link rel="stylesheet" href="dist/jquery-confirm.min.css" />
 	<link rel="stylesheet" href="dist/mead-mate.min.css" />
-	<link rel="stylesheet" href="dist/datepicker/css/mdDateTimePicker.css">
+	<link rel="stylesheet" href="dist/datepicker/css/themes/dark/yellow/mdDateTimePicker.min.css">
 	<link rel="stylesheet" href="main.css">
 	<link rel="stylesheet" href="theme-b.css">
 
@@ -181,7 +181,7 @@
 			<input type="hidden" name="newEventMeadId" id="newEventMeadId" value="">
 
 			<label for="newEventDate">Date:</label>
-			<input type="date" name="newEventDate" id="newEventDate" value="">
+			<input type="text" name="newEventDate" id="newEventDate" onfocus="blur();" value="">
 
 			<label for="newEventType">Type:</label>
 			<select id="newEventType">
@@ -231,7 +231,7 @@
 			<input type="hidden" name="newReadingMeadId" id="newReadingMeadId" value="">
 
 			<label for="newReadingDate">Reading Date:</label>
-			<input type="date" name="newReadingDate" id="newReadingDate" value="">
+			<input type="text" name="newReadingDate" id="newReadingDate" onfocus="blur();" value="">
 
 			<label for="newReadingGravity">Specific Gravity:</label>
 			<input type="number" name="newReadingGravity" pattern="[0-1]+\.[0-9]{3}" id="newReadingGravity" value="1.000">

@@ -25,6 +25,23 @@ const themeModePrefKeyName = 'THEMEPREF';
 // One-time code executions
 var tagList;
 var confirmTheme = 'light'; // default value
+moment.locale('en');
+
+// Datepickers
+var meadFormDatepicker = new mdDateTimePicker.default({
+    type: 'date',
+    orientation: 'PORTRAIT'
+});
+
+var eventFormDatepicker = new mdDateTimePicker.default({
+    type: 'date',
+    orientation: 'PORTRAIT'
+});
+
+var readingFormDatepicker = new mdDateTimePicker.default({
+    type: 'date',
+    orientation: 'PORTRAIT'
+});
 
 $(function() {
 
@@ -70,22 +87,21 @@ $(function() {
     var themePref = localStorage.getItem(themeModePrefKeyName);
     if(themePref == 'b') confirmTheme = 'dark';
 
-    // Datepicker
-    moment.locale('en');
-
-    var meadFormDatepicker = new mdDateTimePicker.default({
-      type: 'date',
-      orientation: 'PORTRAIT'
-    });
-
-    $("#newMeadStartDate").on("tap", function(event){
-        meadFormDatepicker.toggle();
-    });
-
+    // Datepicker triggers & listeners
     meadFormDatepicker.trigger = document.getElementById('newMeadStartDate');
+    eventFormDatepicker.trigger = document.getElementById('newEventDate');
+    readingFormDatepicker.trigger = document.getElementById('newReadingDate');
 
     document.getElementById('newMeadStartDate').addEventListener('onOk', function() {
-        this.value = meadFormDatepicker.time.toString();
+        this.value = meadFormDatepicker.time.format(dpUserPrefFormat());
+    });
+
+    document.getElementById('newEventDate').addEventListener('onOk', function() {
+        this.value = eventFormDatepicker.time.format(dpUserPrefFormat());
+    });
+
+    document.getElementById('newReadingDate').addEventListener('onOk', function() {
+        this.value = readingFormDatepicker.time.format(dpUserPrefFormat());
     });
 });
 
@@ -97,9 +113,25 @@ function AbvResultSet() {
     this.wine = '-.--%';
 };
 
+// Datepicker input events
+$("#newMeadStartDate").on("tap", function(event){
+    meadFormDatepicker.toggle();
+});
+
+$("#newEventDate").on("tap", function(event){
+    eventFormDatepicker.toggle();
+});
+
+$("#newReadingDate").on("tap", function(event){
+    readingFormDatepicker.toggle();
+});
+
 // Page Transition events
 
 $(document).on("pagebeforeshow","#abv", function(){
+
+    // Reset form validation
+    abvFormValidator.resetForm();
 
     var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
 
@@ -173,10 +205,16 @@ $(document).on("pagebeforeshow","#new-mead",function() {
     }
 });
 
+$(document).on("pagebeforehide","#new-mead",function() {
+    meadFormDatepicker.hide();
+});
+
 $(document).on("pagebeforeshow","#new-recipe",function() {
 
-    // use hidden field as the trigger for the form mode
+    // Reset form validation
+    newRecipeFormValidator.resetForm();
 
+    // use hidden field as the trigger for the form mode
     var recipeId = $("#recipeId").val();
 
     if(recipeId)
@@ -194,13 +232,23 @@ $(document).on("pagebeforeshow","#new-recipe",function() {
 
 $(document).on("pagebeforeshow","#new-reading",function() {
 
+    // Reset form validation
+    newReadingFormValidator.resetForm();
+
     // Clear form
     $("#newReadingDate").val('');
     $("#newReadingGravity").val('');
 
 });
 
+$(document).on("pagebeforehide","#new-reading",function() {
+    readingFormDatepicker.hide();
+});
+
 $(document).on("pagebeforeshow","#new-event",function() {
+
+    // Reset form validation
+    newEventFormValidator.resetForm();
 
     var eventId = $("#eventId").val();
 
@@ -218,6 +266,10 @@ $(document).on("pagebeforeshow","#new-event",function() {
         $("#newEventType").selectmenu("refresh", true);
         $("#newEventDescription").val('');
     }
+});
+
+$(document).on("pagebeforehide","#new-event",function() {
+    eventFormDatepicker.hide();
 });
 
 $(document).on("pagebeforeshow","#preferences",function(){
@@ -245,8 +297,7 @@ $(document).on("pagebeforeshow","#preferences",function(){
 });
 
 // Form validation events
-
-// Hoist validator for form resets
+// Hoist validators for form resets
 var newMeadFormValidator = $("#new-mead-form").validate({
     errorLabelContainer: "#messageList",
     wrapper: "li",
@@ -268,8 +319,6 @@ var newMeadFormValidator = $("#new-mead-form").validate({
         newMeadOriginalGravity: "Specific Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
-
-// Hoist validator for form resets
 var newRecipeFormValidator = $("#new-recipe-form").validate({
     errorLabelContainer: "#recipeMessageList",
     wrapper: "li",
@@ -282,8 +331,6 @@ var newRecipeFormValidator = $("#new-recipe-form").validate({
         newRecipeName: "Recipe Name is required."
     }
 });
-
-// Hoist validator for form resets
 var newReadingFormValidator = $("#new-reading-form").validate({
     errorLabelContainer: "#newReadingMessageList",
     wrapper: "li",
@@ -301,8 +348,6 @@ var newReadingFormValidator = $("#new-reading-form").validate({
         newReadingGravity: "Specific Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
-
-// Hoist validator for form resets
 var newEventFormValidator = $("#new-event-form").validate({
     errorLabelContainer: "#newEventMessageList",
     wrapper: "li",
@@ -319,9 +364,7 @@ var newEventFormValidator = $("#new-event-form").validate({
         newEventType: "Event Type is required."
     }
 });
-
-// Hoist validator for form resets
-$("#abv-form").validate({
+var abvFormValidator = $("#abv-form").validate({
     errorLabelContainer: "#abvMessageList",
     wrapper: "li",
     rules: {
@@ -339,9 +382,7 @@ $("#abv-form").validate({
         newGravity: "New Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
-
-// Hoist validator for form resets
-$("#calendar-event-form").validate({
+var calendarEventFormValidator = $("#calendar-event-form").validate({
    errorLabelContainer: "#calendarEventMessageList",
    wrapper: "li",
    rules: {
@@ -619,8 +660,6 @@ $("#saveCalendarEventButton").on("tap", function(event){
         });
     }
 });
-
-
 
 // Select change events
 $("#abv-formula-pref").change(function() {
@@ -1079,6 +1118,9 @@ function viewMead(id)
         $("#calendarEventButton").on("tap", { meadId: meadData.id, meadName: meadData.name }, function(event) {
 
             event.preventDefault();
+
+            // Reset form validation
+            calendarEventFormValidator.resetForm();
 
             // set field values
             $("#newCalendarEventMeadId").val(event.data.meadId);
@@ -1762,7 +1804,7 @@ function changeGlobalTheme(theme)
 {
     // These themes will be cleared, add more
     // swatch letters as needed.
-    var themes = " a b c d e";
+    var themes = "a b c d e";
 
     // Updates the theme for all elements that match the
     // CSS selector with the specified theme class.
@@ -1781,4 +1823,20 @@ function changeGlobalTheme(theme)
     setTheme("[data-role='listview'] > li", "ui-bar", theme);
     setTheme(".ui-btn", "ui-btn-up", theme);
     setTheme(".ui-btn", "ui-btn-hover", theme);
+}
+
+function dpUserPrefFormat()
+{
+    switch(localStorage.getItem(dateFormatPrefKeyName))
+    {
+        case 'US':
+            return 'MM/DD/YYYY';
+        case 'ISO':
+            return 'YYYY-MM-DD';
+        default:
+            // log error
+            if(window.Android) window.Android.logError('dpUserPrefFormat','User preference was not found or unexpected.');
+            // default to ISO
+            return 'YYYY-MM-DD';
+    }
 }
