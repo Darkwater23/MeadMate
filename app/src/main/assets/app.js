@@ -125,6 +125,9 @@ $(document).on("pagebeforeshow","#my-recipes",function() {
 
 $(document).on("pagebeforeshow","#new-mead",function() {
 
+    // Reset form validation
+    newMeadFormValidator.resetForm();
+
     // use hidden field as the trigger for the form mode
     var meadId = $("#meadId").val();
 
@@ -227,7 +230,8 @@ $(document).on("pagebeforeshow","#preferences",function(){
 
 // Form validation events
 
-$("#new-mead-form").validate({
+// Hoist validator for form resets
+var newMeadFormValidator = $("#new-mead-form").validate({
     errorLabelContainer: "#messageList",
     wrapper: "li",
     rules: {
@@ -249,7 +253,8 @@ $("#new-mead-form").validate({
     }
 });
 
-$("#new-recipe-form").validate({
+// Hoist validator for form resets
+var newRecipeFormValidator = $("#new-recipe-form").validate({
     errorLabelContainer: "#recipeMessageList",
     wrapper: "li",
     rules: {
@@ -262,7 +267,8 @@ $("#new-recipe-form").validate({
     }
 });
 
-$("#new-reading-form").validate({
+// Hoist validator for form resets
+var newReadingFormValidator = $("#new-reading-form").validate({
     errorLabelContainer: "#newReadingMessageList",
     wrapper: "li",
     rules: {
@@ -280,7 +286,8 @@ $("#new-reading-form").validate({
     }
 });
 
-$("#new-event-form").validate({
+// Hoist validator for form resets
+var newEventFormValidator = $("#new-event-form").validate({
     errorLabelContainer: "#newEventMessageList",
     wrapper: "li",
     rules: {
@@ -297,6 +304,7 @@ $("#new-event-form").validate({
     }
 });
 
+// Hoist validator for form resets
 $("#abv-form").validate({
     errorLabelContainer: "#abvMessageList",
     wrapper: "li",
@@ -316,6 +324,7 @@ $("#abv-form").validate({
     }
 });
 
+// Hoist validator for form resets
 $("#calendar-event-form").validate({
    errorLabelContainer: "#calendarEventMessageList",
    wrapper: "li",
@@ -410,7 +419,6 @@ $("#saveMeadButton").on("tap", function(event){
             content:'Android Javascript bridge is not available'
         });
     }
-
 });
 
 $("#saveRecipeButton").on("tap", function(event){
@@ -666,19 +674,6 @@ function loadMyMeadsListView()
         // Insert mock item for layout testing
         $("#mead-list").empty();
         $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false"><span class="archived">My First Mead</span></a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
         $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
         $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
         $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
