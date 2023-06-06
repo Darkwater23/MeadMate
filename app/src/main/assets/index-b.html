@@ -20,11 +20,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>Mead Mate</title>
-	<link rel="stylesheet" href="dist/mead-mate.min.css" />
+
   	<link rel="stylesheet" href="dist/jquery.mobile.icons.min.css" />
   	<link rel="stylesheet" href="dist/jquery.mobile.structure-1.4.5.min.css" />
 	<link rel="stylesheet" href="dist/jquery-confirm.min.css" />
-
+	<link rel="stylesheet" href="dist/mead-mate.min.css" />
 	<link rel="stylesheet" href="main.css">
 	<link rel="stylesheet" href="theme-b.css">
 
@@ -315,7 +315,7 @@
 			<input type="text" name="newMeadName" id="newMeadName" value="">
 
 			<label for="newMeadStartDate">Start Date:</label>
-			<input type="date" name="newMeadStartDate" id="newMeadStartDate" value="">
+			<input type="text" name="newMeadStartDate" id="newMeadStartDate" data-theme="b" onfocus="blur();" value="">
 
 			<label for="newMeadOriginalGravity">Original Specific Gravity:</label>
 			<input type="number" name="newMeadOriginalGravity" pattern="[0-1]+\.[0-9]{3}" id="newMeadOriginalGravity" value="1.000">
@@ -632,7 +632,7 @@
 		</dl>
 	</div>
 </div>
-<script src="dist/jquery-1.11.1.min.js"></script>
+<script src="dist/jquery-1.12.4.min.js"></script>
 <script src="dist/jquery.validate.min.js"></script>
 <script src="dist/jquery.mobile-1.4.5.min.js"></script>
 <script src="dist/decimal.min.js"></script>
