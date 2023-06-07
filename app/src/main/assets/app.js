@@ -179,9 +179,6 @@ $(document).on("pagebeforeshow","#new-mead",function() {
     // use hidden field as the trigger for the form mode
     var meadId = $("#meadId").val();
 
-    var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
-    var dateFormatString = (dateFormatPref === 'ISO') ? 'ISO_8601' : 'mm/dd/yy';
-
     if(meadId)
     {
         // Field values should already be set from invoking function
@@ -199,7 +196,7 @@ $(document).on("pagebeforeshow","#new-mead",function() {
     {
         $("#new-mead-content-title").text("Add New Mead");
         $("#newMeadName").val('');
-        $("#newMeadStartDate").val('');
+        $("#newMeadStartDate").val(new moment().format(dpUserPrefFormat()));
         $("#newMeadOriginalGravity").val('');
         $("#newMeadDescription").val('');
     }
@@ -236,7 +233,7 @@ $(document).on("pagebeforeshow","#new-reading",function() {
     newReadingFormValidator.resetForm();
 
     // Clear form
-    $("#newReadingDate").val('');
+    $("#newReadingDate").val(new moment().format(dpUserPrefFormat()));
     $("#newReadingGravity").val('');
 
 });
@@ -261,7 +258,7 @@ $(document).on("pagebeforeshow","#new-event",function() {
     {
         $("#new-event-content-title").text("Add New Event");
 
-        $("#newEventDate").val('');
+        $("#newEventDate").val(new moment().format(dpUserPrefFormat()));
         $("#newEventType").val('');
         $("#newEventType").selectmenu("refresh", true);
         $("#newEventDescription").val('');
@@ -823,6 +820,7 @@ function viewReadings(meadId)
 
         $("#newReadingButton").off("tap"); // clear existing event handlers
         $("#backToMeadViewButton").off("tap"); // clear existing event handlers
+        $("#backToMeadReadingsButton").off("tap"); // clear existing event handlers
 
         $("#newReadingButton").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
@@ -831,15 +829,25 @@ function viewReadings(meadId)
 
             // set value of hidden form
             $("#newReadingMeadId").val(event.data.meadId);
-
+            // prevents back button from taking us back. Don't remember why I did this.
+            // new custom back button will help with UX.
             $(":mobile-pagecontainer").pagecontainer("change", "#new-reading",{changeHash:false});
         });
+
         $("#backToMeadViewButton").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
 
             window.Android.logDebug('MainActivity', 'Back To Mead View Button pressed. Mead ID: ' + event.data.meadId);
 
             viewMead(event.data.meadId);
+        });
+
+        $("#backToMeadReadingsButton").on("tap", { meadId: meadId }, function(event) {
+            event.preventDefault();
+
+            window.Android.logDebug('MainActivity', 'Back To Mead Readings Button pressed. Mead ID: ' + event.data.meadId);
+
+            viewReadings(event.data.meadId);
         });
     }
     else
@@ -901,6 +909,7 @@ function viewEvents(meadId)
         }
 
         $("#newEventButton").off("tap"); // clear existing event handlers
+        $("#backToMeadEventsButton").off("tap"); // clear existing event handlers
 
         $("#newEventButton").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
@@ -912,6 +921,14 @@ function viewEvents(meadId)
             $("#newEventMeadId").val(event.data.meadId);
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-event", {changeHash:false});
+        });
+
+        $("#backToMeadEventsButton").on("tap", { meadId: meadId }, function(event) {
+            event.preventDefault();
+
+            window.Android.logDebug('MainActivity', 'Back To Mead Events Button pressed. Mead ID: ' + event.data.meadId);
+
+            viewEvents(event.data.meadId);
         });
     }
     else

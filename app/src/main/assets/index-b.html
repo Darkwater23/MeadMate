@@ -169,7 +169,8 @@
 </div>
 
 <div id="new-event" data-role="page" data-theme="b">
-	<div data-role="header" data-position="fixed" data-add-back-btn="true">
+	<div data-role="header" data-position="fixed">
+		<a id="backToMeadEventsButton" href="#events" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
@@ -220,7 +221,8 @@
 </div>
 
 <div id="new-reading" data-role="page" data-theme="b">
-	<div data-role="header" data-position="fixed" data-add-back-btn="true">
+	<div data-role="header" data-position="fixed">
+		<a id="backToMeadReadingsButton" href="#readings" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
@@ -336,9 +338,11 @@
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">Calculate Alcohol by Volume</h2>
-		<p>Set your preferred formula under 'Preferences' on the Main Menu.</p>
 		<p id="abvFormulaPref"></p>
 		<form id="abv-form">
+			<p>
+				<span id="abvResult"></span>
+			</p>
 			<ul id="abvMessageList"></ul>
 			<p>
 				<label for="initialGravity">Initial Specific Gravity:</label>
@@ -348,10 +352,8 @@
 				<label for="newGravity">New Specific Gravity:</label>
 				<input type="text" inputmode="numeric" name="newGravity" value="" id="newGravity" />
 			</p>
-			<p>Result:<br>
-				<span id="abvResult"></span>
-			</p>
 			<input type="button" value="Calculate" name="calcButton" id="calcButton">
+			<p>Set your preferred formula under 'Preferences' on the Main Menu.</p>
 		</form>
 	</div>
 </div>
@@ -616,6 +618,11 @@
 		<ul>
 			<li>Reformatted the Preferences page</li>
 			<li>Added support for a Dark Mode theme</li>
+			<li>Added new 'themeable' datepicker</li>
+			<li>Minor updates to ABV Calculator view</li>
+			<li>Update jQuery version</li>
+			<li>Fixed minor issues with form validators</li>
+			<li>Customized Reading and Event forms to go back to their lists</li>
 		</ul>
 
 		<h3>Open Source Project Information</h3>
