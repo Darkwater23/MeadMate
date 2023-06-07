@@ -1,0 +1,60 @@
+/*
+This file is part of Mead Mate.
+
+Mead Mate is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Mead Mate is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
+*/
+label.error {
+    color: #C00;
+}
+
+thead
+{
+    background-color: #B5651D;
+}
+
+tbody
+{
+    background-color: #F3CD05;
+}
+
+td, th {
+  border-color: #333;
+}
+
+hr
+{
+    border-color: #b5651d;
+}
+
+#mead-tags span
+{
+    border-color: #B5651D;
+    background-color: #F3CD05;
+}
+
+#mead-menu, #recipe-menu, #main-menu
+{
+    background-color: #F49F05;
+}
+
+#toggleArchivedMeadsButton.ui-btn-active {
+    background-color: #F3CD05 /*{a-bup-background-color}*/;
+    border-color: #b5651d /*{a-bup-border}*/;
+    color: #000000 /*{a-bup-color}*/;
+}
+
+span.archived
+{
+    color: #444;
+}

@@ -599,4 +599,12 @@ public class JavaScriptBridge {
 
         mainActivity.requestEvent(request);
     }
+
+    @JavascriptInterface
+    public void activateTheme(String code)
+    {
+        Log.d("JavaScriptBridge", "Activate Theme: " + code);
+        MainActivity mainActivity = (MainActivity) this.activity;
+        mainActivity.changeTheme(code);
+    }
 }

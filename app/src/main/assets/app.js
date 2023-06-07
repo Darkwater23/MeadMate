@@ -20,9 +20,28 @@ const sortPrefKeyName = 'SORTPREF';
 const specificGravityRange = [0.700, 2.000];
 const archivePrefKeyName = 'INCLUDE_ARCHIVED';
 const dateFormatPrefKeyName = 'DATEFORMATPREF';
+const themeModePrefKeyName = 'THEMEPREF';
 
 // One-time code executions
 var tagList;
+var confirmTheme = 'light'; // default value
+moment.locale('en');
+
+// Datepickers
+var meadFormDatepicker = new mdDateTimePicker.default({
+    type: 'date',
+    orientation: 'PORTRAIT'
+});
+
+var eventFormDatepicker = new mdDateTimePicker.default({
+    type: 'date',
+    orientation: 'PORTRAIT'
+});
+
+var readingFormDatepicker = new mdDateTimePicker.default({
+    type: 'date',
+    orientation: 'PORTRAIT'
+});
 
 $(function() {
 
@@ -63,6 +82,27 @@ $(function() {
 
     $("#newEventType").selectmenu();
     $("#newCalendarEventDescription").selectmenu();
+    $("#theme-pref").selectmenu();
+
+    var themePref = localStorage.getItem(themeModePrefKeyName);
+    if(themePref == 'b') confirmTheme = 'dark';
+
+    // Datepicker triggers & listeners
+    meadFormDatepicker.trigger = document.getElementById('newMeadStartDate');
+    eventFormDatepicker.trigger = document.getElementById('newEventDate');
+    readingFormDatepicker.trigger = document.getElementById('newReadingDate');
+
+    document.getElementById('newMeadStartDate').addEventListener('onOk', function() {
+        this.value = meadFormDatepicker.time.format(dpUserPrefFormat());
+    });
+
+    document.getElementById('newEventDate').addEventListener('onOk', function() {
+        this.value = eventFormDatepicker.time.format(dpUserPrefFormat());
+    });
+
+    document.getElementById('newReadingDate').addEventListener('onOk', function() {
+        this.value = readingFormDatepicker.time.format(dpUserPrefFormat());
+    });
 });
 
 // Object definitions
@@ -73,9 +113,25 @@ function AbvResultSet() {
     this.wine = '-.--%';
 };
 
+// Datepicker input events
+$("#newMeadStartDate").on("tap", function(event){
+    meadFormDatepicker.toggle();
+});
+
+$("#newEventDate").on("tap", function(event){
+    eventFormDatepicker.toggle();
+});
+
+$("#newReadingDate").on("tap", function(event){
+    readingFormDatepicker.toggle();
+});
+
 // Page Transition events
 
 $(document).on("pagebeforeshow","#abv", function(){
+
+    // Reset form validation
+    abvFormValidator.resetForm();
 
     var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
 
@@ -117,8 +173,10 @@ $(document).on("pagebeforeshow","#my-recipes",function() {
 
 $(document).on("pagebeforeshow","#new-mead",function() {
 
-    // use hidden field as the trigger for the form mode
+    // Reset form validation
+    newMeadFormValidator.resetForm();
 
+    // use hidden field as the trigger for the form mode
     var meadId = $("#meadId").val();
 
     if(meadId)
@@ -138,16 +196,22 @@ $(document).on("pagebeforeshow","#new-mead",function() {
     {
         $("#new-mead-content-title").text("Add New Mead");
         $("#newMeadName").val('');
-        $("#newMeadStartDate").val('');
+        $("#newMeadStartDate").val(new moment().format(dpUserPrefFormat()));
         $("#newMeadOriginalGravity").val('');
         $("#newMeadDescription").val('');
     }
 });
 
+$(document).on("pagebeforehide","#new-mead",function() {
+    meadFormDatepicker.hide();
+});
+
 $(document).on("pagebeforeshow","#new-recipe",function() {
 
-    // use hidden field as the trigger for the form mode
+    // Reset form validation
+    newRecipeFormValidator.resetForm();
 
+    // use hidden field as the trigger for the form mode
     var recipeId = $("#recipeId").val();
 
     if(recipeId)
@@ -165,13 +229,23 @@ $(document).on("pagebeforeshow","#new-recipe",function() {
 
 $(document).on("pagebeforeshow","#new-reading",function() {
 
+    // Reset form validation
+    newReadingFormValidator.resetForm();
+
     // Clear form
-    $("#newReadingDate").val('');
+    $("#newReadingDate").val(new moment().format(dpUserPrefFormat()));
     $("#newReadingGravity").val('');
 
 });
 
+$(document).on("pagebeforehide","#new-reading",function() {
+    readingFormDatepicker.hide();
+});
+
 $(document).on("pagebeforeshow","#new-event",function() {
+
+    // Reset form validation
+    newEventFormValidator.resetForm();
 
     var eventId = $("#eventId").val();
 
@@ -184,11 +258,15 @@ $(document).on("pagebeforeshow","#new-event",function() {
     {
         $("#new-event-content-title").text("Add New Event");
 
-        $("#newEventDate").val('');
+        $("#newEventDate").val(new moment().format(dpUserPrefFormat()));
         $("#newEventType").val('');
         $("#newEventType").selectmenu("refresh", true);
         $("#newEventDescription").val('');
     }
+});
+
+$(document).on("pagebeforehide","#new-event",function() {
+    eventFormDatepicker.hide();
 });
 
 $(document).on("pagebeforeshow","#preferences",function(){
@@ -196,6 +274,7 @@ $(document).on("pagebeforeshow","#preferences",function(){
     var abvPref = localStorage.getItem(abvPrefKeyName) ?? 'std';
     var sortPref = localStorage.getItem(sortPrefKeyName) ?? 'byId';
     var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
+    var themePref = localStorage.getItem(themeModePrefKeyName) ?? 'a';
 
     $("#abv-formula-pref").val(abvPref);
     $("#abv-formula-pref").selectmenu("refresh", true);
@@ -206,11 +285,17 @@ $(document).on("pagebeforeshow","#preferences",function(){
     $("#date-format-pref").val(dateFormatPref);
     $("#date-format-pref").selectmenu("refresh", true);
 
+    $("#theme-pref").val(themePref);
+    $("#theme-pref").selectmenu("refresh", true);
+
+    // Change theme immediately
+    //$('div[data-role="page"]').attr('data-theme', themePref);
+    changeGlobalTheme(themePref);
 });
 
 // Form validation events
-
-$("#new-mead-form").validate({
+// Hoist validators for form resets
+var newMeadFormValidator = $("#new-mead-form").validate({
     errorLabelContainer: "#messageList",
     wrapper: "li",
     rules: {
@@ -231,8 +316,7 @@ $("#new-mead-form").validate({
         newMeadOriginalGravity: "Specific Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
-
-$("#new-recipe-form").validate({
+var newRecipeFormValidator = $("#new-recipe-form").validate({
     errorLabelContainer: "#recipeMessageList",
     wrapper: "li",
     rules: {
@@ -244,8 +328,7 @@ $("#new-recipe-form").validate({
         newRecipeName: "Recipe Name is required."
     }
 });
-
-$("#new-reading-form").validate({
+var newReadingFormValidator = $("#new-reading-form").validate({
     errorLabelContainer: "#newReadingMessageList",
     wrapper: "li",
     rules: {
@@ -262,8 +345,7 @@ $("#new-reading-form").validate({
         newReadingGravity: "Specific Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
-
-$("#new-event-form").validate({
+var newEventFormValidator = $("#new-event-form").validate({
     errorLabelContainer: "#newEventMessageList",
     wrapper: "li",
     rules: {
@@ -279,8 +361,7 @@ $("#new-event-form").validate({
         newEventType: "Event Type is required."
     }
 });
-
-$("#abv-form").validate({
+var abvFormValidator = $("#abv-form").validate({
     errorLabelContainer: "#abvMessageList",
     wrapper: "li",
     rules: {
@@ -298,8 +379,7 @@ $("#abv-form").validate({
         newGravity: "New Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
-
-$("#calendar-event-form").validate({
+var calendarEventFormValidator = $("#calendar-event-form").validate({
    errorLabelContainer: "#calendarEventMessageList",
    wrapper: "li",
    rules: {
@@ -387,9 +467,12 @@ $("#saveMeadButton").on("tap", function(event){
     }
     else
     {
-        $.alert('Android Javascript bridge is not available');
+        $.alert({
+            theme: confirmTheme,
+            title: 'Alert',
+            content:'Android Javascript bridge is not available'
+        });
     }
-
 });
 
 $("#saveRecipeButton").on("tap", function(event){
@@ -428,39 +511,47 @@ $("#saveRecipeButton").on("tap", function(event){
     }
     else
     {
-        $.alert('Android Javascript bridge is not available');
+        $.alert({
+            theme: confirmTheme,
+            title: 'Alert',
+            content:'Android Javascript bridge is not available'
+        });
     }
 
 });
 
 $("#saveReadingButton").on("tap", function(event){
 
-event.preventDefault();
+    event.preventDefault();
 
-if(window.Android)
-{
-    if($("#new-reading-form").valid()){
+    if(window.Android)
+    {
+        if($("#new-reading-form").valid()){
 
-        // Persist data
-        var meadId = $("#newReadingMeadId").val();
-        var date = $("#newReadingDate").val();
-        var gravity = $("#newReadingGravity").val();
+            // Persist data
+            var meadId = $("#newReadingMeadId").val();
+            var date = $("#newReadingDate").val();
+            var gravity = $("#newReadingGravity").val();
 
-        window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
-        window.Android.logDebug('MainActivity', 'Date: ' + date);
-        window.Android.logDebug('MainActivity', 'Gravity: ' + gravity);
+            window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
+            window.Android.logDebug('MainActivity', 'Date: ' + date);
+            window.Android.logDebug('MainActivity', 'Gravity: ' + gravity);
 
-        window.Android.addReading(meadId, date, gravity);
+            window.Android.addReading(meadId, date, gravity);
 
-        window.Android.logInfo('MainActivity', 'New mead reading saved!');
+            window.Android.logInfo('MainActivity', 'New mead reading saved!');
 
-        viewReadings(meadId);
+            viewReadings(meadId);
+        }
     }
-}
-else
-{
-    $.alert('Android Javascript bridge is not available');
-}
+    else
+    {
+        $.alert({
+            theme: confirmTheme,
+            title: 'Alert',
+            content:'Android Javascript bridge is not available'
+        });
+    }
 
 });
 
@@ -501,7 +592,11 @@ $("#saveEventButton").on("tap", function(event){
  }
  else
  {
-     $.alert('Android Javascript bridge is not available');
+     $.alert({
+         theme: confirmTheme,
+         title: 'Alert',
+         content:'Android Javascript bridge is not available'
+     });
  }
 
 });
@@ -555,11 +650,13 @@ $("#saveCalendarEventButton").on("tap", function(event){
     }
     else
     {
-        $.alert('Android Javascript bridge is not available');
+        $.alert({
+            theme: confirmTheme,
+            title: 'Alert',
+            content:'Android Javascript bridge is not available'
+        });
     }
 });
-
-
 
 // Select change events
 $("#abv-formula-pref").change(function() {
@@ -575,6 +672,14 @@ $("#sort-pref").change(function() {
 $("#date-format-pref").change(function() {
     localStorage.setItem(dateFormatPrefKeyName,this.value);
     window.Android.logDebug('ChangeEvent','Date Format preference set to: ' + this.value);
+});
+
+$("#theme-pref").change(function() {
+    localStorage.setItem(themeModePrefKeyName,this.value);
+    window.Android.logDebug('ChangeEvent','Theme preference set to: ' + this.value);
+    // This function is special. It will cause the webview to load a new file.
+    // Testing this method since switching the theme is JS was harder than it should have been.
+    window.Android.activateTheme(this.value);
 });
 
 // Custom app functions
@@ -621,19 +726,6 @@ function loadMyMeadsListView()
         // Insert mock item for layout testing
         $("#mead-list").empty();
         $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false"><span class="archived">My First Mead</span></a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
-        $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
         $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
         $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
         $("#mead-list").append('<li><a href="javascript:viewMead(0);" data-ajax="false">My First Mead</a></li>');
@@ -728,6 +820,7 @@ function viewReadings(meadId)
 
         $("#newReadingButton").off("tap"); // clear existing event handlers
         $("#backToMeadViewButton").off("tap"); // clear existing event handlers
+        $("#backToMeadReadingsButton").off("tap"); // clear existing event handlers
 
         $("#newReadingButton").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
@@ -736,15 +829,25 @@ function viewReadings(meadId)
 
             // set value of hidden form
             $("#newReadingMeadId").val(event.data.meadId);
-
+            // prevents back button from taking us back. Don't remember why I did this.
+            // new custom back button will help with UX.
             $(":mobile-pagecontainer").pagecontainer("change", "#new-reading",{changeHash:false});
         });
+
         $("#backToMeadViewButton").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
 
             window.Android.logDebug('MainActivity', 'Back To Mead View Button pressed. Mead ID: ' + event.data.meadId);
 
             viewMead(event.data.meadId);
+        });
+
+        $("#backToMeadReadingsButton").on("tap", { meadId: meadId }, function(event) {
+            event.preventDefault();
+
+            window.Android.logDebug('MainActivity', 'Back To Mead Readings Button pressed. Mead ID: ' + event.data.meadId);
+
+            viewReadings(event.data.meadId);
         });
     }
     else
@@ -806,6 +909,7 @@ function viewEvents(meadId)
         }
 
         $("#newEventButton").off("tap"); // clear existing event handlers
+        $("#backToMeadEventsButton").off("tap"); // clear existing event handlers
 
         $("#newEventButton").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
@@ -817,6 +921,14 @@ function viewEvents(meadId)
             $("#newEventMeadId").val(event.data.meadId);
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-event", {changeHash:false});
+        });
+
+        $("#backToMeadEventsButton").on("tap", { meadId: meadId }, function(event) {
+            event.preventDefault();
+
+            window.Android.logDebug('MainActivity', 'Back To Mead Events Button pressed. Mead ID: ' + event.data.meadId);
+
+            viewEvents(event.data.meadId);
         });
     }
     else
@@ -835,6 +947,7 @@ function deleteReading(meadId, readingId)
     if(window.Android && meadId > 0 && readingId > 0)
     {
         $.confirm({
+            theme: confirmTheme,
             title: 'Delete Reading',
             content: 'Are you sure?',
             animation: 'top',
@@ -853,7 +966,11 @@ function deleteReading(meadId, readingId)
     }
     else
     {
-        $.alert('Android Javascript bridge is not available');
+        $.alert({
+            theme: confirmTheme,
+            title: 'Alert',
+            content:'Android Javascript bridge is not available'
+        });
     }
 
     // Keep link from doing anything
@@ -868,6 +985,7 @@ function deleteEvent(meadId, eventId)
      if(window.Android && meadId > 0 && eventId > 0)
      {
          $.confirm({
+             theme: confirmTheme,
              title: 'Delete Event',
              content: 'Are you sure?',
              animation: 'top',
@@ -886,7 +1004,11 @@ function deleteEvent(meadId, eventId)
      }
      else
      {
-         $.alert('Android Javascript bridge is not available');
+         $.alert({
+             theme: confirmTheme,
+             title: 'Alert',
+             content:'Android Javascript bridge is not available'
+         });
      }
 
      // Keep link from doing anything
@@ -970,6 +1092,7 @@ function viewMead(id)
             var id = event.data.value;
 
             $.confirm({
+                theme: confirmTheme,
                 title: 'Delete Mead Entry',
                 content: 'Are you sure?',
                 animation: 'top',
@@ -1013,6 +1136,9 @@ function viewMead(id)
 
             event.preventDefault();
 
+            // Reset form validation
+            calendarEventFormValidator.resetForm();
+
             // set field values
             $("#newCalendarEventMeadId").val(event.data.meadId);
             $("#newCalendarEventMeadName").val(event.data.meadName);
@@ -1030,6 +1156,7 @@ function viewMead(id)
             event.preventDefault();
 
             $.confirm({
+                theme: confirmTheme,
                 title: 'Add Tag',
                 content: '<input id="newTagMeadId" name="newTagMeadId" type="hidden" value="' + event.data.meadId + '"><input id="newTag" name="newTag" type="text">',
                 buttons: {
@@ -1051,6 +1178,7 @@ function viewMead(id)
             event.preventDefault();
 
             $.confirm({
+                theme: confirmTheme,
                 title: 'Split Mead Batch',
                 content: '<label for="splitCount">Split into how many batches? (2 to 20)</label><br>' +
                         '<input id="splitMeadId" name="splitMeadId" type="hidden" value="' + event.data.meadId + '">' +
@@ -1065,7 +1193,13 @@ function viewMead(id)
                                 var count = $('#splitCount').val();
 
                                 if(isNaN(count) || count < 2 || count > 20){
-                                    $.alert('Please enter a valid split value');
+
+                                    $.alert({
+                                        theme: confirmTheme,
+                                        title: 'Error',
+                                        content: 'Please enter a valid split value (2 - 20)'
+                                    });
+
                                     return false;
                                 }
 
@@ -1109,6 +1243,7 @@ function viewMead(id)
                 var tagName = $(event.target).text();
 
                 $.confirm({
+                    theme: confirmTheme,
                     title: "Remove Tag '" + tagName + "'",
                     content: 'Are you sure?',
                     animation: 'top',
@@ -1165,6 +1300,7 @@ function viewRecipe(id)
             var id = event.data.value;
 
             $.confirm({
+                theme: confirmTheme,
                 title: 'Delete Recipe Entry',
                 content: 'Are you sure?',
                 animation: 'top',
@@ -1248,7 +1384,11 @@ function editEvent(eventId)
     }
     else
     {
-        $.alert('Android Javascript bridge is not available');
+        $.alert({
+            theme: confirmTheme,
+            title: 'Alert',
+            content: 'Android Javascript bridge is not available'
+        });
     }
 }
 
@@ -1496,6 +1636,7 @@ function showEventDescription(id, dateString)
         window.Android.logDebug('MainActivity', description);
 
         $.alert({
+            theme: confirmTheme,
             title: dateString,
             content: '<span class="description">' + description + '</span>',
             animation: 'top',
@@ -1509,7 +1650,11 @@ function showEventDescription(id, dateString)
     }
     else
     {
-        $.alert('Android Javascript Bridge is not available.');
+        $.alert({
+            theme: confirmTheme,
+            title: 'Alert',
+            content: 'Android Javascript bridge is not available'
+        });
     }
 
     // Tell browser not to activate link
@@ -1670,4 +1815,45 @@ function formatDisplayDate(dateString)
     }
 
     return dateString;
+}
+
+function changeGlobalTheme(theme)
+{
+    // These themes will be cleared, add more
+    // swatch letters as needed.
+    var themes = "a b c d e";
+
+    // Updates the theme for all elements that match the
+    // CSS selector with the specified theme class.
+    function setTheme(cssSelector, themeClass, theme)
+    {
+        $(cssSelector)
+                .removeClass(themes.split(" ").join(" " + themeClass + "-"))
+                .addClass(themeClass + "-" + theme)
+                .attr("data-theme", theme);
+    }
+
+    // Add more selectors/theme classes as needed.
+    setTheme(".ui-mobile-viewport", "ui-overlay", theme);
+    setTheme("[data-role='page']", "ui-page-theme", theme);
+    setTheme("[data-role='header']", "ui-bar", theme);
+    setTheme("[data-role='listview'] > li", "ui-bar", theme);
+    setTheme(".ui-btn", "ui-btn-up", theme);
+    setTheme(".ui-btn", "ui-btn-hover", theme);
+}
+
+function dpUserPrefFormat()
+{
+    switch(localStorage.getItem(dateFormatPrefKeyName))
+    {
+        case 'US':
+            return 'MM/DD/YYYY';
+        case 'ISO':
+            return 'YYYY-MM-DD';
+        default:
+            // log error
+            if(window.Android) window.Android.logError('dpUserPrefFormat','User preference was not found or unexpected.');
+            // default to ISO
+            return 'YYYY-MM-DD';
+    }
 }
