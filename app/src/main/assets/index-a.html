@@ -37,9 +37,7 @@
 
 <div id="my-meads" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
-		<a id="newMeadButton" href="#new-mead" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
 	<div id="my-meads-navbar" data-role="navbar">
 		<ul>
@@ -49,31 +47,64 @@
 	<div role="main" class="ui-content">
 		<ul id="mead-list" data-role="listview">
 		</ul>
+		<a href="#new-mead" id="newMeadButton" class="add-button add-button-light">New Batch</a>
 	</div>
 	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
 		<ul>
 			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
 			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
-			<li><a class="navbar-abv" href="#abv" style="margin-right: 1px;">ABV</a></li>
+			<li><a class="navbar-last navbar-abv" href="#abv">ABV</a></li>
 		</ul>
 	</div>
 </div>
 
 <div id="my-recipes" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
-		<a id="newRecipeButton" href="#new-recipe" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
 	<div role="main" class="ui-content">
 		<ul id="recipe-list" data-role="listview">
 		</ul>
+		<a href="#new-recipe" id="newRecipeButton" class="add-button add-button-light">New Recipe</a>
 	</div>
 	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
 		<ul>
 			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
 			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
-			<li><a class="navbar-abv" href="#abv" style="margin-right: 1px;">ABV</a></li>
+			<li><a class="navbar-last navbar-abv" href="#abv">ABV</a></li>
+		</ul>
+	</div>
+</div>
+
+<div id="abv" data-role="page" data-theme="a">
+	<div data-role="header" data-position="fixed">
+		<h1>Mead Mate</h1>
+	</div>
+	<div role="main" class="ui-content">
+		<h2 class="content-title">Calculate Alcohol by Volume</h2>
+		<p id="abvFormulaPref"></p>
+		<form id="abv-form">
+			<p>
+				<span id="abvResult"></span>
+			</p>
+			<ul id="abvMessageList"></ul>
+			<p>
+				<label for="initialGravity">Initial Specific Gravity:</label>
+				<input type="text" inputmode="numeric" name="initialGravity" value="" id="initialGravity" />
+			</p>
+			<p>
+				<label for="newGravity">New Specific Gravity:</label>
+				<input type="text" inputmode="numeric" name="newGravity" value="" id="newGravity" />
+			</p>
+			<input type="button" value="Calculate" name="calcButton" id="calcButton">
+			<p>Set your preferred formula under 'Preferences' on the Main Menu.</p>
+		</form>
+	</div>
+	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
+		<ul>
+			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
+			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
+			<li><a class="navbar-last navbar-abv" href="#abv">ABV</a></li>
 		</ul>
 	</div>
 </div>
@@ -322,43 +353,9 @@
 	</div>
 </div>
 
-<div id="abv" data-role="page" data-theme="a">
-	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
-		<h1>Mead Mate</h1>
-	</div>
-	<div role="main" class="ui-content">
-		<h2 class="content-title">Calculate Alcohol by Volume</h2>
-		<p id="abvFormulaPref"></p>
-		<form id="abv-form">
-			<p>
-				<span id="abvResult"></span>
-			</p>
-			<ul id="abvMessageList"></ul>
-			<p>
-				<label for="initialGravity">Initial Specific Gravity:</label>
-				<input type="text" inputmode="numeric" name="initialGravity" value="" id="initialGravity" />
-			</p>
-			<p>
-				<label for="newGravity">New Specific Gravity:</label>
-				<input type="text" inputmode="numeric" name="newGravity" value="" id="newGravity" />
-			</p>
-			<input type="button" value="Calculate" name="calcButton" id="calcButton">
-			<p>Set your preferred formula under 'Preferences' on the Main Menu.</p>
-		</form>
-	</div>
-	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
-		<ul>
-			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
-			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
-			<li><a class="navbar-abv" href="#abv" style="margin-right: 1px;">ABV</a></li>
-		</ul>
-	</div>
-</div>
-
 <div id="mead-types" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
@@ -409,7 +406,7 @@
 
 <div id="preferences" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
 	</div>
 
@@ -486,7 +483,7 @@
 
 <div id="privacy-policy" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
@@ -605,7 +602,7 @@
 
 <div id="about" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
