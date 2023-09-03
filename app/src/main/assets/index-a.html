@@ -35,29 +35,6 @@
 </head>
 <body>
 
-<div id="home" data-role="page" data-theme="a">
-	<div data-role="header" data-position="fixed">
-		<h1>Mead Mate</h1>
-		<a href="#main-menu" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-bars" id="mainMenuButton">Menu</a>
-	</div>
-	<div role="main" class="ui-content">
-		<ul id="mainMenu">
-			<li><a href="#my-meads" class="ui-btn ui-shadow ui-corner-all">My Meads</a></li>
-			<li><a href="#my-recipes" class="ui-btn ui-shadow ui-corner-all">My Recipes</a></li>
-			<li><a href="#abv" class="ui-btn ui-shadow ui-corner-all">ABV Calculator</a></li>
-		</ul>
-	</div>
-	<div data-role="panel" id="main-menu" data-position="right" data-display="overlay">
-		<ul data-role="listview">
-			<li><a href="#mead-types" class="ui-btn ui-icon-info ui-btn-icon-left">Types of Mead</a></li>
-			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Preferences</a></li>
-			<li><a href="#privacy-policy" class="ui-btn ui-icon-eye ui-btn-icon-left">Privacy Policy</a></li>
-			<li><a href="#about" class="ui-btn ui-icon-info ui-btn-icon-left">About</a></li>
-			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
-		</ul>
-	</div>
-</div>
-
 <div id="my-meads" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
 		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
@@ -73,6 +50,13 @@
 		<ul id="mead-list" data-role="listview">
 		</ul>
 	</div>
+	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
+		<ul>
+			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
+			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
+			<li><a class="navbar-abv" href="#abv" style="margin-right: 1px;">ABV</a></li>
+		</ul>
+	</div>
 </div>
 
 <div id="my-recipes" data-role="page" data-theme="a">
@@ -83,6 +67,13 @@
 	</div>
 	<div role="main" class="ui-content">
 		<ul id="recipe-list" data-role="listview">
+		</ul>
+	</div>
+	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
+		<ul>
+			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
+			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
+			<li><a class="navbar-abv" href="#abv" style="margin-right: 1px;">ABV</a></li>
 		</ul>
 	</div>
 </div>
@@ -355,6 +346,13 @@
 			<input type="button" value="Calculate" name="calcButton" id="calcButton">
 			<p>Set your preferred formula under 'Preferences' on the Main Menu.</p>
 		</form>
+	</div>
+	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
+		<ul>
+			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
+			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
+			<li><a class="navbar-abv" href="#abv" style="margin-right: 1px;">ABV</a></li>
+		</ul>
 	</div>
 </div>
 

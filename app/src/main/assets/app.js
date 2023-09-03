@@ -157,18 +157,28 @@ $(document).on("pagebeforeshow","#abv", function(){
     $('#initialGravity').val('');
     $('#newGravity').val('');
     $("#abvResult").text('0.00%');
+
+    $("a.navbar-batches").removeClass("ui-btn-active");
+    $("a.navbar-recipes").removeClass("ui-btn-active");
+    $("a.navbar-abv").addClass("ui-btn-active");
 });
 
 $(document).on("pagebeforeshow","#my-meads",function() {
 
     loadMyMeadsListView();
 
+    $("a.navbar-batches").addClass("ui-btn-active");
+    $("a.navbar-recipes").removeClass("ui-btn-active");
+    $("a.navbar-abv").removeClass("ui-btn-active");
 });
 
 $(document).on("pagebeforeshow","#my-recipes",function() {
 
     loadMyRecipesListView();
 
+    $("a.navbar-batches").removeClass("ui-btn-active");
+    $("a.navbar-recipes").addClass("ui-btn-active");
+    $("a.navbar-abv").removeClass("ui-btn-active");
 });
 
 $(document).on("pagebeforeshow","#new-mead",function() {
