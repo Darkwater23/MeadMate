@@ -177,13 +177,3 @@ a.add-button
     font-size: 0;
     color: transparent;
 }
-
-a.add-button-light
-{
-    background-image: url( 'dist/images/icons-svg/new-doc-dark-brown.svg' );
-}
-
-a.add-button-dark
-{
-    background-image: url( 'dist/images/icons-svg/new-doc-white.svg' );
-}

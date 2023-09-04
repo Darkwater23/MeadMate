@@ -35,19 +35,29 @@
 </head>
 <body>
 
-<div id="home" data-role="page" data-theme="b">
+<div id="my-meads" data-role="page" data-theme="b">
 	<div data-role="header" data-position="fixed">
 		<h1>Mead Mate</h1>
-		<a href="#main-menu" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-bars" id="mainMenuButton">Menu</a>
+		<a href="#main-menu-batches" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-bars">Menu</a>
 	</div>
-	<div role="main" class="ui-content">
-		<ul id="mainMenu">
-			<li><a href="#my-meads" class="ui-btn ui-shadow ui-corner-all">My Meads</a></li>
-			<li><a href="#my-recipes" class="ui-btn ui-shadow ui-corner-all">My Recipes</a></li>
-			<li><a href="#abv" class="ui-btn ui-shadow ui-corner-all">ABV Calculator</a></li>
+	<div id="my-meads-navbar" data-role="navbar">
+		<ul>
+			<li><a id="toggleArchivedMeadsButton" href="#my-meads" class="ui-btn ui-btn-inline ui-mini">Include / Exclude Hidden Meads</a></li>
 		</ul>
 	</div>
-	<div data-role="panel" id="main-menu" data-position="right" data-display="overlay">
+	<div role="main" class="ui-content">
+		<ul id="mead-list" data-role="listview">
+		</ul>
+		<a href="#new-mead" id="newMeadButton" class="add-button">New Batch</a>
+	</div>
+	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
+		<ul>
+			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
+			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
+			<li><a class="navbar-last navbar-abv" href="#abv">ABV</a></li>
+		</ul>
+	</div>
+	<div data-role="panel" id="main-menu-batches" data-position="right" data-display="overlay">
 		<ul data-role="listview">
 			<li><a href="#mead-types" class="ui-btn ui-icon-info ui-btn-icon-left">Types of Mead</a></li>
 			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Preferences</a></li>
@@ -58,31 +68,73 @@
 	</div>
 </div>
 
-<div id="my-meads" data-role="page" data-theme="b">
+<div id="my-recipes" data-role="page" data-theme="b">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
-		<a id="newMeadButton" href="#new-mead" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
-	</div>
-	<div id="my-meads-navbar" data-role="navbar">
-		<ul>
-			<li><a id="toggleArchivedMeadsButton" href="#my-meads" class="ui-btn ui-btn-inline ui-mini">Include / Exclude Hidden Meads</a></li>
-		</ul>
+		<a href="#main-menu-recipes" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-bars">Menu</a>
 	</div>
 	<div role="main" class="ui-content">
-		<ul id="mead-list" data-role="listview">
+		<ul id="recipe-list" data-role="listview">
+		</ul>
+		<a href="#new-recipe" id="newRecipeButton" class="add-button">New Recipe</a>
+	</div>
+	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
+		<ul>
+			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
+			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
+			<li><a class="navbar-last navbar-abv" href="#abv">ABV</a></li>
+		</ul>
+	</div>
+	<div data-role="panel" id="main-menu-recipes" data-position="right" data-display="overlay">
+		<ul data-role="listview">
+			<li><a href="#mead-types" class="ui-btn ui-icon-info ui-btn-icon-left">Types of Mead</a></li>
+			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Preferences</a></li>
+			<li><a href="#privacy-policy" class="ui-btn ui-icon-eye ui-btn-icon-left">Privacy Policy</a></li>
+			<li><a href="#about" class="ui-btn ui-icon-info ui-btn-icon-left">About</a></li>
+			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
 	</div>
 </div>
 
-<div id="my-recipes" data-role="page" data-theme="b">
+<div id="abv" data-role="page" data-theme="b">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
-		<a id="newRecipeButton" href="#new-recipe" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+		<a href="#main-menu-abv" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-bars">Menu</a>
 	</div>
 	<div role="main" class="ui-content">
-		<ul id="recipe-list" data-role="listview">
+		<h2 class="content-title">Calculate Alcohol by Volume</h2>
+		<p id="abvFormulaPref"></p>
+		<form id="abv-form">
+			<p>
+				<span id="abvResult"></span>
+			</p>
+			<ul id="abvMessageList"></ul>
+			<p>
+				<label for="initialGravity">Initial Specific Gravity:</label>
+				<input type="text" inputmode="numeric" name="initialGravity" value="" id="initialGravity" />
+			</p>
+			<p>
+				<label for="newGravity">New Specific Gravity:</label>
+				<input type="text" inputmode="numeric" name="newGravity" value="" id="newGravity" />
+			</p>
+			<input type="button" value="Calculate" name="calcButton" id="calcButton">
+			<p>Set your preferred formula under 'Preferences' using the Menu above.</p>
+		</form>
+	</div>
+	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
+		<ul>
+			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
+			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
+			<li><a class="navbar-last navbar-abv" href="#abv">ABV</a></li>
+		</ul>
+	</div>
+	<div data-role="panel" id="main-menu-abv" data-position="right" data-display="overlay">
+		<ul data-role="listview">
+			<li><a href="#mead-types" class="ui-btn ui-icon-info ui-btn-icon-left">Types of Mead</a></li>
+			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Preferences</a></li>
+			<li><a href="#privacy-policy" class="ui-btn ui-icon-eye ui-btn-icon-left">Privacy Policy</a></li>
+			<li><a href="#about" class="ui-btn ui-icon-info ui-btn-icon-left">About</a></li>
+			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
 	</div>
 </div>
@@ -331,36 +383,9 @@
 	</div>
 </div>
 
-<div id="abv" data-role="page" data-theme="b">
-	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
-		<h1>Mead Mate</h1>
-	</div>
-	<div role="main" class="ui-content">
-		<h2 class="content-title">Calculate Alcohol by Volume</h2>
-		<p id="abvFormulaPref"></p>
-		<form id="abv-form">
-			<p>
-				<span id="abvResult"></span>
-			</p>
-			<ul id="abvMessageList"></ul>
-			<p>
-				<label for="initialGravity">Initial Specific Gravity:</label>
-				<input type="text" inputmode="numeric" name="initialGravity" value="" id="initialGravity" />
-			</p>
-			<p>
-				<label for="newGravity">New Specific Gravity:</label>
-				<input type="text" inputmode="numeric" name="newGravity" value="" id="newGravity" />
-			</p>
-			<input type="button" value="Calculate" name="calcButton" id="calcButton">
-			<p>Set your preferred formula under 'Preferences' on the Main Menu.</p>
-		</form>
-	</div>
-</div>
-
 <div id="mead-types" data-role="page" data-theme="b">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
@@ -411,7 +436,7 @@
 
 <div id="preferences" data-role="page" data-theme="b">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
 	</div>
 
@@ -488,7 +513,7 @@
 
 <div id="privacy-policy" data-role="page" data-theme="b">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
@@ -607,7 +632,7 @@
 
 <div id="about" data-role="page" data-theme="b">
 	<div data-role="header" data-position="fixed">
-		<a href="#home" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
