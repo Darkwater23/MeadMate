@@ -21,6 +21,13 @@ const specificGravityRange = [0.700, 2.000];
 const archivePrefKeyName = 'INCLUDE_ARCHIVED';
 const dateFormatPrefKeyName = 'DATEFORMATPREF';
 const themeModePrefKeyName = 'THEMEPREF';
+const exportAsCsv = 1;
+const exportAsJson = 2;
+const alertNoBridge = {
+          theme: confirmTheme,
+          title: 'Warning',
+          content:'Android Javascript bridge is not available'
+      };
 
 // One-time code executions
 var tagList;
@@ -411,6 +418,32 @@ var calendarEventFormValidator = $("#calendar-event-form").validate({
 });
 
 // Button tap events
+$("#exportCsvButton").on("tap", function(event) {
+    event.preventDefault();
+
+    if(window.Android)
+    {
+        var result = window.Android.exportData(exportAsCsv);
+    }
+    else
+    {
+        $.alert(alertNoBridge);
+    }
+});
+
+$("#exportJsonButton").on("tap", function(event) {
+    event.preventDefault();
+
+    if(window.Android)
+    {
+        var result = window.Android.exportData(exportAsJson);
+    }
+    else
+    {
+        $.alert(alertNoBridge);
+    }
+});
+
 $("#newMeadButton").on("tap", function(event) {
 
     event.preventDefault();
@@ -477,11 +510,7 @@ $("#saveMeadButton").on("tap", function(event){
     }
     else
     {
-        $.alert({
-            theme: confirmTheme,
-            title: 'Alert',
-            content:'Android Javascript bridge is not available'
-        });
+        $.alert(alertNoBridge);
     }
 });
 
@@ -521,11 +550,7 @@ $("#saveRecipeButton").on("tap", function(event){
     }
     else
     {
-        $.alert({
-            theme: confirmTheme,
-            title: 'Alert',
-            content:'Android Javascript bridge is not available'
-        });
+        $.alert(alertNoBridge);
     }
 
 });
@@ -556,11 +581,7 @@ $("#saveReadingButton").on("tap", function(event){
     }
     else
     {
-        $.alert({
-            theme: confirmTheme,
-            title: 'Alert',
-            content:'Android Javascript bridge is not available'
-        });
+        $.alert(alertNoBridge);
     }
 
 });
@@ -602,11 +623,7 @@ $("#saveEventButton").on("tap", function(event){
  }
  else
  {
-     $.alert({
-         theme: confirmTheme,
-         title: 'Alert',
-         content:'Android Javascript bridge is not available'
-     });
+     $.alert(alertNoBridge);
  }
 
 });
@@ -660,11 +677,7 @@ $("#saveCalendarEventButton").on("tap", function(event){
     }
     else
     {
-        $.alert({
-            theme: confirmTheme,
-            title: 'Alert',
-            content:'Android Javascript bridge is not available'
-        });
+        $.alert(alertNoBridge);
     }
 });
 
@@ -976,11 +989,7 @@ function deleteReading(meadId, readingId)
     }
     else
     {
-        $.alert({
-            theme: confirmTheme,
-            title: 'Alert',
-            content:'Android Javascript bridge is not available'
-        });
+        $.alert(alertNoBridge);
     }
 
     // Keep link from doing anything
@@ -1014,11 +1023,7 @@ function deleteEvent(meadId, eventId)
      }
      else
      {
-         $.alert({
-             theme: confirmTheme,
-             title: 'Alert',
-             content:'Android Javascript bridge is not available'
-         });
+         $.alert(alertNoBridge);
      }
 
      // Keep link from doing anything
@@ -1394,11 +1399,7 @@ function editEvent(eventId)
     }
     else
     {
-        $.alert({
-            theme: confirmTheme,
-            title: 'Alert',
-            content: 'Android Javascript bridge is not available'
-        });
+        $.alert(alertNoBridge);
     }
 }
 
@@ -1660,11 +1661,7 @@ function showEventDescription(id, dateString)
     }
     else
     {
-        $.alert({
-            theme: confirmTheme,
-            title: 'Alert',
-            content: 'Android Javascript bridge is not available'
-        });
+        $.alert(alertNoBridge);
     }
 
     // Tell browser not to activate link

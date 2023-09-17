@@ -20,38 +20,42 @@ package com.dawsonsoftware.meadmate;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.provider.CalendarContract;
 import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.time.Instant;
+import com.dawsonsoftware.meadmate.models.CombinedMeadRecord;
+import com.google.gson.Gson;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
     private WebView mWebView;
+    private final MeadMateData data = new MeadMateData(this);
+    private static final int CREATE_CSV_FILE = 1;
+    private static final int CREATE_JSON_FILE = 2;
+    private static final int CREATE_EVENT = 3;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -127,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            startActivityForResult(intent, 1);
+            startActivityForResult(intent, CREATE_EVENT);
         }
         catch(Exception ex)
         {
@@ -136,17 +140,61 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
 
-        super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, resultData);
 
-        if(requestCode == 1)
+        if(requestCode == CREATE_EVENT)
         {
-            Log.d("MainActivity", "ResultCode: " + resultCode);
+            Log.d("MainActivity", "Create Event ResultCode: " + resultCode);
+        }
 
-            String functionSig = "calendarEventCallback(" + resultCode + ")";
+        if(requestCode == CREATE_CSV_FILE && resultCode == Activity.RESULT_OK)
+        {
+            Log.d("MainActivity", "Create Event ResultCode: " + resultCode);
 
-            mWebView.loadUrl("javascript:" + functionSig);
+            Uri uri = null;
+
+            if (resultData != null) {
+
+                uri = resultData.getData();
+
+                Log.d("MainActivity", "Selected file path: " + uri);
+
+                try
+                {
+                    String content = generateCsvExportFile();
+                    writeExportFile(uri, content);
+                }
+                catch(Exception ex)
+                {
+                    Log.e("MainActivity", "Unexpected error while exporting batch data to CSV.", ex);
+                }
+            }
+        }
+
+        if(requestCode == CREATE_JSON_FILE && resultCode == Activity.RESULT_OK)
+        {
+            Log.d("MainActivity", "Create Event ResultCode: " + resultCode);
+
+            Uri uri = null;
+
+            if (resultData != null) {
+
+                uri = resultData.getData();
+
+                Log.d("MainActivity", "Selected file path: " + uri);
+
+                try
+                {
+                    String content = generateJsonExportFile();
+                    writeExportFile(uri, content);
+                }
+                catch(Exception ex)
+                {
+                    Log.e("MainActivity", "Unexpected error while exporting batch data to JSON.", ex);
+                }
+            }
         }
     }
 
@@ -172,6 +220,107 @@ public class MainActivity extends AppCompatActivity {
         {
             mWebView.post(() -> mWebView.loadUrl(getString(R.string.theme_b_url)));
             return;
+        }
+    }
+
+    public void requestCsvExportFileUri() {
+
+        Log.i("DataExport", "Starting mead data export in CSV.");
+
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/csv");
+        intent.putExtra(Intent.EXTRA_TITLE, "mead-mate-data.csv");
+
+        startActivityForResult(intent, CREATE_CSV_FILE);
+    }
+
+    public void requestJsonExportFileUri() {
+
+        Log.i("DataExport", "Starting mead data export in JSON.");
+
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/json");
+        intent.putExtra(Intent.EXTRA_TITLE, "mead-mate-data.json");
+
+        startActivityForResult(intent, CREATE_JSON_FILE);
+    }
+
+    private String generateCsvExportFile() {
+
+        try {
+
+            List<CombinedMeadRecord> records = data.getMeadRecords();
+
+            StringBuilder str = new StringBuilder();
+
+            // header
+            str.append("MeadId,");
+            str.append("BatchName,");
+            str.append("Start Date,");
+            str.append("Description,");
+            str.append("Starting Gravity,");
+            str.append("Archived,");
+            str.append("Tags,");
+            str.append("Event Date,");
+            str.append("Event Type,");
+            str.append("Event Description / Value" + System.lineSeparator());
+
+            for (CombinedMeadRecord record : records) {
+                str.append(record.getMeadId() + ",");
+                str.append(record.getBatchName() + ",");
+                str.append(record.getStartDate() + ",");
+                str.append(record.getDescription() + ",");
+                str.append(record.getStartingGravity() + ",");
+                str.append(record.getArchived() + ",");
+                str.append(record.getTags() + ",");
+                str.append(record.getEventDate() + ",");
+                str.append(record.getEventDescription() + System.lineSeparator());
+            }
+
+            return str.toString();
+
+        } catch (Exception e) {
+
+            Log.e("MainActivity", "Unexpected error in generateCsvExportFile", e);
+
+            return "Unexpected error while trying to export data.";
+        }
+    }
+
+    private String generateJsonExportFile()
+    {
+        try {
+
+            List<CombinedMeadRecord> records = data.getMeadRecords();
+
+            Gson gson = new Gson();
+
+            return gson.toJson(records);
+
+        } catch (Exception e) {
+
+            Log.e("MainActivity", "Unexpected error in generateJsonExportFile", e);
+
+            return "Unexpected error while trying to export data.";
+        }
+    }
+
+    private void writeExportFile(Uri uri, String content)
+    {
+        try
+        {
+            ParcelFileDescriptor pfd = this.getContentResolver().openFileDescriptor(uri, "w");
+            FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor());
+            fileOutputStream.write(content.getBytes());
+            // Let the document provider know you're done by closing the stream.
+            fileOutputStream.close();
+            pfd.close();
+        }
+        catch(Exception e)
+        {
+            Log.e("MainActivity", "Unexpected error in writeExportFile", e);
         }
     }
 }

@@ -55,52 +55,18 @@ import static java.lang.Integer.parseInt;
 public class JavaScriptBridge {
     private final Activity activity;
     private final MeadMateData data;
+    private static final int EXPORT_AS_CSV = 1;
+    private static final int EXPORT_AS_JSON = 2;
 
     public JavaScriptBridge(Activity activity) {
         this.activity = activity;
         data = new MeadMateData(activity);
     }
 
-    /*@JavascriptInterface
-    public void exportData()
-    {
-        Log.i("JavaScriptBridge", "Exporting app data.");
-
-        //TODO: Add method for exporting data
-
-        Log.i("JavaScriptBridge", "Export complete!");
-    }*/
-
-    /*@JavascriptInterface
-    public String importData(String filePath)
-    {
-        Log.i("JavaScriptBridge", "Importing app data.");
-        Log.d("JavaScriptBridge", "Path to user-selected file:" + filePath);
-
-        String result = "Not implemented yet.";
-
-        //TODO: Add method for importing data
-
-        Log.i("JavaScriptBridge", "Import complete!");
-
-        return result;
-    }*/
-
     @JavascriptInterface
     public String fetchMeads(String sortBy, boolean includeArchived){
 
         Log.i("JavaScriptBridge", "Fetching mead data.");
-
-        //private static final String KEY_MEAD_ID = "_ID";
-        //private static final String KEY_MEAD_NAME = "NAME";
-        //private static final String KEY_MEAD_START_DATE = "START_DATE";
-
-        //<option value="byId">Record Id (Oldest First)</option>
-        //<option value="byName">Mead Name (A-Z)</option>
-        //<option value="byDate">Mead Start Date (Oldest First)</option>
-        //<option value="byIdDesc">Record Id (Newest First)</option>
-        //<option value="byNameDesc">Mead Name (Z-A)</option>
-        //<option value="byDateDesc">Mead Start Date (Newest First)</option>
 
         String orderBy;
 
@@ -606,5 +572,23 @@ public class JavaScriptBridge {
         Log.d("JavaScriptBridge", "Activate Theme: " + code);
         MainActivity mainActivity = (MainActivity) this.activity;
         mainActivity.changeTheme(code);
+    }
+
+    @JavascriptInterface
+    public void exportData(int exportType)
+    {
+        Log.d("JavaScriptBridge", "Start export using type: " + exportType);
+
+        MainActivity mainActivity = (MainActivity) this.activity;
+
+        if(exportType == EXPORT_AS_CSV)
+        {
+            mainActivity.requestCsvExportFileUri();
+        }
+
+        if(exportType == EXPORT_AS_JSON)
+        {
+            mainActivity.requestJsonExportFileUri();
+        }
     }
 }

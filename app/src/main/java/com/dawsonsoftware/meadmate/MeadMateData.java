@@ -24,6 +24,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.dawsonsoftware.meadmate.models.CombinedMeadRecord;
 import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.EventType;
 import com.dawsonsoftware.meadmate.models.Mead;
@@ -525,14 +526,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
         }
     }
-
-    //void deleteMead(Mead mead)
-    //{
-    //    if(mead != null)
-    //    {
-    //        deleteMead(mead.getId());
-    //    }
-    //}
 
     void archiveMead(int meadId)
     {
@@ -1055,6 +1048,81 @@ public class MeadMateData extends SQLiteOpenHelper {
         catch(Exception ex)
         {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
+        }
+
+        return model;
+    }
+
+    List<CombinedMeadRecord> getMeadRecords()
+    {
+        List<CombinedMeadRecord> model = new ArrayList<>();
+
+        String query = "select m._ID AS MeadId, m.NAME as BatchName, m.START_DATE as 'Start Date', m.DESCRIPTION as Description, m.ORIGINAL_GRAVITY as 'Starting Gravity', m.ARCHIVED as Archived, '' as Tags, " +
+            "e.DATE as 'Event Date', et.NAME as 'Event Type', e.DESCRIPTION as 'Event Description / Value' " +
+            "FROM " +
+            "MEADS AS m " +
+            "LEFT JOIN EVENTS AS e " +
+            "on e.MEAD_ID = m._ID " +
+            "INNER JOIN EVENT_TYPES AS et " +
+            "on e.TYPE_ID = et._ID " +
+            "UNION " +
+            "select m._ID AS MeadId, m.NAME as BatchName, m.START_DATE as 'Start Date', m.DESCRIPTION as Description, m.ORIGINAL_GRAVITY as 'Starting Gravity', m.ARCHIVED as Archived, '' as Tags, " +
+            "r.DATE, 'Gravity Reading', r.SPECIFIC_GRAVITY " +
+            "FROM " +
+            "MEADS AS m " +
+            "LEFT JOIN READINGS AS r " +
+            "on r.MEAD_ID = m._ID " +
+            "ORDER BY m._ID";
+
+        try
+        {
+            SQLiteDatabase db = this.getReadableDatabase();
+
+            Cursor c = db.rawQuery(query, null);
+
+            if(c.getCount() > 0)
+            {
+                c.moveToFirst();
+
+                do {
+                    
+                    List<Tag> tags = getMeadTags(c.getInt(0));
+                    String tagsString = "";
+
+                    if(tags.size() > 0)
+                    {
+                        for (Tag tag : tags) {
+                            tagsString = tagsString.concat(tag.getName()).concat(",");
+                        }
+
+                        Log.d("MeadMateData","TagsString: " + tagsString);
+
+                        tagsString = tagsString.substring(0, tagsString.length() - 1);
+                    }
+
+                    CombinedMeadRecord record = new CombinedMeadRecord();
+
+                    record.setMeadId(c.getInt(0));
+                    record.setBatchName(c.getString(1));
+                    record.setStartDate(c.getString(2));
+                    record.setDescription(c.getString(3));
+                    record.setStartingGravity(c.getString(4));
+                    record.setArchived((c.getInt(5) == 1) ? "true" : "false");
+                    record.setTags(tagsString);
+                    record.setEventDate(c.getString(7));
+                    record.setEventType(c.getString(8));
+                    record.setEventDescription(c.getString(9));
+
+                    model.add(record);
+
+                }while(c.moveToNext());
+            }
+
+            c.close();
+        }
+        catch(Exception ex)
+        {
+            Log.e(MeadMateData.class.getTypeName(),ex.toString());
         }
 
         return model;
