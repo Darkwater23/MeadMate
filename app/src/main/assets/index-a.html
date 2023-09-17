@@ -48,13 +48,13 @@
 	<div role="main" class="ui-content">
 		<ul id="mead-list" data-role="listview">
 		</ul>
-		<a href="#new-mead" id="newMeadButton" class="add-button add-button-light">New Batch</a>
+		<a href="#new-mead" id="newMeadButton" class="add-button">New Batch</a>
 	</div>
 	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
 		<ul>
-			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
-			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
-			<li><a class="navbar-last navbar-abv" href="#abv">ABV</a></li>
+			<li><a class="navbar-batches" href="#my-meads" style="font-size: 1em;">Batches</a></li>
+			<li><a class="navbar-recipes" href="#my-recipes" style="font-size: 1em;">Recipes</a></li>
+			<li><a class="navbar-last navbar-abv" href="#abv" style="font-size: 1em;">ABV</a></li>
 		</ul>
 	</div>
 	<div data-role="panel" id="main-menu-batches" data-position="right" data-display="overlay">
@@ -80,9 +80,9 @@
 	</div>
 	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
 		<ul>
-			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
-			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
-			<li><a class="navbar-last navbar-abv" href="#abv">ABV</a></li>
+			<li><a class="navbar-batches" href="#my-meads" style="font-size: 1em;">Batches</a></li>
+			<li><a class="navbar-recipes" href="#my-recipes" style="font-size: 1em;">Recipes</a></li>
+			<li><a class="navbar-last navbar-abv" href="#abv" style="font-size: 1em;">ABV</a></li>
 		</ul>
 	</div>
 	<div data-role="panel" id="main-menu-recipes" data-position="right" data-display="overlay">
@@ -123,9 +123,9 @@
 	</div>
 	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
 		<ul>
-			<li><a class="navbar-batches" href="#my-meads">Batches</a></li>
-			<li><a class="navbar-recipes" href="#my-recipes">Recipes</a></li>
-			<li><a class="navbar-last navbar-abv" href="#abv">ABV</a></li>
+			<li><a class="navbar-batches" href="#my-meads" style="font-size: 1em;">Batches</a></li>
+			<li><a class="navbar-recipes" href="#my-recipes" style="font-size: 1em;">Recipes</a></li>
+			<li><a class="navbar-last navbar-abv" href="#abv" style="font-size: 1em;">ABV</a></li>
 		</ul>
 	</div>
 	<div data-role="panel" id="main-menu-abv" data-position="right" data-display="overlay">
@@ -644,12 +644,14 @@
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">About</h2>
-		<h3>Mead Mate Release 15</h3>
-		<p>Just a quick bug fix. I updated the API level of the app, but I didn't notice that extra declarations were needed for Mead Mate to insert a calendar event.</p>
-		<p>It's working on my Pixel 7a and in the Pixel 3a emulator. Please let me know if isn't working for you.</p>
+		<h3>Mead Mate Release 16</h3>
+		<p>Another long-awaited update! I updated the UI to reduce the number of clicks needed to get around. I also added features for exporting batch data in CSV or JSON format. Please let me know what adjustments you might like.</p>
 		<p><strong>What's New</strong></p>
 		<ul>
-			<li>Updated the app manifest to fix issue with setting reminders.</li>
+			<li>Removed list of buttons from main view</li>
+			<li>Added navbar to bottom of three primary views</li>
+			<li>Added feature to export mead batch data as CSV</li>
+			<li>Added feature to export mead batch data as JSON</li>
 		</ul>
 
 		<h3>Open Source Project Information</h3>
