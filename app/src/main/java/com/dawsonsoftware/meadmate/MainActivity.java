@@ -268,15 +268,34 @@ public class MainActivity extends AppCompatActivity {
             str.append("Event Description / Value" + System.lineSeparator());
 
             for (CombinedMeadRecord record : records) {
+
+                // Remove \r \n \t from Description and Event Description
+
+                String description = record.getDescription();
+                String eventDescription = record.getEventDescription();
+
+                if(description != null) {
+                    description = description.replaceAll("\\r", " ");
+                    description = description.replaceAll("\\n", " ");
+                    description = description.replaceAll("\\t", " ");
+                }
+
+                if(eventDescription != null){
+                    eventDescription = eventDescription.replaceAll("\\r", " ");
+                    eventDescription = eventDescription.replaceAll("\\n", " ");
+                    eventDescription = eventDescription.replaceAll("\\t", " ");
+                }
+
                 str.append(record.getMeadId() + ",");
                 str.append(record.getBatchName() + ",");
                 str.append(record.getStartDate() + ",");
-                str.append(record.getDescription() + ",");
+                str.append(description + ",");
                 str.append(record.getStartingGravity() + ",");
                 str.append(record.getArchived() + ",");
                 str.append(record.getTags() + ",");
                 str.append(record.getEventDate() + ",");
-                str.append(record.getEventDescription() + System.lineSeparator());
+                str.append(record.getEventType() + ",");
+                str.append(eventDescription + System.lineSeparator());
             }
 
             return str.toString();
