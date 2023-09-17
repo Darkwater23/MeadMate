@@ -155,3 +155,25 @@ ul.spaced-list li
     padding: 0;
     display: block;
 }
+
+a.navbar-last
+{
+    /* the last nav inherited a 4px margin that threw things off. */
+    /* not sure where it came from so I just fixed it here. */
+    style="margin-right: 1px;"
+}
+
+a.add-button
+{
+    display: block;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-size: cover;
+    right: 3%;
+    bottom: 7%;
+    width: 5rem;
+    height: 5rem;
+    line-height: 0;
+    font-size: 0;
+    color: transparent;
+}

@@ -43,7 +43,7 @@ hr
     background-color: #4F4F4F;
 }
 
-#mead-menu, #recipe-menu, #main-menu
+#mead-menu, #recipe-menu, #main-menu, #main-menu-batches, #main-menu-recipes, #main-menu-abv
 {
     background-color: #000;
 }
@@ -61,4 +61,9 @@ span.archived
 
 a:link, a:visited, a:hover, a:active {
   color: yellow;
+}
+
+a.add-button
+{
+    background-image: url( 'dist/images/icons-svg/add-hex-dark.svg' );
 }
