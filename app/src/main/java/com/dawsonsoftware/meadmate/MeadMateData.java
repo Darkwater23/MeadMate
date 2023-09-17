@@ -397,8 +397,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
-
-
     int addMead(Mead mead) {
 
         try
@@ -784,35 +782,6 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
-    /*void deleteTag(int tagId)
-    {
-        String meadTagsWhereClause = KEY_MEAD_TAGS_TAG_ID + "=?";
-        String[] meadTagsWhereArgs = new String[] { String.valueOf(tagId) };
-
-        String tagWhereClause = KEY_TAGS_ID + "=?";
-        String[] tagWhereArgs = new String[] { String.valueOf(tagId) };
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        db.beginTransaction();
-
-        try
-        {
-            db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, meadTagsWhereArgs);
-            db.delete(TABLE_TAGS, tagWhereClause, tagWhereArgs);
-
-            db.setTransactionSuccessful();
-        }
-        catch(Exception ex)
-        {
-            Log.e(MeadMateData.class.getTypeName(), ex.toString());
-        }
-        finally
-        {
-            db.endTransaction();
-        }
-    }*/
-
     void addMeadTag(int meadId, int tagId)
     {
         try
@@ -830,23 +799,6 @@ public class MeadMateData extends SQLiteOpenHelper {
             Log.e(MeadMateData.class.getTypeName(), ex.toString());
         }
     }
-
-    /*void deleteMeadTag(int meadTagId)
-    {
-        String meadTagsWhereClause = KEY_MEAD_TAGS_ID + "=?";
-        String[] meadTagsWhereArgs = new String[] { String.valueOf(meadTagId) };
-
-        try
-        {
-            SQLiteDatabase db = this.getWritableDatabase();
-
-            db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, meadTagsWhereArgs);
-        }
-        catch(Exception ex)
-        {
-            Log.e(MeadMateData.class.getTypeName(), ex.toString());
-        }
-    }*/
 
     public void deleteMeadTag(int meadId, String tagName)
     {
