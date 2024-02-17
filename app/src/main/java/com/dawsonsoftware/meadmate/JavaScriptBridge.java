@@ -559,7 +559,6 @@ public class JavaScriptBridge {
         request.setTitle(title);
         request.setDescription(description);
         request.setDate(date);
-        //request.setMeadId(Integer.parseInt(meadId));
 
         MainActivity mainActivity = (MainActivity) this.activity;
 
