@@ -42,13 +42,13 @@
 	</div>
 	<div id="my-meads-navbar" data-role="navbar">
 		<ul>
-			<li><a id="toggleArchivedMeadsButton" href="#my-meads" class="ui-btn ui-btn-inline ui-mini">Include / Exclude Hidden Meads</a></li>
+			<li><a id="toggle-archived-meads-button" href="#my-meads" class="ui-btn ui-btn-inline ui-mini">Include / Exclude Hidden Meads</a></li>
 		</ul>
 	</div>
 	<div role="main" class="ui-content">
 		<ul id="mead-list" data-role="listview">
 		</ul>
-		<a href="#new-mead" id="newMeadButton" class="add-button">New Batch</a>
+		<a href="#new-mead" id="new-mead-button" class="add-button">New Batch</a>
 	</div>
 	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
 		<ul>
@@ -76,7 +76,7 @@
 	<div role="main" class="ui-content">
 		<ul id="recipe-list" data-role="listview">
 		</ul>
-		<a href="#new-recipe" id="newRecipeButton" class="add-button">New Recipe</a>
+		<a href="#new-recipe" id="new-recipe-button" class="add-button">New Recipe</a>
 	</div>
 	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
 		<ul>
@@ -103,19 +103,19 @@
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">Calculate Alcohol by Volume</h2>
-		<p id="abvFormulaPref"></p>
+		<p id="abv-formula-pref"></p>
 		<form id="abv-form">
 			<p>
-				<span id="abvResult"></span>
+				<span id="abv-result"></span>
 			</p>
-			<ul id="abvMessageList"></ul>
+			<ul id="abv-message-list"></ul>
 			<p>
-				<label for="initialGravity">Initial Specific Gravity:</label>
-				<input type="text" inputmode="numeric" name="initialGravity" value="" id="initialGravity" />
+				<label for="initial-gravity">Initial Specific Gravity:</label>
+				<input type="text" inputmode="numeric" name="initial-gravity" value="" id="initial-gravity" />
 			</p>
 			<p>
-				<label for="newGravity">New Specific Gravity:</label>
-				<input type="text" inputmode="numeric" name="newGravity" value="" id="newGravity" />
+				<label for="new-gravity">New Specific Gravity:</label>
+				<input type="text" inputmode="numeric" name="new-gravity" value="" id="new-gravity" />
 			</p>
 			<input type="button" value="Calculate" name="calcButton" id="calcButton">
 			<p>Set your preferred formula under 'Preferences' using the Menu above.</p>
@@ -146,15 +146,15 @@
 	<div role="main" class="ui-content">
 		<h2 id="new-recipe-content-title" class="content-title">Add New Recipe</h2>
 		<form id="new-recipe-form">
-			<ul id="recipeMessageList"></ul>
-			<input type="hidden" name="recipeId" id="recipeId" value="0">
-			<label for="newRecipeName">Recipe Name:</label>
-			<input type="text" name="newRecipeName" id="newRecipeName" value="">
+			<ul id="recipe-message-list"></ul>
+			<input type="hidden" name="recipe-id" id="recipe-id" value="0">
+			<label for="new-recipe-name">Recipe Name:</label>
+			<input type="text" name="new-recipe-name" id="new-recipe-name" value="">
 
-			<label for="newRecipeDescription">Description:</label>
-			<textarea name="newRecipeDescription" id="newRecipeDescription"></textarea>
+			<label for="new-recipe-description">Description:</label>
+			<textarea name="new-recipe-description" id="new-recipe-description"></textarea>
 
-			<input type="button" value="Save" name="saveRecipeButton" id="saveRecipeButton">
+			<input type="button" value="Save" name="save-recipe-button" id="save-recipe-button">
 		</form>
 	</div>
 </div>
@@ -188,7 +188,7 @@
 	<div role="main" class="ui-content">
 		<h2 class="content-title">Create Calendar Event</h2>
 		<form id="calendar-event-form">
-			<ul id="calendarEventMessageList"></ul>
+			<ul id="calendar-event-message-list"></ul>
 
 			<input type="hidden" name="newCalendarEventMeadId" id="newCalendarEventMeadId" value="">
 			<input type="hidden" name="newCalendarEventMeadName" id="newCalendarEventMeadName" value="">
@@ -196,8 +196,8 @@
 			<label for="newCalendarEventTitle">Event Title:</label>
 			<input type="text" name="newCalendarEventTitle" id="newCalendarEventTitle" value="">
 
-			<label for="newCalendarEventDescription">Event Description:</label>
-			<select id="newCalendarEventDescription">
+			<label for="new-calendar-event-description">Event Description:</label>
+			<select id="new-calendar-event-description">
 				<option>Take A Reading</option>
 				<option>Rack Batch</option>
 				<option>Add Ingredients</option>
@@ -229,20 +229,20 @@
 		<h2 id="new-event-content-title" class="content-title">New Event</h2>
 		<p id="new-event-savemsg"></p>
 		<form id="new-event-form">
-			<ul id="newEventMessageList"></ul>
-			<input type="hidden" name="eventId" id="eventId" value="">
+			<ul id="new-event-message-list"></ul>
+			<input type="hidden" name="event-id" id="event-id" value="">
 			<input type="hidden" name="newEventMeadId" id="newEventMeadId" value="">
 
-			<label for="newEventDate">Date:</label>
-			<input type="text" name="newEventDate" id="newEventDate" onfocus="blur();" value="">
+			<label for="new-event-date">Date:</label>
+			<input type="text" name="new-event-date" id="new-event-date" onfocus="blur();" value="">
 
-			<label for="newEventType">Type:</label>
-			<select id="newEventType">
+			<label for="new-event-type">Type:</label>
+			<select id="new-event-type">
 
 			</select>
 
-			<label for="newEventDescription">Description:</label>
-			<textarea name="newEventDescription" id="newEventDescription"></textarea>
+			<label for="new-event-description">Description:</label>
+			<textarea name="new-event-description" id="new-event-description"></textarea>
 
 			<input type="button" value="Save" name="saveEventButton" id="saveEventButton">
 		</form>
@@ -281,14 +281,14 @@
 		<h2 class="content-title">New Reading</h2>
 		<p id="new-reading-savemsg"></p>
 		<form id="new-reading-form">
-			<ul id="newReadingMessageList"></ul>
+			<ul id="new-reading-message-list"></ul>
 			<input type="hidden" name="newReadingMeadId" id="newReadingMeadId" value="">
 
-			<label for="newReadingDate">Reading Date:</label>
-			<input type="text" name="newReadingDate" id="newReadingDate" onfocus="blur();" value="">
+			<label for="new-reading-date">Reading Date:</label>
+			<input type="text" name="new-reading-date" id="new-reading-date" onfocus="blur();" value="">
 
-			<label for="newReadingGravity">Specific Gravity:</label>
-			<input type="number" name="newReadingGravity" pattern="[0-1]+\.[0-9]{3}" id="newReadingGravity" value="1.000">
+			<label for="new-reading-gravity">Specific Gravity:</label>
+			<input type="number" name="new-reading-gravity" pattern="[0-1]+\.[0-9]{3}" id="new-reading-gravity" value="1.000">
 
 			<input type="button" value="Save" name="saveReadingButton" id="saveReadingButton">
 		</form>
@@ -364,21 +364,21 @@
 	<div role="main" class="ui-content">
 		<h2 id="new-mead-content-title" class="content-title">Add New Mead</h2>
 		<form id="new-mead-form">
-			<ul id="messageList"></ul>
-			<input type="hidden" name="meadId" id="meadId" value="0">
-			<label for="newMeadName">Mead Name:</label>
-			<input type="text" name="newMeadName" id="newMeadName" value="">
+			<ul id="new-mead-message-list"></ul>
+			<input type="hidden" name="mead-id" id="mead-id" value="0">
+			<label for="new-mead-name">Mead Name:</label>
+			<input type="text" name="new-mead-name" id="new-mead-name" value="">
 
-			<label for="newMeadStartDate">Start Date:</label>
-			<input type="text" name="newMeadStartDate" id="newMeadStartDate" data-theme="b" onfocus="blur();" value="">
+			<label for="new-mead-start-date">Start Date:</label>
+			<input type="text" name="new-mead-start-date" id="new-mead-start-date" data-theme="b" onfocus="blur();" value="">
 
-			<label for="newMeadOriginalGravity">Original Specific Gravity:</label>
-			<input type="number" name="newMeadOriginalGravity" pattern="[0-1]+\.[0-9]{3}" id="newMeadOriginalGravity" value="1.000">
+			<label for="new-mead-original-gravity">Original Specific Gravity:</label>
+			<input type="number" name="new-mead-original-gravity" pattern="[0-1]+\.[0-9]{3}" id="new-mead-original-gravity" value="1.000">
 
-			<label for="newMeadDescription">Description:</label>
-			<textarea name="newMeadDescription" id="newMeadDescription"></textarea>
+			<label for="new-mead-description">Description:</label>
+			<textarea name="new-mead-description" id="new-mead-description"></textarea>
 
-			<input type="button" value="Save" name="saveMeadButton" id="saveMeadButton">
+			<input type="button" value="Save" name="save-mead-button" id="save-mead-button">
 		</form>
 	</div>
 </div>
@@ -510,8 +510,8 @@
 			<div data-role="collapsible">
 				<h3>Export Data (New!)</h3>
 				<p>Get a data file with all your content in it.</p>
-				<button id="exportCsvButton" class="ui-btn ui-btn-b">Export Data as CSV</button>
-				<button id="exportJsonButton" class="ui-btn ui-btn-b">Export Data as JSON</button>
+				<button id="export-csv-button" class="ui-btn ui-btn-b">Export Data as CSV</button>
+				<button id="export-json-button" class="ui-btn ui-btn-b">Export Data as JSON</button>
 			</div>
 
 		</div>

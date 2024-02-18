@@ -47,7 +47,7 @@ dd {
     margin: 0.25em 0 1em 0;
 }
 
-#abvResult {
+#abv-result {
     font-weight: bold;
     font-size: 2em;
     text-align: center;
@@ -114,7 +114,7 @@ hr
   width: 100%;
 }
 
-#toggleArchivedMeadsButton
+#toggle-archived-meads-button
 {
     border-width: 0;
     -webkit-box-shadow: none;
@@ -122,7 +122,7 @@ hr
     box-shadow: none;
 }
 
-#toggleArchivedMeadsButton.ui-btn-active {
+#toggle-archived-meads-button.ui-btn-active {
     text-shadow: 0 /*{a-bup-shadow-x}*/ 1px /*{a-bup-shadow-y}*/ 0 /*{a-bup-shadow-radius}*/ #88888888 /*{a-bup-shadow-color}*/;
 }
 
@@ -160,7 +160,7 @@ a.navbar-last
 {
     /* the last nav inherited a 4px margin that threw things off. */
     /* not sure where it came from so I just fixed it here. */
-    style="margin-right: 1px;"
+    margin-right: 1px;
 }
 
 a.add-button
