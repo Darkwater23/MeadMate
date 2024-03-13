@@ -1808,15 +1808,24 @@ function formatDisplayDate(dateString)
 
     if(dateString && dateFormatPref)
     {
+        // Database dates will have dashes in them
+        const [year, month, day] = dateString.split('-');
+        
         if(dateFormatPref === "US")
         {
-            // Database dates will have dashes in them
-            const [year, month, day] = dateString.split('-');
-
             // if the split was clean, reassemble date to preferred format
             if(year && month && day)
             {
                 return month + '/' + day + '/' + year;
+            }
+        }
+
+        if(dateFormatPref === "DMY")
+        {
+            // if the split was clean, reassemble date to preferred format
+            if(year && month && day)
+            {
+                return day + '/' + month + '/' + year;
             }
         }
     }
