@@ -117,7 +117,7 @@
 				<label for="new-gravity">New Specific Gravity:</label>
 				<input type="text" inputmode="numeric" name="new-gravity" value="" id="new-gravity" />
 			</p>
-			<input type="button" value="Calculate" name="calcButton" id="calcButton">
+			<input type="button" value="Calculate" name="calculate-abv-button" id="calculate-abv-button">
 			<p>Set your preferred formula under 'Preferences' using the Menu above.</p>
 		</form>
 	</div>
@@ -162,7 +162,7 @@
 <div id="events" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed" data-add-back-btn="true">
 		<h1>Mead Mate</h1>
-		<a id="newEventButton" href="#new-event" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+		<a id="new-event-button" href="#new-event" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">Events</h2>
@@ -190,11 +190,11 @@
 		<form id="calendar-event-form">
 			<ul id="calendar-event-message-list"></ul>
 
-			<input type="hidden" name="newCalendarEventMeadId" id="newCalendarEventMeadId" value="">
-			<input type="hidden" name="newCalendarEventMeadName" id="newCalendarEventMeadName" value="">
+			<input type="hidden" name="new-calendar-event-mead-id" id="new-calendar-event-mead-id" value="">
+			<input type="hidden" name="new-calendar-event-mead-name" id="new-calendar-event-mead-name" value="">
 
-			<label for="newCalendarEventTitle">Event Title:</label>
-			<input type="text" name="newCalendarEventTitle" id="newCalendarEventTitle" value="">
+			<label for="new-calendar-event-title">Event Title:</label>
+			<input type="text" name="new-calendar-event-title" id="new-calendar-event-title" value="">
 
 			<label for="new-calendar-event-description">Event Description:</label>
 			<select id="new-calendar-event-description">
@@ -207,13 +207,13 @@
 				<option>Other</option>
 			</select>
 
-			<label for="newCalendarEventDate">Event Date:</label>
-			<input type="date" name="newCalendarEventDate" id="newCalendarEventDate" value="">
+			<label for="new-calendar-event-date">Event Date:</label>
+			<input type="date" name="new-calendar-event-date" id="new-calendar-event-date" value="">
 
-			<label for="newCalendarEventNotes">Additional Notes:</label>
-			<textarea name="newCalendarEventNotes" id="newCalendarEventNotes"></textarea>
+			<label for="new-calendar-event-notes">Additional Notes:</label>
+			<textarea name="new-calendar-event-notes" id="new-calendar-event-notes"></textarea>
 
-			<input type="button" value="Save" name="saveCalendarEventButton" id="saveCalendarEventButton">
+			<input type="button" value="Save" name="save-calendar-event-button" id="save-calendar-event-button">
 
 			<p>This feature helps you create a reminder in your default calendar app. You'll have many more options for this reminder there.</p>
 		</form>
@@ -222,7 +222,7 @@
 
 <div id="new-event" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a id="backToMeadEventsButton" href="#events" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
+		<a id="back-to-mead-events-button" href="#events" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
@@ -231,7 +231,7 @@
 		<form id="new-event-form">
 			<ul id="new-event-message-list"></ul>
 			<input type="hidden" name="event-id" id="event-id" value="">
-			<input type="hidden" name="newEventMeadId" id="newEventMeadId" value="">
+			<input type="hidden" name="new-event-mead-id" id="new-event-mead-id" value="">
 
 			<label for="new-event-date">Date:</label>
 			<input type="text" name="new-event-date" id="new-event-date" onfocus="blur();" value="">
@@ -244,16 +244,16 @@
 			<label for="new-event-description">Description:</label>
 			<textarea name="new-event-description" id="new-event-description"></textarea>
 
-			<input type="button" value="Save" name="saveEventButton" id="saveEventButton">
+			<input type="button" value="Save" name="save-event-button" id="save-event-button">
 		</form>
 	</div>
 </div>
 
 <div id="readings" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a id="backToMeadViewButton" href="#mead-view" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
+		<a id="back-to-mead-view-button" href="#mead-view" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
 		<h1>Mead Mate</h1>
-		<a id="newReadingButton" href="#new-reading" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+		<a id="new-reading-button" href="#new-reading" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">Readings</h2>
@@ -274,7 +274,7 @@
 
 <div id="new-reading" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a id="backToMeadReadingsButton" href="#readings" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
+		<a id="back-to-mead-readings-button" href="#readings" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
@@ -282,7 +282,7 @@
 		<p id="new-reading-savemsg"></p>
 		<form id="new-reading-form">
 			<ul id="new-reading-message-list"></ul>
-			<input type="hidden" name="newReadingMeadId" id="newReadingMeadId" value="">
+			<input type="hidden" name="new-reading-mead-id" id="new-reading-mead-id" value="">
 
 			<label for="new-reading-date">Reading Date:</label>
 			<input type="text" name="new-reading-date" id="new-reading-date" onfocus="blur();" value="">
@@ -290,7 +290,7 @@
 			<label for="new-reading-gravity">Specific Gravity:</label>
 			<input type="number" name="new-reading-gravity" pattern="[0-1]+\.[0-9]{3}" id="new-reading-gravity" value="1.000">
 
-			<input type="button" value="Save" name="saveReadingButton" id="saveReadingButton">
+			<input type="button" value="Save" name="save-reading-button" id="save-reading-button">
 		</form>
 	</div>
 </div>
@@ -321,14 +321,14 @@
 	</div>
 	<div data-role="panel" id="mead-menu" data-position="right" data-display="overlay">
 		<ul data-role="listview">
-			<li><a id="editMeadButton" href="#new-mead" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
-			<li><a id="eventsButton" href="#events" class="ui-btn ui-icon-calendar ui-btn-icon-left">Events</a></li>
-			<li><a id="readingsButton" href="#readings" class="ui-btn ui-icon-plus ui-btn-icon-left">Readings</a></li>
-			<li><a id="calendarEventButton" href="#calendar-event" class="ui-btn ui-icon-action ui-btn-icon-left">Add Reminder</a></li>
-			<li><a id="tagsButton" href="#mead-view" class="ui-btn ui-icon-tag ui-btn-icon-left">Tags</a></li>
-			<li><a id="splitButton" href="#my-meads" class="ui-btn ui-icon-grid ui-btn-icon-left">Split Batch</a></li>
-			<li><a id="archiveButton" href="#my-meads" class="ui-btn ui-icon-eye ui-btn-icon-left">Show/Hide Mead</a></li>
-			<li><a id="deleteMeadButton" href="#my-meads" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
+			<li><a id="edit-mead-button" href="#new-mead" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
+			<li><a id="events-button" href="#events" class="ui-btn ui-icon-calendar ui-btn-icon-left">Events</a></li>
+			<li><a id="readings-button" href="#readings" class="ui-btn ui-icon-plus ui-btn-icon-left">Readings</a></li>
+			<li><a id="calendar-event-button" href="#calendar-event" class="ui-btn ui-icon-action ui-btn-icon-left">Add Reminder</a></li>
+			<li><a id="tags-button" href="#mead-view" class="ui-btn ui-icon-tag ui-btn-icon-left">Tags</a></li>
+			<li><a id="split-button" href="#my-meads" class="ui-btn ui-icon-grid ui-btn-icon-left">Split Batch</a></li>
+			<li><a id="archive-button" href="#my-meads" class="ui-btn ui-icon-eye ui-btn-icon-left">Show/Hide Mead</a></li>
+			<li><a id="delete-mead-button" href="#my-meads" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
 			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
 	</div>
@@ -349,9 +349,9 @@
 	</div>
 	<div data-role="panel" id="recipe-menu" data-position="right" data-display="overlay">
 		<ul data-role="listview">
-			<li><a id="editRecipeButton" href="#new-recipe" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
-			<li><a id="createBatchButton" href="#my-recipes" class="ui-btn ui-icon-action ui-btn-icon-left">Create Batch</a></li>
-			<li><a id="deleteRecipeButton" href="#my-recipes" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
+			<li><a id="edit-recipe-button" href="#new-recipe" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
+			<li><a id="create-batch-button" href="#my-recipes" class="ui-btn ui-icon-action ui-btn-icon-left">Create Batch</a></li>
+			<li><a id="delete-recipe-button" href="#my-recipes" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
 			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
 	</div>
