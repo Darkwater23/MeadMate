@@ -22,6 +22,7 @@ const archivePrefKeyName = 'INCLUDE_ARCHIVED';
 const dateFormatPrefKeyName = 'DATEFORMATPREF';
 const themeModePrefKeyName = 'THEMEPREF';
 const createBatchTriggerValue = 'FROM_RECIPE';
+const appVersionKeyName = 'APP_VERSION';
 const exportAsCsv = 1;
 const exportAsJson = 2;
 const tagTipDisplayMilliseconds = 10000;
@@ -29,6 +30,11 @@ const alertNoBridge = {
           theme: confirmTheme,
           title: 'Warning',
           content:'Android Javascript bridge is not available'
+      };
+const alertNewVersion = {
+          theme: confirmTheme,
+          title: 'New Version!',
+          content:'Please check out the About page under the Menu above to see what is new with this release.'
       };
 
 // One-time code executions
@@ -86,6 +92,18 @@ $(function() {
             $("#app-version-number").text(versionInfo.versionNumber);
             $("#database-version-number").text(versionInfo.databaseVersion);
             $("#update-date").text(formatDisplayDate(versionInfo.dateUpdated));
+
+            // Alert user to check out About page when new version detected
+            var lastAppVersion = localStorage.getItem(appVersionKeyName) ?? 0;
+
+            Android.logDebug("ONPAGELOAD", "LastAppVersion: " + lastAppVersion);
+            Android.logDebug("ONPAGELOAD", "AndroidVersionNumber: " + versionInfo.versionNumber);
+
+            if(lastAppVersion != versionInfo.versionNumber)
+            {
+                localStorage.setItem(appVersionKeyName, versionInfo.versionNumber);
+                $.alert(alertNewVersion);
+            }
         }
     }
 
