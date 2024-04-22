@@ -166,7 +166,7 @@ import java.util.TimeZone;
         {
             Log.d("MainActivity", "Create Event ResultCode: " + resultCode);
 
-            Uri uri = null;
+            Uri uri;
 
             if (resultData != null) {
 
@@ -190,7 +190,7 @@ import java.util.TimeZone;
         {
             Log.d("MainActivity", "Create Event ResultCode: " + resultCode);
 
-            Uri uri = null;
+            Uri uri;
 
             if (resultData != null) {
 
@@ -219,10 +219,10 @@ import java.util.TimeZone;
 
         switch (themeCode) {
             case "a":
-                mWebView.post(() -> mWebView.loadUrl(getString(R.string.theme_a_url)));
+                mWebView.loadUrl(getString(R.string.theme_a_url));
                 break;
             case "b":
-                mWebView.post(() -> mWebView.loadUrl(getString(R.string.theme_b_url)));
+                mWebView.loadUrl(getString(R.string.theme_b_url));
                 break;
         }
 

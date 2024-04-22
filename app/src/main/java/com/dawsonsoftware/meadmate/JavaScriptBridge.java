@@ -24,6 +24,8 @@ import android.provider.CalendarContract;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
+import androidx.annotation.OptIn;
+import androidx.core.os.BuildCompat;
 import androidx.loader.app.LoaderManager;
 
 import com.dawsonsoftware.meadmate.models.ApplicationInfo;
@@ -569,8 +571,10 @@ public class JavaScriptBridge {
     public void activateTheme(String code)
     {
         Log.d("JavaScriptBridge", "Activate Theme: " + code);
+
         MainActivity mainActivity = (MainActivity) this.activity;
-        mainActivity.changeTheme(code);
+
+        mainActivity.runOnUiThread(() -> mainActivity.changeTheme(code));
     }
 
     @JavascriptInterface
