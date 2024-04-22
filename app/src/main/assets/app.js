@@ -21,8 +21,10 @@ const specificGravityRange = [0.700, 2.000];
 const archivePrefKeyName = 'INCLUDE_ARCHIVED';
 const dateFormatPrefKeyName = 'DATEFORMATPREF';
 const themeModePrefKeyName = 'THEMEPREF';
+const createBatchTriggerValue = 'FROM_RECIPE';
 const exportAsCsv = 1;
 const exportAsJson = 2;
+const tagTipDisplayMilliseconds = 10000;
 const alertNoBridge = {
           theme: confirmTheme,
           title: 'Warning',
@@ -53,12 +55,12 @@ var readingFormDatepicker = new mdDateTimePicker.default({
 $(function() {
 
     // If options list is empty, load values from database
-    var count = $('#newEventType').children('option').length;
+    var count = $('#new-event-type').children('option').length;
 
     if(count == 0)
     {
         // Add default option
-        $('#newEventType').append($('<option>', {
+        $('#new-event-type').append($('<option>', {
             value: '',
             text : '- select -'
         }));
@@ -69,7 +71,7 @@ $(function() {
             var eventTypes = JSON.parse(eventTypesJson);
 
             $.each(eventTypes, function (i, item) {
-                $('#newEventType').append($('<option>', {
+                $('#new-event-type').append($('<option>', {
                     value: item.id,
                     text : item.name
                 }));
@@ -87,49 +89,51 @@ $(function() {
         }
     }
 
-    $("#newEventType").selectmenu();
-    $("#newCalendarEventDescription").selectmenu();
+    $("#new-event-type").selectmenu();
+    $("#new-calendar-event-description").selectmenu();
     $("#theme-pref").selectmenu();
 
     var themePref = localStorage.getItem(themeModePrefKeyName);
     if(themePref == 'b') confirmTheme = 'dark';
 
     // Datepicker triggers & listeners
-    meadFormDatepicker.trigger = document.getElementById('newMeadStartDate');
-    eventFormDatepicker.trigger = document.getElementById('newEventDate');
-    readingFormDatepicker.trigger = document.getElementById('newReadingDate');
+    meadFormDatepicker.trigger = document.getElementById('new-mead-start-date');
+    eventFormDatepicker.trigger = document.getElementById('new-event-date');
+    readingFormDatepicker.trigger = document.getElementById('new-reading-date');
 
-    document.getElementById('newMeadStartDate').addEventListener('onOk', function() {
+    document.getElementById('new-mead-start-date').addEventListener('onOk', function() {
         this.value = meadFormDatepicker.time.format(dpUserPrefFormat());
     });
 
-    document.getElementById('newEventDate').addEventListener('onOk', function() {
+    document.getElementById('new-event-date').addEventListener('onOk', function() {
         this.value = eventFormDatepicker.time.format(dpUserPrefFormat());
     });
 
-    document.getElementById('newReadingDate').addEventListener('onOk', function() {
+    document.getElementById('new-reading-date').addEventListener('onOk', function() {
         this.value = readingFormDatepicker.time.format(dpUserPrefFormat());
     });
 });
 
 // Object definitions
-function AbvResultSet() {
-    this.standard = '-.--%';
-    this.highstandard = '-.--%';
-    this.alternate = '-.--%';
-    this.wine = '-.--%';
+class abvResultSet {
+    constructor() {
+        this.standard = '-.--%';
+        this.highstandard = '-.--%';
+        this.alternate = '-.--%';
+        this.wine = '-.--%';
+    }
 };
 
 // Datepicker input events
-$("#newMeadStartDate").on("tap", function(event){
+$("#new-mead-start-date").on("tap", function(event){
     meadFormDatepicker.toggle();
 });
 
-$("#newEventDate").on("tap", function(event){
+$("#new-event-date").on("tap", function(event){
     eventFormDatepicker.toggle();
 });
 
-$("#newReadingDate").on("tap", function(event){
+$("#new-reading-date").on("tap", function(event){
     readingFormDatepicker.toggle();
 });
 
@@ -145,25 +149,25 @@ $(document).on("pagebeforeshow","#abv", function(){
     switch(abvPref)
     {
         case 'std':
-            $("#abvFormulaPref").html("Currently using <strong>Standard</strong> formula.");
+            $("#abv-formula-pref").html("Currently using <strong>Standard</strong> formula.");
             break;
         case 'highstd':
-            $("#abvFormulaPref").html("Currently using <strong>High Standard</strong> formula.");
+            $("#abv-formula-pref").html("Currently using <strong>High Standard</strong> formula.");
             break;
         case 'alt':
-            $("#abvFormulaPref").html("Currently using <strong>Alternate</strong> formula.");
+            $("#abv-formula-pref").html("Currently using <strong>Alternate</strong> formula.");
             break;
         case 'wine':
-            $("#abvFormulaPref").html("Currently using <strong>Wine</strong> formula.");
+            $("#abv-formula-pref").html("Currently using <strong>Wine</strong> formula.");
             break;
         default:
-            $("#abvFormulaPref").html("Preference not found. Using <strong>Standard</strong> formula.");
-            window.Android.logError('calcButton','avbPref variable fell through switch.');
+            $("#abv-formula-pref").html("Preference not found. Using <strong>Standard</strong> formula.");
+            window.Android.logError('calculate-abv-button','avbPref variable fell through switch.');
     }
 
-    $('#initialGravity').val('');
-    $('#newGravity').val('');
-    $("#abvResult").text('0.00%');
+    $('#initial-gravity').val('');
+    $('#new-gravity').val('');
+    $("#abv-result").text('0.00%');
 
     $("a.navbar-batches").removeClass("ui-btn-active");
     $("a.navbar-recipes").removeClass("ui-btn-active");
@@ -194,14 +198,14 @@ $(document).on("pagebeforeshow","#new-mead",function() {
     newMeadFormValidator.resetForm();
 
     // use hidden field as the trigger for the form mode
-    var meadId = $("#meadId").val();
+    var meadId = $("#mead-id").val();
 
     if(meadId)
     {
         // Field values should already be set from invoking function
-        if(meadId == "FromRecipe")
+        if(meadId == createBatchTriggerValue)
         {
-            $("#meadId").val(""); // reset form field for new mead
+            $("#mead-id").val(""); // reset form field for new mead
             $("#new-mead-content-title").text("Add New Mead from Recipe");
         }
         else
@@ -212,10 +216,10 @@ $(document).on("pagebeforeshow","#new-mead",function() {
     else
     {
         $("#new-mead-content-title").text("Add New Mead");
-        $("#newMeadName").val('');
-        $("#newMeadStartDate").val(new moment().format(dpUserPrefFormat()));
-        $("#newMeadOriginalGravity").val('');
-        $("#newMeadDescription").val('');
+        $("#new-mead-name").val('');
+        $("#new-mead-start-date").val(new moment().format(dpUserPrefFormat()));
+        $("#new-mead-original-gravity").val('');
+        $("#new-mead-description").val('');
     }
 });
 
@@ -229,7 +233,7 @@ $(document).on("pagebeforeshow","#new-recipe",function() {
     newRecipeFormValidator.resetForm();
 
     // use hidden field as the trigger for the form mode
-    var recipeId = $("#recipeId").val();
+    var recipeId = $("#recipe-id").val();
 
     if(recipeId)
     {
@@ -239,8 +243,8 @@ $(document).on("pagebeforeshow","#new-recipe",function() {
     else
     {
         $("#new-recipe-content-title").text("Add New Recipe");
-        $("#newRecipeName").val('');
-        $("#newRecipeDescription").val('');
+        $("#new-recipe-name").val('');
+        $("#new-recipe-description").val('');
     }
 });
 
@@ -250,8 +254,8 @@ $(document).on("pagebeforeshow","#new-reading",function() {
     newReadingFormValidator.resetForm();
 
     // Clear form
-    $("#newReadingDate").val(new moment().format(dpUserPrefFormat()));
-    $("#newReadingGravity").val('');
+    $("#new-reading-date").val(new moment().format(dpUserPrefFormat()));
+    $("#new-reading-gravity").val('');
 
 });
 
@@ -264,7 +268,7 @@ $(document).on("pagebeforeshow","#new-event",function() {
     // Reset form validation
     newEventFormValidator.resetForm();
 
-    var eventId = $("#eventId").val();
+    var eventId = $("#event-id").val();
 
     if(eventId)
     {
@@ -274,11 +278,10 @@ $(document).on("pagebeforeshow","#new-event",function() {
     else
     {
         $("#new-event-content-title").text("Add New Event");
-
-        $("#newEventDate").val(new moment().format(dpUserPrefFormat()));
-        $("#newEventType").val('');
-        $("#newEventType").selectmenu("refresh", true);
-        $("#newEventDescription").val('');
+        $("#new-event-date").val(new moment().format(dpUserPrefFormat()));
+        $("#new-event-type").val('');
+        $("#new-event-type").selectmenu("refresh", true);
+        $("#new-event-description").val('');
     }
 });
 
@@ -306,124 +309,123 @@ $(document).on("pagebeforeshow","#preferences",function(){
     $("#theme-pref").selectmenu("refresh", true);
 
     // Change theme immediately
-    //$('div[data-role="page"]').attr('data-theme', themePref);
     changeGlobalTheme(themePref);
 });
 
 // Form validation events
 // Hoist validators for form resets
 var newMeadFormValidator = $("#new-mead-form").validate({
-    errorLabelContainer: "#messageList",
+    errorLabelContainer: "#new-mead-message-list",
     wrapper: "li",
     rules: {
-        newMeadName: {
+        "new-mead-name": {
             required: true
         },
-        newMeadStartDate: {
+        "new-mead-start-date": {
             required: true
         },
-        newMeadOriginalGravity: {
+        "new-mead-original-gravity": {
             required: false,
             range: specificGravityRange
         }
     },
     messages: {
-        newMeadName: "Mead Name is required.",
-        newMeadStartDate: "Start Date is required.",
-        newMeadOriginalGravity: "Specific Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
+        "new-mead-name": "Mead Name is required.",
+        "new-mead-start-date": "Start Date is required.",
+        "new-mead-original-gravity": "Specific Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
 var newRecipeFormValidator = $("#new-recipe-form").validate({
-    errorLabelContainer: "#recipeMessageList",
+    errorLabelContainer: "#recipe-message-list",
     wrapper: "li",
     rules: {
-        newRecipeName: {
+        "new-recipe-name": {
             required: true
         }
     },
     messages: {
-        newRecipeName: "Recipe Name is required."
+        "new-recipe-name": "Recipe Name is required."
     }
 });
 var newReadingFormValidator = $("#new-reading-form").validate({
-    errorLabelContainer: "#newReadingMessageList",
+    errorLabelContainer: "#new-reading-message-list",
     wrapper: "li",
     rules: {
-        newReadingDate: {
+        "new-reading-date": {
             required: true
         },
-        newReadingGravity: {
+        "new-reading-gravity": {
             required: true,
             range: specificGravityRange
         }
     },
     messages: {
-        newReadingDate: "Reading Date is required.",
-        newReadingGravity: "Specific Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
+        "new-reading-date": "Reading Date is required.",
+        "new-reading-gravity": "Specific Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
 var newEventFormValidator = $("#new-event-form").validate({
-    errorLabelContainer: "#newEventMessageList",
+    errorLabelContainer: "#new-event-message-list",
     wrapper: "li",
     rules: {
-        newEventDate: {
+        "new-event-date": {
             required: true
         },
-        newEventType: {
+        "new-event-type": {
             required: true
         }
     },
     messages: {
-        newEventDate: "Event Date is required.",
-        newEventType: "Event Type is required."
+        "new-event-date": "Event Date is required.",
+        "new-event-type": "Event Type is required."
     }
 });
 var abvFormValidator = $("#abv-form").validate({
-    errorLabelContainer: "#abvMessageList",
+    errorLabelContainer: "#abv-message-list",
     wrapper: "li",
     rules: {
-        initialGravity: {
+        "initial-gravity": {
             required: true,
             range: specificGravityRange
         },
-        newGravity: {
+        "new-gravity": {
             required: true,
             range: specificGravityRange
         }
     },
     messages: {
-        initialGravity: "Initial Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
-        newGravity: "New Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
+        "initial-gravity": "Initial Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
+        "new-gravity": "New Gravity between " + specificGravityRange[0] + " and " + specificGravityRange[1] + " is required.",
     }
 });
 var calendarEventFormValidator = $("#calendar-event-form").validate({
-   errorLabelContainer: "#calendarEventMessageList",
+   errorLabelContainer: "#calendar-event-message-list",
    wrapper: "li",
    rules: {
-       newCalendarEventTitle: {
+       "new-calendar-event-title": {
            required: true
        },
-       newCalendarEventDescription: {
+       "new-calendar-event-description": {
            required: true
        },
-       newCalendarEventDate: {
+       "new-calendar-event-date": {
            required: true
        }
    },
    messages: {
-       newCalendarEventTitle: "Event Title is required.",
-       newCalendarEventDescription: "Event Description is required.",
-       newCalendarEventDate: "Event Date is required.",
+       "new-calendar-event-title": "Event Title is required.",
+       "new-calendar-event-description": "Event Description is required.",
+       "new-calendar-event-date": "Event Date is required.",
    }
 });
 
 // Button tap events
-$("#exportCsvButton").on("tap", function(event) {
+$("#export-csv-button").on("tap", function(event) {
     event.preventDefault();
 
     if(window.Android)
     {
-        var result = window.Android.exportData(exportAsCsv);
+        window.Android.exportData(exportAsCsv);
     }
     else
     {
@@ -431,12 +433,12 @@ $("#exportCsvButton").on("tap", function(event) {
     }
 });
 
-$("#exportJsonButton").on("tap", function(event) {
+$("#export-json-button").on("tap", function(event) {
     event.preventDefault();
 
     if(window.Android)
     {
-        var result = window.Android.exportData(exportAsJson);
+        window.Android.exportData(exportAsJson);
     }
     else
     {
@@ -444,35 +446,34 @@ $("#exportJsonButton").on("tap", function(event) {
     }
 });
 
-$("#newMeadButton").on("tap", function(event) {
+$("#new-mead-button").on("tap", function(event) {
 
     event.preventDefault();
 
     // Set hidden field value so form switches to correct mode
-    $("#meadId").val('');
+    $("#mead-id").val('');
     $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
 });
 
-$("#newRecipeButton").on("tap", function(event) {
+$("#new-recipe-button").on("tap", function(event) {
 
     event.preventDefault();
 
     // Set hidden field value so form switches to correct mode
-    $("#recipeId").val('');
+    $("#recipe-id").val('');
     $(":mobile-pagecontainer").pagecontainer("change", "#new-recipe");
 });
 
-$("#toggleArchivedMeadsButton").on("tap", function(event) {
+$("#toggle-archived-meads-button").on("tap", function(event) {
+
     var includeArchivedString = localStorage.getItem(archivePrefKeyName) ?? "false";
-
     var includeArchived = !(includeArchivedString === "true");
-
+    
     localStorage.setItem(archivePrefKeyName, includeArchived);
-
     loadMyMeadsListView();
 });
 
-$("#saveMeadButton").on("tap", function(event){
+$("#save-mead-button").on("tap", function(event){
 
     event.preventDefault();
 
@@ -481,11 +482,11 @@ $("#saveMeadButton").on("tap", function(event){
         if($("#new-mead-form").valid()){
 
             // Grab form inputs
-            var mId = $("#meadId").val();
-            var mName = $("#newMeadName").val();
-            var mDate = $("#newMeadStartDate").val();
-            var mGravity = $("#newMeadOriginalGravity").val();
-            var mDesc = $("#newMeadDescription").val();
+            var mId = $("#mead-id").val();
+            var mName = $("#new-mead-name").val();
+            var mDate = $("#new-mead-start-date").val();
+            var mGravity = $("#new-mead-original-gravity").val();
+            var mDesc = $("#new-mead-description").val();
 
             if(mId)
             {
@@ -514,7 +515,7 @@ $("#saveMeadButton").on("tap", function(event){
     }
 });
 
-$("#saveRecipeButton").on("tap", function(event){
+$("#save-recipe-button").on("tap", function(event){
 
     event.preventDefault();
 
@@ -523,9 +524,9 @@ $("#saveRecipeButton").on("tap", function(event){
         if($("#new-recipe-form").valid()){
 
             // Grab form inputs
-            var rId = $("#recipeId").val();
-            var rName = $("#newRecipeName").val();
-            var rDesc = $("#newRecipeDescription").val();
+            var rId = $("#recipe-id").val();
+            var rName = $("#new-recipe-name").val();
+            var rDesc = $("#new-recipe-description").val();
 
             if(rId)
             {
@@ -555,7 +556,7 @@ $("#saveRecipeButton").on("tap", function(event){
 
 });
 
-$("#saveReadingButton").on("tap", function(event){
+$("#save-reading-button").on("tap", function(event){
 
     event.preventDefault();
 
@@ -564,9 +565,9 @@ $("#saveReadingButton").on("tap", function(event){
         if($("#new-reading-form").valid()){
 
             // Persist data
-            var meadId = $("#newReadingMeadId").val();
-            var date = $("#newReadingDate").val();
-            var gravity = $("#newReadingGravity").val();
+            var meadId = $("#new-reading-mead-id").val();
+            var date = $("#new-reading-date").val();
+            var gravity = $("#new-reading-gravity").val();
 
             window.Android.logDebug('MainActivity', 'MeadID: ' + meadId);
             window.Android.logDebug('MainActivity', 'Date: ' + date);
@@ -586,7 +587,7 @@ $("#saveReadingButton").on("tap", function(event){
 
 });
 
-$("#saveEventButton").on("tap", function(event){
+$("#save-event-button").on("tap", function(event){
 
  event.preventDefault();
 
@@ -595,11 +596,11 @@ $("#saveEventButton").on("tap", function(event){
      if($("#new-event-form").valid()){
 
          // Grab form inputs
-         var eventId = $("#eventId").val();
-         var meadId = $("#newEventMeadId").val();
-         var date = $("#newEventDate").val();
-         var typeId = $("#newEventType").val();
-         var description = $("#newEventDescription").val();
+         var eventId = $("#event-id").val();
+         var meadId = $("#new-event-mead-id").val();
+         var date = $("#new-event-date").val();
+         var typeId = $("#new-event-type").val();
+         var description = $("#new-event-description").val();
 
          window.Android.logDebug('MainActivity', 'Event ID: ' + eventId);
          window.Android.logDebug('MainActivity', 'Event Mead ID: ' + meadId);
@@ -628,25 +629,25 @@ $("#saveEventButton").on("tap", function(event){
 
 });
 
-$("#calcButton").on("tap", function(event) {
+$("#calculate-abv-button").on("tap", function(event) {
 
     event.preventDefault();
 
     if($("#abv-form").valid()){
 
-        var ig = $('#initialGravity').val();
-        var ng = $('#newGravity').val();
+        var ig = $('#initial-gravity').val();
+        var ng = $('#new-gravity').val();
 
         var result = calculateAbv(ig,ng);
 
         var abvDisplayValue = getPreferredAbvValue(result);
 
-        $("#abvResult").text(abvDisplayValue);
+        $("#abv-result").text(abvDisplayValue);
     }
 
 });
 
-$("#saveCalendarEventButton").on("tap", function(event){
+$("#save-calendar-event-button").on("tap", function(event){
     event.preventDefault();
 
     if(window.Android)
@@ -654,11 +655,11 @@ $("#saveCalendarEventButton").on("tap", function(event){
         if($("#calendar-event-form").valid()){
             // craft message strings and call JS bridge with data
             // set field values
-            //var meadId = $("#newCalendarEventMeadId").val();
-            var title = $("#newCalendarEventTitle").val();
-            var desc = $("#newCalendarEventDescription option:selected").text(); // selected option
-            var date = $("#newCalendarEventDate").val();
-            var notes = $("#newCalendarEventNotes").val();
+            //var meadId = $("#new-calendar-event-mead-id").val();
+            var title = $("#new-calendar-event-title").val();
+            var desc = $("#new-calendar-event-description option:selected").text(); // selected option
+            var date = $("#new-calendar-event-date").val();
+            var notes = $("#new-calendar-event-notes").val();
             var linebreaks = "\r\n\r\n";
 
             if(desc == 'Other')
@@ -841,23 +842,23 @@ function viewReadings(meadId)
             $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
         }
 
-        $("#newReadingButton").off("tap"); // clear existing event handlers
-        $("#backToMeadViewButton").off("tap"); // clear existing event handlers
-        $("#backToMeadReadingsButton").off("tap"); // clear existing event handlers
+        $("#new-reading-button").off("tap"); // clear existing event handlers
+        $("#back-to-mead-view-button").off("tap"); // clear existing event handlers
+        $("#back-to-mead-readings-button").off("tap"); // clear existing event handlers
 
-        $("#newReadingButton").on("tap", { meadId: meadId }, function(event) {
+        $("#new-reading-button").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
 
             window.Android.logDebug('MainActivity', 'New Reading Button pressed. Mead ID: ' + event.data.meadId);
 
             // set value of hidden form
-            $("#newReadingMeadId").val(event.data.meadId);
+            $("#new-reading-mead-id").val(event.data.meadId);
             // prevents back button from taking us back. Don't remember why I did this.
             // new custom back button will help with UX.
             $(":mobile-pagecontainer").pagecontainer("change", "#new-reading",{changeHash:false});
         });
 
-        $("#backToMeadViewButton").on("tap", { meadId: meadId }, function(event) {
+        $("#back-to-mead-view-button").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
 
             window.Android.logDebug('MainActivity', 'Back To Mead View Button pressed. Mead ID: ' + event.data.meadId);
@@ -865,7 +866,7 @@ function viewReadings(meadId)
             viewMead(event.data.meadId);
         });
 
-        $("#backToMeadReadingsButton").on("tap", { meadId: meadId }, function(event) {
+        $("#back-to-mead-readings-button").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
 
             window.Android.logDebug('MainActivity', 'Back To Mead Readings Button pressed. Mead ID: ' + event.data.meadId);
@@ -931,22 +932,22 @@ function viewEvents(meadId)
                 '</td></tr>');
         }
 
-        $("#newEventButton").off("tap"); // clear existing event handlers
-        $("#backToMeadEventsButton").off("tap"); // clear existing event handlers
+        $("#new-event-button").off("tap"); // clear existing event handlers
+        $("#back-to-mead-events-button").off("tap"); // clear existing event handlers
 
-        $("#newEventButton").on("tap", { meadId: meadId }, function(event) {
+        $("#new-event-button").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
 
             window.Android.logDebug('MainActivity', 'New Event Button pressed. Mead ID: ' + event.data.meadId);
 
             // set value of hidden form fields
-            $("#eventId").val('');
-            $("#newEventMeadId").val(event.data.meadId);
+            $("#event-id").val('');
+            $("#new-event-mead-id").val(event.data.meadId);
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-event", {changeHash:false});
         });
 
-        $("#backToMeadEventsButton").on("tap", { meadId: meadId }, function(event) {
+        $("#back-to-mead-events-button").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
 
             window.Android.logDebug('MainActivity', 'Back To Mead Events Button pressed. Mead ID: ' + event.data.meadId);
@@ -1091,17 +1092,17 @@ function viewMead(id)
         displayMeadTags(tagsData);
 
         // add event handlers for buttons
-        $("#deleteMeadButton").off("tap"); // clear existing event handlers
-        $("#readingsButton").off("tap"); // clear existing event handlers
-        $("#eventsButton").off("tap"); // clear existing event handlers
-        $("#editMeadButton").off("tap"); // clear existing event handlers
-        $("#calendarEventButton").off("tap"); // clear existing event handlers
-        $("#tagsButton").off("tap"); //clear existing event handlers
-        $("#splitButton").off("tap"); //clear existing event handlers
-        $("#archiveButton").off("tap"); //clear existing event handlers
+        $("#delete-mead-button").off("tap"); // clear existing event handlers
+        $("#readings-button").off("tap"); // clear existing event handlers
+        $("#events-button").off("tap"); // clear existing event handlers
+        $("#edit-mead-button").off("tap"); // clear existing event handlers
+        $("#calendar-event-button").off("tap"); // clear existing event handlers
+        $("#tags-button").off("tap"); //clear existing event handlers
+        $("#split-button").off("tap"); //clear existing event handlers
+        $("#archive-button").off("tap"); //clear existing event handlers
         $("#mead-tags").off("taphold"); //clear existing event handlers
 
-        $("#deleteMeadButton").on("tap", { value: id }, function(event) {
+        $("#delete-mead-button").on("tap", { value: id }, function(event) {
             event.preventDefault();
 
             var id = event.data.value;
@@ -1124,30 +1125,30 @@ function viewMead(id)
                 }
             });
         });
-        $("#readingsButton").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity }, function(event) {
+        $("#readings-button").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity }, function(event) {
             event.preventDefault();
 
             viewReadings(event.data.meadId);
         });
-        $("#eventsButton").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity }, function(event) {
+        $("#events-button").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity }, function(event) {
             event.preventDefault();
 
             viewEvents(event.data.meadId);
         });
-        $("#editMeadButton").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity, meadDescription: meadData.description }, function(event) {
+        $("#edit-mead-button").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity, meadDescription: meadData.description }, function(event) {
 
             event.preventDefault();
 
             // Populate data
-            $("#meadId").val(event.data.meadId);
-            $("#newMeadName").val(event.data.meadName);
-            $("#newMeadStartDate").val(event.data.meadStartDate);
-            $("#newMeadOriginalGravity").val(event.data.meadOriginalGravity);
-            $("#newMeadDescription").val(event.data.meadDescription);
+            $("#mead-id").val(event.data.meadId);
+            $("#new-mead-name").val(event.data.meadName);
+            $("#new-mead-start-date").val(event.data.meadStartDate);
+            $("#new-mead-original-gravity").val(event.data.meadOriginalGravity);
+            $("#new-mead-description").val(event.data.meadDescription);
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
         });
-        $("#calendarEventButton").on("tap", { meadId: meadData.id, meadName: meadData.name }, function(event) {
+        $("#calendar-event-button").on("tap", { meadId: meadData.id, meadName: meadData.name }, function(event) {
 
             event.preventDefault();
 
@@ -1155,29 +1156,29 @@ function viewMead(id)
             calendarEventFormValidator.resetForm();
 
             // set field values
-            $("#newCalendarEventMeadId").val(event.data.meadId);
-            $("#newCalendarEventMeadName").val(event.data.meadName);
+            $("#new-calendar-event-mead-id").val(event.data.meadId);
+            $("#new-calendar-event-mead-name").val(event.data.meadName);
 
-            $("#newCalendarEventTitle").val("Mead Mate: '" + event.data.meadName + "'");
-            $("#newCalendarEventDescription").prop("selectedIndex", 0);
-            $("#newCalendarEventDate").val("");
-            $("#newCalendarEventNotes").val("");
+            $("#new-calendar-event-title").val("Mead Mate: '" + event.data.meadName + "'");
+            $("#new-calendar-event-description").prop("selectedIndex", 0);
+            $("#new-calendar-event-date").val("");
+            $("#new-calendar-event-notes").val("");
 
             // transition to view
             $(":mobile-pagecontainer").pagecontainer("change", "#calendar-event");
         });
-        $("#tagsButton").on("tap", { meadId: meadData.id }, function(event) {
+        $("#tags-button").on("tap", { meadId: meadData.id }, function(event) {
 
             event.preventDefault();
 
             $.confirm({
                 theme: confirmTheme,
                 title: 'Add Tag',
-                content: '<input id="newTagMeadId" name="newTagMeadId" type="hidden" value="' + event.data.meadId + '"><input id="newTag" name="newTag" type="text">',
+                content: '<input id="new-tag-mead-id" name="new-tag-mead-id" type="hidden" value="' + event.data.meadId + '"><input id="new-tag" name="new-tag" type="text">',
                 buttons: {
                     save: function () {
-                        var meadId = $("#newTagMeadId").val();
-                        var tag = $("#newTag").val();
+                        var meadId = $("#new-tag-mead-id").val();
+                        var tag = $("#new-tag").val();
                         window.Android.addMeadTag(meadId, tag);
                         displayTag(tag); // Update DOM so we don't have to re-fetch data
                         displayTagTip();
@@ -1188,24 +1189,24 @@ function viewMead(id)
                 }
             });
         });
-        $("#splitButton").on("tap", { meadId: meadData.id }, function(event) {
+        $("#split-button").on("tap", { meadId: meadData.id }, function(event) {
 
             event.preventDefault();
 
             $.confirm({
                 theme: confirmTheme,
                 title: 'Split Mead Batch',
-                content: '<label for="splitCount">Split into how many batches? (2 to 20)</label><br>' +
-                        '<input id="splitMeadId" name="splitMeadId" type="hidden" value="' + event.data.meadId + '">' +
-                        '<input type="number" id="splitCount" name="splitCount" min="2" max="20"><br><br>' +
-                        '<label for="splitDeleteOriginal">Delete Original Mead Record?</label>' +
-                        '<input type="checkbox" id="splitDeleteOriginal" name="splitDeleteOriginal" checked> Delete Original' +
-                        '<p id="splitDescription">Deleting the original record is recommended, but can be skipped and done later, if desired.</p>',
+                content: '<label for="split-count">Split into how many batches? (2 to 20)</label><br>' +
+                        '<input id="split-mead-id" name="split-mead-id" type="hidden" value="' + event.data.meadId + '">' +
+                        '<input type="number" id="split-count" name="split-count" min="2" max="20"><br><br>' +
+                        '<label for="split-delete-original">Delete Original Mead Record?</label>' +
+                        '<input type="checkbox" id="split-delete-original" name="split-delete-original" checked> Delete Original' +
+                        '<p id="split-description">Deleting the original record is recommended, but can be skipped and done later, if desired.</p>',
                 buttons: {
                         formSubmit: {
                             text: 'Save',
                             action: function () {
-                                var count = $('#splitCount').val();
+                                var count = $('#split-count').val();
 
                                 if(isNaN(count) || count < 2 || count > 20){
 
@@ -1218,9 +1219,9 @@ function viewMead(id)
                                     return false;
                                 }
 
-                                var meadId = $("#splitMeadId").val();
-                                var splitCount = $("#splitCount").val();
-                                var deleteOriginal = $("#splitDeleteOriginal").is(':checked')
+                                var meadId = $("#split-mead-id").val();
+                                var splitCount = $("#split-count").val();
+                                var deleteOriginal = $("#split-delete-original").is(':checked')
                                 window.Android.splitMead(meadId, splitCount, deleteOriginal);
 
                                 $.mobile.navigate("#my-meads");
@@ -1233,7 +1234,7 @@ function viewMead(id)
             });
         });
 
-        $("#archiveButton").on("tap", { meadId: meadData.id }, function(event) {
+        $("#archive-button").on("tap", { meadId: meadData.id }, function(event) {
             event.preventDefault();
 
             window.Android.logDebug('MainActivity', 'Toggling archive bit for mead ID ' + event.data.meadId);
@@ -1246,11 +1247,11 @@ function viewMead(id)
         // Update link text on archive button to make it clear what clicking it will do
         if(meadData.archived)
         {
-            $("#archiveButton").text("Unhide Mead");
+            $("#archive-button").text("Unhide Mead");
         }
         else
         {
-            $("#archiveButton").text("Hide Mead");
+            $("#archive-button").text("Hide Mead");
         }
 
         $("#mead-tags").on("taphold", "span", function(event)
@@ -1278,7 +1279,6 @@ function viewMead(id)
     else
     {
         // Populate sample data
-        //$("#mead-id").text("0");
         $("#mead-name").text("My First Mead");
         $("#mead-start-date").text(formatDisplayDate("2022-01-01"));
         $("#mead-description").text("Sample data");
@@ -1305,11 +1305,11 @@ function viewRecipe(id)
         $("#recipe-description").text(recipeData.description);
 
         // add event handlers for buttons
-        $("#deleteRecipeButton").off("tap"); // clear existing event handlers
-        $("#editRecipeButton").off("tap"); // clear existing event handlers
-        $("#createBatchButton").off("tap"); //clear existing event handlers
+        $("#delete-recipe-button").off("tap"); // clear existing event handlers
+        $("#edit-recipe-button").off("tap"); // clear existing event handlers
+        $("#create-batch-button").off("tap"); //clear existing event handlers
 
-        $("#deleteRecipeButton").on("tap", { value: id }, function(event) {
+        $("#delete-recipe-button").on("tap", { value: id }, function(event) {
             event.preventDefault();
 
             var id = event.data.value;
@@ -1333,17 +1333,17 @@ function viewRecipe(id)
             });
         });
 
-        $("#editRecipeButton").on("tap", { recipeId: recipeData.id, recipeName: recipeData.name, recipeDescription: recipeData.description }, function(event) {
+        $("#edit-recipe-button").on("tap", { recipeId: recipeData.id, recipeName: recipeData.name, recipeDescription: recipeData.description }, function(event) {
 
             // Populate data
-            $("#recipeId").val(event.data.recipeId);
-            $("#newRecipeName").val(event.data.recipeName);
-            $("#newRecipeDescription").val(event.data.recipeDescription);
+            $("#recipe-id").val(event.data.recipeId);
+            $("#new-recipe-name").val(event.data.recipeName);
+            $("#new-recipe-description").val(event.data.recipeDescription);
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-recipe");
         });
 
-        $("#createBatchButton").on("tap", { recipeName: recipeData.name, recipeDescription: recipeData.description }, function(event) {
+        $("#create-batch-button").on("tap", { recipeName: recipeData.name, recipeDescription: recipeData.description }, function(event) {
 
             event.preventDefault();
 
@@ -1352,11 +1352,11 @@ function viewRecipe(id)
 
             window.Android.logInfo('MainActivity', 'Formatted batch date: ' + today);
 
-            $("#meadId").val("FromRecipe"); // Used as trigger
-            $("#newMeadName").val(event.data.recipeName);
-            $("#newMeadStartDate").val(today);
-            $("#newMeadOriginalGravity").val("");
-            $("#newMeadDescription").val(event.data.recipeDescription);
+            $("#mead-id").val(createBatchTriggerValue); // Used as trigger
+            $("#new-mead-name").val(event.data.recipeName);
+            $("#new-mead-start-date").val(today);
+            $("#new-mead-original-gravity").val("");
+            $("#new-mead-description").val(event.data.recipeDescription);
 
             $(":mobile-pagecontainer").pagecontainer("change", "#new-mead");
         });
@@ -1387,12 +1387,12 @@ function editEvent(eventId)
         window.Android.logDebug('MainActivity', eventJson);
 
         // set form fields on event form
-        $("#eventId").val(eventId);
-        $("#newEventMeadId").val(eventData.meadId);
-        $("#newEventDate").val(eventData.date);
-        $("#newEventType").val(eventData.typeId);
-        $("#newEventType").selectmenu("refresh", true);
-        $("#newEventDescription").val(eventData.description);
+        $("#event-id").val(eventId);
+        $("#new-event-mead-id").val(eventData.meadId);
+        $("#new-event-date").val(eventData.date);
+        $("#new-event-type").val(eventData.typeId);
+        $("#new-event-type").selectmenu("refresh", true);
+        $("#new-event-description").val(eventData.description);
 
         // transition to event form
         $(":mobile-pagecontainer").pagecontainer("change", "#new-event", {changeHash:false});
@@ -1413,14 +1413,14 @@ function calculateAbvByReadings(initialGravity, batchReadings)
     if(isNaN(parseFloat(initialGravity)))
     {
         // return array with single object
-        results.push(new AbvResultSet());
+        results.push(new abv-resultSet());
         return results;
     }
 
     if(!Array.isArray(batchReadings) || batchReadings.length == 0)
     {
         // return array with single object
-        results.push(new AbvResultSet());
+        results.push(new abv-resultSet());
         return results;
     }
 
@@ -1482,7 +1482,7 @@ function calculateAbvByReadings(initialGravity, batchReadings)
 function calculateAbv(initialGravity, subsequentGravity)
 {
     // Initial model error result first
-    var result = new AbvResultSet();
+    var result = new abv-resultSet();
 
     if(isNaN(parseFloat(initialGravity)))
     {
@@ -1733,7 +1733,7 @@ function displayMeadTags(tagData)
 
 function displayTagTip()
 {
-    $("#tag-tip").show().delay(10000).fadeOut();
+    $("#tag-tip").show().delay(tagTipDisplayMilliseconds).fadeOut();
 }
 
 function getPreferredAbvValue(result)
@@ -1743,7 +1743,7 @@ function getPreferredAbvValue(result)
     if(!result)
     {
         window.Android.logDebug('getPreferredAbvValue',"Result parameter is null or undefined.");
-        var errorResult = new AbvResultSet();
+        var errorResult = new abv-resultSet();
         return errorResult.standard;
     }
 
@@ -1782,7 +1782,7 @@ function calendarEventCallback(resultValue)
     {
         // Intent call for scheduling reminder doesn't return extra values
         // Needed to pull meadId from form that invoked the new activity
-        var meadId = parseInt($("#newCalendarEventMeadId").val());
+        var meadId = parseInt($("#new-calendar-event-mead-id").val());
 
         if(meadId)
         {
@@ -1808,15 +1808,24 @@ function formatDisplayDate(dateString)
 
     if(dateString && dateFormatPref)
     {
+        // Database dates will have dashes in them
+        const [year, month, day] = dateString.split('-');
+        
         if(dateFormatPref === "US")
         {
-            // Database dates will have dashes in them
-            const [year, month, day] = dateString.split('-');
-
             // if the split was clean, reassemble date to preferred format
             if(year && month && day)
             {
                 return month + '/' + day + '/' + year;
+            }
+        }
+
+        if(dateFormatPref === "DMY")
+        {
+            // if the split was clean, reassemble date to preferred format
+            if(year && month && day)
+            {
+                return day + '/' + month + '/' + year;
             }
         }
     }
