@@ -149,19 +149,19 @@ $(document).on("pagebeforeshow","#abv", function(){
     switch(abvPref)
     {
         case 'std':
-            $("#abv-formula-pref").html("Currently using <strong>Standard</strong> formula.");
+            $("#selected-abv-formula-pref").html("Currently using <strong>Standard</strong> formula.");
             break;
         case 'highstd':
-            $("#abv-formula-pref").html("Currently using <strong>High Standard</strong> formula.");
+            $("#selected-abv-formula-pref").html("Currently using <strong>High Standard</strong> formula.");
             break;
         case 'alt':
-            $("#abv-formula-pref").html("Currently using <strong>Alternate</strong> formula.");
+            $("#selected-abv-formula-pref").html("Currently using <strong>Alternate</strong> formula.");
             break;
         case 'wine':
-            $("#abv-formula-pref").html("Currently using <strong>Wine</strong> formula.");
+            $("#selected-abv-formula-pref").html("Currently using <strong>Wine</strong> formula.");
             break;
         default:
-            $("#abv-formula-pref").html("Preference not found. Using <strong>Standard</strong> formula.");
+            $("#selected-abv-formula-pref").html("Preference not found. Using <strong>Standard</strong> formula.");
             window.Android.logError('calculate-abv-button','avbPref variable fell through switch.');
     }
 
