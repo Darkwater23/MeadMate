@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="no-js">
+<html class="no-js" lang="en-US">
 <head>
 	<!--
 	This file is part of Mead Mate.
@@ -29,7 +29,7 @@
 	<link rel="stylesheet" href="main.css">
 	<link rel="stylesheet" href="theme-a.css">
 
-	<style type="text/css">
+	<style>
 		.no-js { display: none; }
 	</style>
 </head>
@@ -446,7 +446,7 @@
 			<div data-role="collapsible">
 				<h3>ABV Formula</h3>
 				<p>Mead Mate supports four common Alcohol By Volume (ABV) formulas. The Standard formula is the default.</p>
-				<p><strong>Select Preferred Formula:</strong><br>
+				<p><label for="abv-formula-pref">Select Preferred Formula:</label><br>
 					<select id="abv-formula-pref" name="abv-formula-pref">
 						<option value="std">Standard</option>
 						<option value="highstd">High Standard</option>
@@ -472,8 +472,8 @@
 			<div data-role="collapsible">
 				<h3>Mead List Sorting</h3>
 				<p>Select preferred sorting option for the My Meads list. The Record Id sort is the default.</p>
-				<p><strong>Select Preferred Sort:</strong><br>
-					<select id="sort-pref" name="sort-pref">
+				<p><label for="sort-pref">Select Preferred Sort:</label><br>
+					</label><select id="sort-pref" name="sort-pref">
 						<option value="byId">Record Id (Oldest First)</option>
 						<option value="byName">Mead Name (A-Z)</option>
 						<option value="byDate">Mead Start Date (Oldest First)</option>
@@ -487,7 +487,7 @@
 			<div data-role="collapsible">
 				<h3>Date Format</h3>
 				<p>The internal date format is a short international format due to the database used. However, places where the date is displayed can be reformatted.</p>
-				<p><strong>Select Preferred Date Format:</strong><br>
+				<p><label for="date-format-pref">Select Preferred Date Format:</label><br>
 					<select id="date-format-pref" name="date-format-pref">
 						<option value="ISO">YYYY-MM-DD</option>
 						<option value="US">MM/DD/YYYY</option>
