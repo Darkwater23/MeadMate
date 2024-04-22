@@ -1413,14 +1413,14 @@ function calculateAbvByReadings(initialGravity, batchReadings)
     if(isNaN(parseFloat(initialGravity)))
     {
         // return array with single object
-        results.push(new abv-resultSet());
+        results.push(new abvResultSet());
         return results;
     }
 
     if(!Array.isArray(batchReadings) || batchReadings.length == 0)
     {
         // return array with single object
-        results.push(new abv-resultSet());
+        results.push(new abvResultSet());
         return results;
     }
 
@@ -1482,7 +1482,7 @@ function calculateAbvByReadings(initialGravity, batchReadings)
 function calculateAbv(initialGravity, subsequentGravity)
 {
     // Initial model error result first
-    var result = new abv-resultSet();
+    var result = new abvResultSet();
 
     if(isNaN(parseFloat(initialGravity)))
     {
@@ -1743,7 +1743,7 @@ function getPreferredAbvValue(result)
     if(!result)
     {
         window.Android.logDebug('getPreferredAbvValue',"Result parameter is null or undefined.");
-        var errorResult = new abv-resultSet();
+        var errorResult = new abvResultSet();
         return errorResult.standard;
     }
 
