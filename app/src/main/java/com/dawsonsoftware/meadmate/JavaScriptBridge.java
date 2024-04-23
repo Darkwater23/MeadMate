@@ -17,16 +17,14 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 package com.dawsonsoftware.meadmate;
 
+import static java.lang.Integer.parseInt;
+
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
-import android.provider.CalendarContract;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
-import androidx.annotation.OptIn;
 import androidx.core.os.BuildCompat;
-import androidx.loader.app.LoaderManager;
 
 import com.dawsonsoftware.meadmate.models.ApplicationInfo;
 import com.dawsonsoftware.meadmate.models.Event;
@@ -36,25 +34,13 @@ import com.dawsonsoftware.meadmate.models.Reading;
 import com.dawsonsoftware.meadmate.models.Recipe;
 import com.dawsonsoftware.meadmate.models.Tag;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
-import static java.lang.Integer.parseInt;
-
-public class JavaScriptBridge {
+@BuildCompat.PrereleaseSdkCheck public class JavaScriptBridge {
     private final Activity activity;
     private final MeadMateData data;
     private static final int EXPORT_AS_CSV = 1;
@@ -316,7 +302,7 @@ public class JavaScriptBridge {
         Log.d("JavaScriptBridge", "Adding '" + tag + "' tag to mead " + meadId);
 
         // Create or fetch tag's ID
-        Integer tagId = data.addTag(tag);
+        int tagId = data.addTag(tag);
 
         // Associate tag with mead by ID
         if(tagId > 0)
@@ -478,7 +464,6 @@ public class JavaScriptBridge {
 
             int meadRecordId = parseInt(meadId);
             int count = parseInt(splitCount);
-            boolean canBeDeleted = deleteOriginal;
 
             // Minor validation
             if(count < 2)
@@ -486,7 +471,7 @@ public class JavaScriptBridge {
                 return; // this shouldn't happen, but covering the base
             }
 
-            data.splitMead(meadRecordId, count, canBeDeleted);
+            data.splitMead(meadRecordId, count, deleteOriginal);
         }
         catch(Exception ex)
         {
@@ -546,9 +531,8 @@ public class JavaScriptBridge {
             model.setDatabaseVersion(0);
 
             Gson gson = new Gson();
-            String json = gson.toJson(model);
 
-            return json;
+            return gson.toJson(model);
         }
     }
 
