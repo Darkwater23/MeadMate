@@ -1886,7 +1886,7 @@ function dpUserPrefFormat()
             return 'YYYY-MM-DD';
         default:
             // log error
-            if(window.Android) window.Android.logError('dpUserPrefFormat','User preference was not found or unexpected.');
+            if(window.Android) window.Android.logInfo('dpUserPrefFormat','User preference was not found; using default.');
             // default to ISO
             return 'YYYY-MM-DD';
     }
