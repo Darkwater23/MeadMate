@@ -1816,7 +1816,7 @@ function formatDisplayDate(dateString)
     // I'm going to do this as an explicit string manipulation
 
     // We know the date has dashes in it from the database, we only need to switch the string
-    // if the user preference is freedom units
+    // if the user preference is freedom units or European style.
 
     // This is a helper function and not a library function, so I'm not going to make this bulletproof
     // right now.
@@ -1838,7 +1838,16 @@ function formatDisplayDate(dateString)
             }
         }
 
-        if(dateFormatPref === "DMY")
+        if(dateFormatPref === "EURODOT")
+        {
+            // if the split was clean, reassemble date to preferred format
+            if(year && month && day)
+            {
+                return day + '.' + month + '.' + year;
+            }
+        }
+
+        if(dateFormatPref === "EUROSLASH")
         {
             // if the split was clean, reassemble date to preferred format
             if(year && month && day)
@@ -1884,6 +1893,10 @@ function dpUserPrefFormat()
             return 'MM/DD/YYYY';
         case 'ISO':
             return 'YYYY-MM-DD';
+        case 'EURODOT':
+            return 'DD.MM.YYYY';
+        case 'EUROSLASH':
+            return 'DD/MM/YYYY';
         default:
             // log error
             if(window.Android) window.Android.logInfo('dpUserPrefFormat','User preference was not found; using default.');
