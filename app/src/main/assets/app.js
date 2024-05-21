@@ -1824,35 +1824,29 @@ function formatDisplayDate(dateString)
     // Fetch ABV formula preference
     var dateFormatPref = localStorage.getItem(dateFormatPrefKeyName) ?? 'ISO';
 
+    if(window.Android) window.Android.logDebug('formatDisplayDate','Input date: ' + dateString);
+    if(window.Android) window.Android.logDebug('formatDisplayDate','Date preference: ' + dateFormatPref);
+
     if(dateString && dateFormatPref)
     {
         // Database dates will have dashes in them
         const [year, month, day] = dateString.split('-');
-        
-        if(dateFormatPref === "US")
-        {
-            // if the split was clean, reassemble date to preferred format
-            if(year && month && day)
-            {
-                return month + '/' + day + '/' + year;
-            }
-        }
 
-        if(dateFormatPref === "EURODOT")
+        if(year && month && day)
         {
-            // if the split was clean, reassemble date to preferred format
-            if(year && month && day)
+            switch (dateFormatPref)
             {
-                return day + '.' + month + '.' + year;
-            }
-        }
-
-        if(dateFormatPref === "EUROSLASH")
-        {
-            // if the split was clean, reassemble date to preferred format
-            if(year && month && day)
-            {
-                return day + '/' + month + '/' + year;
+                case 'US':
+                    return month + '/' + day + '/' + year;
+                    break;
+                case 'EURODOT':
+                    return day + '.' + month + '.' + year;
+                    break;
+                case 'EUROSLASH':
+                    return day + '/' + month + '/' + year;
+                    break;
+                default:
+                    if(window.Android) window.Android.logDebug('formatDisplayDate','Fell through switch, returning input string.');
             }
         }
     }
