@@ -648,6 +648,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    @SuppressLint("Range")
     int addTag(String name) {
 
         int tagId;
@@ -703,6 +704,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return tagId;
     }
 
+    @SuppressLint("Range")
     List<Tag> getMeadTags(int meadId)
     {
         List<Tag> model = new ArrayList<>();
@@ -746,6 +748,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     List<Tag> getTags()
     {
         List<Tag> model = new ArrayList<>();
@@ -813,6 +816,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    @SuppressLint("Range")
     public void deleteMeadTag(int meadId, String tagName)
     {
         String[] tableColumns = new String[] {
@@ -854,6 +858,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    @SuppressLint("Range")
     Mead getMead(int meadId)
     {
         Mead model = null;
@@ -909,6 +914,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     List<Mead> getMeads(String orderBy, boolean includeArchived)
     {
         List<Mead> model = new ArrayList<>();
@@ -961,6 +967,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     List<Reading> getReadings(int meadId)
     {
         List<Reading> model = new ArrayList<>();
@@ -1093,6 +1100,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     List<Event> getEvents(int meadId)
     {
         List<Event> model = new ArrayList<>();
@@ -1140,6 +1148,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     Event getEvent(int eventId)
     {
         Event model = new Event();
@@ -1190,6 +1199,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     String getEventDescription(int id)
     {
         String eventDescription = "";
@@ -1233,6 +1243,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return eventDescription;
     }
 
+    @SuppressLint("Range")
     List<EventType> getEventTypes()
     {
         List<EventType> model = new ArrayList<>();
