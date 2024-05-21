@@ -17,6 +17,7 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 package com.dawsonsoftware.meadmate;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -37,7 +38,7 @@ import java.util.List;
 
 public class MeadMateData extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 8;
+    private static final int DB_VERSION = 9;
     private static final String DB_NAME = "appdata";
 
     // Meads table fields
@@ -160,6 +161,12 @@ public class MeadMateData extends SQLiteOpenHelper {
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
             "(11,'Cold Crashing')";
 
+    String FIX_BAD_MEADS_DATE_DATA = "UPDATE MEADS SET START_DATE = substr(START_DATE, 7, 4) || '-' || substr(START_DATE, 1, 2) || '-' || substr(START_DATE, 4, 2) WHERE START_DATE LIKE '%/%'";
+
+    String FIX_BAD_EVENTS_DATE_DATA = "UPDATE EVENTS SET \"DATE\" = substr(\"DATE\", 7, 4) || '-' || substr(\"DATE\", 1, 2) || '-' || substr(\"DATE\", 4, 2) WHERE \"DATE\" LIKE '%/%'";
+
+    String FIX_BAD_READINGS_DATE_DATA = "UPDATE READINGS SET \"DATE\" = substr(\"DATE\", 7, 4) || '-' || substr(\"DATE\", 1, 2) || '-' || substr(\"DATE\", 4, 2) WHERE \"DATE\" LIKE '%/%'";
+
     public MeadMateData(Context context){
         super(context,DB_NAME, null, DB_VERSION);
     }
@@ -204,6 +211,10 @@ public class MeadMateData extends SQLiteOpenHelper {
                 db.execSQL(ADD_NEW_EVENT_TYPE_REL8);
             case 7:
                 db.execSQL(ADD_NEW_EVENT_TYPE_REL12);
+            case 8:
+                db.execSQL(FIX_BAD_MEADS_DATE_DATA);
+                db.execSQL(FIX_BAD_EVENTS_DATE_DATA);
+                db.execSQL(FIX_BAD_READINGS_DATE_DATA);
                 break;
             default:
                 //log no update applied
@@ -257,6 +268,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    @SuppressLint("Range")
     List<Recipe> getRecipes()
     {
         List<Recipe> model = new ArrayList<>();
@@ -303,6 +315,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     Recipe getRecipe(int recipeId)
     {
         Recipe model = new Recipe();
