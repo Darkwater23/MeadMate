@@ -419,6 +419,12 @@ public class MeadMateData extends SQLiteOpenHelper {
                 throw new IllegalArgumentException("Mead object cannot be null");
             }
 
+            // Guard for date formatting issue
+            if(mead.getStartDate().contains("/") || mead.getStartDate().contains("."))
+            {
+                throw new IllegalArgumentException("Mead Start Date is not properly formatted for storage");
+            }
+
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
@@ -458,6 +464,17 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         try
         {
+            if(mead == null)
+            {
+                throw new IllegalArgumentException("Mead object cannot be null");
+            }
+
+            // Guard for date formatting issue
+            if(mead.getStartDate().contains("/") || mead.getStartDate().contains("."))
+            {
+                throw new IllegalArgumentException("Mead Start Date is not properly formatted for storage");
+            }
+
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
@@ -482,6 +499,17 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         try
         {
+            if(reading == null)
+            {
+                throw new IllegalArgumentException("Reading object cannot be null");
+            }
+
+            // Guard for date formatting issue
+            if(reading.getDate().contains("/") || reading.getDate().contains("."))
+            {
+                throw new IllegalArgumentException("Reading Date is not properly formatted for storage");
+            }
+
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
@@ -501,6 +529,17 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         try
         {
+            if(event == null)
+            {
+                throw new IllegalArgumentException("Event object cannot be null");
+            }
+
+            // Guard for date formatting issue
+            if(event.getDate().contains("/") || event.getDate().contains("."))
+            {
+                throw new IllegalArgumentException("Event Date is not properly formatted for storage");
+            }
+
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
@@ -521,6 +560,17 @@ public class MeadMateData extends SQLiteOpenHelper {
     {
         try
         {
+            if(event == null)
+            {
+                throw new IllegalArgumentException("Event object cannot be null");
+            }
+
+            // Guard for date formatting issue
+            if(event.getDate().contains("/") || event.getDate().contains("."))
+            {
+                throw new IllegalArgumentException("Event Date is not properly formatted for storage");
+            }
+
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
