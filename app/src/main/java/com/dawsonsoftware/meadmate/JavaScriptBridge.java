@@ -251,7 +251,7 @@ import java.util.List;
         Mead mead = new Mead();
 
         mead.setName(name);
-        mead.setStartDate(startDate);
+        mead.setStartDate(Utilities.ConvertDateString(startDate));
         mead.setDescription(description);
         mead.setOriginalGravity(originalGravity);
 
@@ -321,7 +321,7 @@ import java.util.List;
 
         mead.setId(parseInt(id));
         mead.setName(name);
-        mead.setStartDate(startDate);
+        mead.setStartDate(Utilities.ConvertDateString(startDate));
         mead.setDescription(description);
         mead.setOriginalGravity(originalGravity);
 
@@ -360,7 +360,7 @@ import java.util.List;
         Reading reading = new Reading();
 
         reading.setMeadId(parseInt(meadId));
-        reading.setDate(date);
+        reading.setDate(Utilities.ConvertDateString(date));
         reading.setSpecificGravity(specificGravity);
 
         data.addReading(reading);
@@ -390,7 +390,7 @@ import java.util.List;
         Event event = new Event();
 
         event.setMeadId(parseInt(meadId));
-        event.setDate(date);
+        event.setDate(Utilities.ConvertDateString(date));
         event.setTypeId(parseInt(typeId));
         event.setDescription(description);
 
@@ -406,7 +406,7 @@ import java.util.List;
 
         event.setId(parseInt(eventId));
         event.setMeadId(parseInt(meadId));
-        event.setDate(date);
+        event.setDate(Utilities.ConvertDateString(date));
         event.setTypeId(parseInt(typeId));
         event.setDescription(description);
 

@@ -33,6 +33,7 @@ import com.dawsonsoftware.meadmate.models.Recipe;
 import com.dawsonsoftware.meadmate.models.Reading;
 import com.dawsonsoftware.meadmate.models.Tag;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -419,17 +420,11 @@ public class MeadMateData extends SQLiteOpenHelper {
                 throw new IllegalArgumentException("Mead object cannot be null");
             }
 
-            // Guard for date formatting issue
-            if(mead.getStartDate().contains("/") || mead.getStartDate().contains("."))
-            {
-                throw new IllegalArgumentException("Mead Start Date is not properly formatted for storage");
-            }
-
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
             values.put(KEY_MEAD_NAME, mead.getName());
-            values.put(KEY_MEAD_START_DATE, mead.getStartDate());
+            values.put(KEY_MEAD_START_DATE, mead.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
             values.put(KEY_MEAD_DESC, mead.getDescription());
             values.put(KEY_MEAD_ORIG_GRAV, mead.getOriginalGravity());
             values.put(KEY_MEAD_ARCHIVED, (mead.getArchived() ? 1 : 0));
@@ -469,17 +464,11 @@ public class MeadMateData extends SQLiteOpenHelper {
                 throw new IllegalArgumentException("Mead object cannot be null");
             }
 
-            // Guard for date formatting issue
-            if(mead.getStartDate().contains("/") || mead.getStartDate().contains("."))
-            {
-                throw new IllegalArgumentException("Mead Start Date is not properly formatted for storage");
-            }
-
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
             values.put(KEY_MEAD_NAME, mead.getName());
-            values.put(KEY_MEAD_START_DATE, mead.getStartDate());
+            values.put(KEY_MEAD_START_DATE, mead.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
             values.put(KEY_MEAD_DESC, mead.getDescription());
             values.put(KEY_MEAD_ORIG_GRAV, mead.getOriginalGravity());
             values.put(KEY_MEAD_ARCHIVED, (mead.getArchived() ? 1 : 0));
@@ -504,17 +493,11 @@ public class MeadMateData extends SQLiteOpenHelper {
                 throw new IllegalArgumentException("Reading object cannot be null");
             }
 
-            // Guard for date formatting issue
-            if(reading.getDate().contains("/") || reading.getDate().contains("."))
-            {
-                throw new IllegalArgumentException("Reading Date is not properly formatted for storage");
-            }
-
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
             values.put(KEY_READINGS_MEADID, reading.getMeadId());
-            values.put(KEY_READINGS_DATE, reading.getDate());
+            values.put(KEY_READINGS_DATE, reading.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
             values.put(KEY_READINGS_GRAV, reading.getSpecificGravity());
 
             db.insert(TABLE_READINGS, null, values);
@@ -534,17 +517,11 @@ public class MeadMateData extends SQLiteOpenHelper {
                 throw new IllegalArgumentException("Event object cannot be null");
             }
 
-            // Guard for date formatting issue
-            if(event.getDate().contains("/") || event.getDate().contains("."))
-            {
-                throw new IllegalArgumentException("Event Date is not properly formatted for storage");
-            }
-
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
             values.put(KEY_EVENT_MEADID, event.getMeadId());
-            values.put(KEY_EVENT_DATE, event.getDate());
+            values.put(KEY_EVENT_DATE, event.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
             values.put(KEY_EVENT_TYPEID, event.getTypeId());
             values.put(KEY_EVENT_DESC, event.getDescription());
 
@@ -565,16 +542,10 @@ public class MeadMateData extends SQLiteOpenHelper {
                 throw new IllegalArgumentException("Event object cannot be null");
             }
 
-            // Guard for date formatting issue
-            if(event.getDate().contains("/") || event.getDate().contains("."))
-            {
-                throw new IllegalArgumentException("Event Date is not properly formatted for storage");
-            }
-
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
-            values.put(KEY_EVENT_DATE, event.getDate());
+            values.put(KEY_EVENT_DATE, event.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
             values.put(KEY_EVENT_TYPEID, event.getTypeId());
             values.put(KEY_EVENT_DESC, event.getDescription());
 
@@ -948,7 +919,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
                 model.setId(c.getInt(c.getColumnIndex(KEY_MEAD_ID)));
                 model.setName(c.getString(c.getColumnIndex(KEY_MEAD_NAME)));
-                model.setStartDate(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE)));
+                model.setStartDate(Utilities.ConvertDateString(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE))));
                 model.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
                 model.setOriginalGravity(c.getString(c.getColumnIndex(KEY_MEAD_ORIG_GRAV)));
                 model.setArchived(c.getInt(c.getColumnIndex(KEY_MEAD_ARCHIVED)) == 1);
@@ -997,7 +968,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
                     mead.setId(c.getInt(c.getColumnIndex(KEY_MEAD_ID)));
                     mead.setName(c.getString(c.getColumnIndex(KEY_MEAD_NAME)));
-                    mead.setStartDate(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE)));
+                    mead.setStartDate(Utilities.ConvertDateString(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE))));
                     mead.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
                     mead.setOriginalGravity(c.getString(c.getColumnIndex(KEY_MEAD_ORIG_GRAV)));
                     mead.setArchived(c.getInt(c.getColumnIndex(KEY_MEAD_ARCHIVED)) == 1);
@@ -1057,7 +1028,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
                     reading.setId(c.getInt(c.getColumnIndex(KEY_READINGS_ID)));
                     reading.setMeadId(c.getInt(c.getColumnIndex(KEY_READINGS_MEADID)));
-                    reading.setDate(c.getString(c.getColumnIndex(KEY_READINGS_DATE)));
+                    reading.setDate(Utilities.ConvertDateString(c.getString(c.getColumnIndex(KEY_READINGS_DATE))));
                     reading.setSpecificGravity(c.getString(c.getColumnIndex(KEY_READINGS_GRAV)));
 
                     model.add(reading);
@@ -1178,7 +1149,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
                     event.setId(c.getInt(c.getColumnIndex(KEY_EVENT_ID)));
                     event.setMeadId(c.getInt(c.getColumnIndex(KEY_EVENT_MEADID)));
-                    event.setDate(c.getString(c.getColumnIndex(KEY_EVENT_DATE)));
+                    event.setDate(Utilities.ConvertDateString(c.getString(c.getColumnIndex(KEY_EVENT_DATE))));
                     event.setTypeId(c.getInt(c.getColumnIndex(KEY_EVENT_TYPEID)));
                     event.setDescription(c.getString(c.getColumnIndex(KEY_EVENT_DESC)));
                     event.setTypeName(c.getString(c.getColumnIndex(KEY_EVENT_TYPE_NAME)));
@@ -1236,7 +1207,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 model.setTypeId(c.getInt(c.getColumnIndex(KEY_EVENT_TYPEID)));
                 model.setMeadId(c.getInt((c.getColumnIndex(KEY_EVENT_MEADID))));
                 model.setDescription(c.getString(c.getColumnIndex(KEY_EVENT_DESC)));
-                model.setDate(c.getString(c.getColumnIndex(KEY_EVENT_DATE)));
+                model.setDate(Utilities.ConvertDateString(c.getString(c.getColumnIndex(KEY_EVENT_DATE))));
             }
 
             c.close();
