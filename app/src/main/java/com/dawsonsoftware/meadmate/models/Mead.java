@@ -17,11 +17,13 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 package com.dawsonsoftware.meadmate.models;
 
+import java.time.LocalDate;
+
 public class Mead {
 
     private int id;
     private String name;
-    private String startDate;
+    private LocalDate startDate;
     private String description;
     private String originalGravity;
     private boolean archived;
@@ -42,9 +44,9 @@ public class Mead {
         this.name = name;
     }
 
-    public String getStartDate() { return startDate; }
+    public LocalDate getStartDate() { return startDate; }
 
-    public void setStartDate(String startDate) { this.startDate = startDate; }
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
 
     public String getDescription() {
         return description;
