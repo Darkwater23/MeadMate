@@ -34,10 +34,12 @@ import com.dawsonsoftware.meadmate.models.Reading;
 import com.dawsonsoftware.meadmate.models.Recipe;
 import com.dawsonsoftware.meadmate.models.Tag;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @BuildCompat.PrereleaseSdkCheck public class JavaScriptBridge {
@@ -46,9 +48,15 @@ import java.util.List;
     private static final int EXPORT_AS_CSV = 1;
     private static final int EXPORT_AS_JSON = 2;
 
+    private final Gson gson;
+
     public JavaScriptBridge(Activity activity) {
         this.activity = activity;
         data = new MeadMateData(activity);
+        gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter()
+                .nullSafe())
+                .create();
     }
 
     @JavascriptInterface
@@ -86,8 +94,6 @@ import java.util.List;
 
         Log.i("JavaScriptBridge", "Fetched " + meads.size() + " records.");
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(meads);
 
         Log.d("JavaScriptBridge", json);
@@ -104,8 +110,6 @@ import java.util.List;
 
         Log.i("JavaScriptBridge", "Fetched " + recipes.size() + " records.");
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(recipes);
 
         Log.d("JavaScriptBridge", json);
@@ -119,8 +123,6 @@ import java.util.List;
         Log.i("JavaScriptBridge", "Fetching recipe data by ID: " + id);
 
         Recipe recipe = data.getRecipe(parseInt(id));
-
-        Gson gson = new Gson();
 
         String json = gson.toJson(recipe);
 
@@ -138,8 +140,6 @@ import java.util.List;
 
         Log.i("JavaScriptBridge", "Fetched " + readings.size() + " records.");
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(readings);
 
         Log.d("JavaScriptBridge", json);
@@ -156,8 +156,6 @@ import java.util.List;
 
         Log.i("JavaScriptBridge", "Fetched " + events.size() + " records.");
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(events);
 
         Log.d("JavaScriptBridge", json);
@@ -173,8 +171,6 @@ import java.util.List;
         List<EventType> eventTypes = data.getEventTypes();
 
         Log.i("JavaScriptBridge", "Fetched " + eventTypes.size() + " records.");
-
-        Gson gson = new Gson();
 
         String json = gson.toJson(eventTypes);
 
@@ -198,8 +194,6 @@ import java.util.List;
 
         Mead mead = data.getMead(parseInt(id));
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(mead);
 
         Log.d("JavaScriptBridge", json);
@@ -216,8 +210,6 @@ import java.util.List;
 
         Log.i("JavaScriptBridge", "Fetched " + tags.size() + " records.");
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(tags);
 
         Log.d("JavaScriptBridge", json);
@@ -233,8 +225,6 @@ import java.util.List;
         List<Tag> tags = data.getMeadTags(parseInt(meadId));
 
         Log.i("JavaScriptBridge", "Fetched " + tags.size() + " records.");
-
-        Gson gson = new Gson();
 
         String json = gson.toJson(tags);
 
@@ -372,8 +362,6 @@ import java.util.List;
         Log.i("JavaScriptBridge", "Fetching event data by ID: " + id);
 
         Event event = data.getEvent(parseInt(id));
-
-        Gson gson = new Gson();
 
         String json = gson.toJson(event);
 
@@ -513,9 +501,8 @@ import java.util.List;
             model.setDatabaseVersion(MeadMateData.getDbVersion());
             model.setVersionName(pinfo.versionName);
             model.setVersionNumber(pinfo.versionCode);
-            model.setDateUpdated(updateDate.toString());
+            model.setDateUpdated(updateDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
 
-            Gson gson = new Gson();
             String json = gson.toJson(model);
 
             Log.d("JavaScriptBridge", json);
@@ -529,8 +516,6 @@ import java.util.List;
             model.setVersionNumber(0);
             model.setVersionName("ERROR");
             model.setDatabaseVersion(0);
-
-            Gson gson = new Gson();
 
             return gson.toJson(model);
         }
