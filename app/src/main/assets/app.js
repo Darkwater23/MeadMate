@@ -1842,9 +1842,6 @@ function formatDisplayDate(dateString)
                 case 'EURODOT':
                     return day + '.' + month + '.' + year;
                     break;
-                case 'EUROSLASH':
-                    return day + '/' + month + '/' + year;
-                    break;
                 default:
                     if(window.Android) window.Android.logDebug('formatDisplayDate','Fell through switch, returning input string.');
             }
@@ -1884,17 +1881,15 @@ function dpUserPrefFormat()
     switch(localStorage.getItem(dateFormatPrefKeyName))
     {
         case 'US':
-            return 'MM/DD/YYYY';
+            return 'MM/dd/YYYY';
         case 'ISO':
-            return 'YYYY-MM-DD';
+            return 'YYYY-MM-dd';
         case 'EURODOT':
-            return 'DD.MM.YYYY';
-        case 'EUROSLASH':
-            return 'DD/MM/YYYY';
+            return 'dd.MM.YYYY';
         default:
             // log error
             if(window.Android) window.Android.logInfo('dpUserPrefFormat','User preference was not found; using default.');
             // default to ISO
-            return 'YYYY-MM-DD';
+            return 'YYYY-MM-dd';
     }
 }
