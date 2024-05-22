@@ -18,17 +18,17 @@ public final class Utilities {
 
             if(date.contains("/"))
             {
-                pattern = "MM/dd/YYYY";
+                pattern = "MM/dd/yyyy";
             }
 
             if(date.contains("."))
             {
-                pattern = "dd.MM.YYYY";
+                pattern = "dd.MM.yyyy";
             }
 
             if(date.contains("-"))
             {
-                pattern = "YYYY-MM-dd";
+                pattern = "yyyy-MM-dd";
             }
 
             if(pattern == null)
