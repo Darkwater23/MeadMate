@@ -17,14 +17,14 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 package com.dawsonsoftware.meadmate;
 
+import static java.lang.Integer.parseInt;
+
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
-import android.provider.CalendarContract;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
-import androidx.loader.app.LoaderManager;
+import androidx.core.os.BuildCompat;
 
 import com.dawsonsoftware.meadmate.models.ApplicationInfo;
 import com.dawsonsoftware.meadmate.models.Event;
@@ -34,33 +34,29 @@ import com.dawsonsoftware.meadmate.models.Reading;
 import com.dawsonsoftware.meadmate.models.Recipe;
 import com.dawsonsoftware.meadmate.models.Tag;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.GsonBuilder;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static java.lang.Integer.parseInt;
-
-public class JavaScriptBridge {
+@BuildCompat.PrereleaseSdkCheck public class JavaScriptBridge {
     private final Activity activity;
     private final MeadMateData data;
     private static final int EXPORT_AS_CSV = 1;
     private static final int EXPORT_AS_JSON = 2;
 
+    private final Gson gson;
+
     public JavaScriptBridge(Activity activity) {
         this.activity = activity;
         data = new MeadMateData(activity);
+        gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter()
+                .nullSafe())
+                .create();
     }
 
     @JavascriptInterface
@@ -98,8 +94,6 @@ public class JavaScriptBridge {
 
         Log.i("JavaScriptBridge", "Fetched " + meads.size() + " records.");
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(meads);
 
         Log.d("JavaScriptBridge", json);
@@ -116,8 +110,6 @@ public class JavaScriptBridge {
 
         Log.i("JavaScriptBridge", "Fetched " + recipes.size() + " records.");
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(recipes);
 
         Log.d("JavaScriptBridge", json);
@@ -131,8 +123,6 @@ public class JavaScriptBridge {
         Log.i("JavaScriptBridge", "Fetching recipe data by ID: " + id);
 
         Recipe recipe = data.getRecipe(parseInt(id));
-
-        Gson gson = new Gson();
 
         String json = gson.toJson(recipe);
 
@@ -150,8 +140,6 @@ public class JavaScriptBridge {
 
         Log.i("JavaScriptBridge", "Fetched " + readings.size() + " records.");
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(readings);
 
         Log.d("JavaScriptBridge", json);
@@ -168,8 +156,6 @@ public class JavaScriptBridge {
 
         Log.i("JavaScriptBridge", "Fetched " + events.size() + " records.");
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(events);
 
         Log.d("JavaScriptBridge", json);
@@ -185,8 +171,6 @@ public class JavaScriptBridge {
         List<EventType> eventTypes = data.getEventTypes();
 
         Log.i("JavaScriptBridge", "Fetched " + eventTypes.size() + " records.");
-
-        Gson gson = new Gson();
 
         String json = gson.toJson(eventTypes);
 
@@ -210,8 +194,6 @@ public class JavaScriptBridge {
 
         Mead mead = data.getMead(parseInt(id));
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(mead);
 
         Log.d("JavaScriptBridge", json);
@@ -227,8 +209,6 @@ public class JavaScriptBridge {
         List<Tag> tags = data.getTags();
 
         Log.i("JavaScriptBridge", "Fetched " + tags.size() + " records.");
-
-        Gson gson = new Gson();
 
         String json = gson.toJson(tags);
 
@@ -246,8 +226,6 @@ public class JavaScriptBridge {
 
         Log.i("JavaScriptBridge", "Fetched " + tags.size() + " records.");
 
-        Gson gson = new Gson();
-
         String json = gson.toJson(tags);
 
         Log.d("JavaScriptBridge", json);
@@ -263,7 +241,7 @@ public class JavaScriptBridge {
         Mead mead = new Mead();
 
         mead.setName(name);
-        mead.setStartDate(startDate);
+        mead.setStartDate(Utilities.ConvertDateString(startDate));
         mead.setDescription(description);
         mead.setOriginalGravity(originalGravity);
 
@@ -314,7 +292,7 @@ public class JavaScriptBridge {
         Log.d("JavaScriptBridge", "Adding '" + tag + "' tag to mead " + meadId);
 
         // Create or fetch tag's ID
-        Integer tagId = data.addTag(tag);
+        int tagId = data.addTag(tag);
 
         // Associate tag with mead by ID
         if(tagId > 0)
@@ -333,7 +311,7 @@ public class JavaScriptBridge {
 
         mead.setId(parseInt(id));
         mead.setName(name);
-        mead.setStartDate(startDate);
+        mead.setStartDate(Utilities.ConvertDateString(startDate));
         mead.setDescription(description);
         mead.setOriginalGravity(originalGravity);
 
@@ -372,7 +350,7 @@ public class JavaScriptBridge {
         Reading reading = new Reading();
 
         reading.setMeadId(parseInt(meadId));
-        reading.setDate(date);
+        reading.setDate(Utilities.ConvertDateString(date));
         reading.setSpecificGravity(specificGravity);
 
         data.addReading(reading);
@@ -384,8 +362,6 @@ public class JavaScriptBridge {
         Log.i("JavaScriptBridge", "Fetching event data by ID: " + id);
 
         Event event = data.getEvent(parseInt(id));
-
-        Gson gson = new Gson();
 
         String json = gson.toJson(event);
 
@@ -402,7 +378,7 @@ public class JavaScriptBridge {
         Event event = new Event();
 
         event.setMeadId(parseInt(meadId));
-        event.setDate(date);
+        event.setDate(Utilities.ConvertDateString(date));
         event.setTypeId(parseInt(typeId));
         event.setDescription(description);
 
@@ -418,7 +394,7 @@ public class JavaScriptBridge {
 
         event.setId(parseInt(eventId));
         event.setMeadId(parseInt(meadId));
-        event.setDate(date);
+        event.setDate(Utilities.ConvertDateString(date));
         event.setTypeId(parseInt(typeId));
         event.setDescription(description);
 
@@ -476,7 +452,6 @@ public class JavaScriptBridge {
 
             int meadRecordId = parseInt(meadId);
             int count = parseInt(splitCount);
-            boolean canBeDeleted = deleteOriginal;
 
             // Minor validation
             if(count < 2)
@@ -484,7 +459,7 @@ public class JavaScriptBridge {
                 return; // this shouldn't happen, but covering the base
             }
 
-            data.splitMead(meadRecordId, count, canBeDeleted);
+            data.splitMead(meadRecordId, count, deleteOriginal);
         }
         catch(Exception ex)
         {
@@ -526,9 +501,8 @@ public class JavaScriptBridge {
             model.setDatabaseVersion(MeadMateData.getDbVersion());
             model.setVersionName(pinfo.versionName);
             model.setVersionNumber(pinfo.versionCode);
-            model.setDateUpdated(updateDate.toString());
+            model.setDateUpdated(updateDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
 
-            Gson gson = new Gson();
             String json = gson.toJson(model);
 
             Log.d("JavaScriptBridge", json);
@@ -543,10 +517,7 @@ public class JavaScriptBridge {
             model.setVersionName("ERROR");
             model.setDatabaseVersion(0);
 
-            Gson gson = new Gson();
-            String json = gson.toJson(model);
-
-            return json;
+            return gson.toJson(model);
         }
     }
 
@@ -559,7 +530,6 @@ public class JavaScriptBridge {
         request.setTitle(title);
         request.setDescription(description);
         request.setDate(date);
-        //request.setMeadId(Integer.parseInt(meadId));
 
         MainActivity mainActivity = (MainActivity) this.activity;
 
@@ -570,8 +540,10 @@ public class JavaScriptBridge {
     public void activateTheme(String code)
     {
         Log.d("JavaScriptBridge", "Activate Theme: " + code);
+
         MainActivity mainActivity = (MainActivity) this.activity;
-        mainActivity.changeTheme(code);
+
+        mainActivity.runOnUiThread(() -> mainActivity.changeTheme(code));
     }
 
     @JavascriptInterface

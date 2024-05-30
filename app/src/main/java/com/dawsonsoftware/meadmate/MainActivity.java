@@ -17,8 +17,6 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 package com.dawsonsoftware.meadmate;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
@@ -33,29 +31,33 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
+import android.window.OnBackInvokedDispatcher;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.os.BuildCompat;
 
 import com.dawsonsoftware.meadmate.models.CombinedMeadRecord;
 import com.google.gson.Gson;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.TimeZone;
 
-public class MainActivity extends AppCompatActivity {
+@BuildCompat.PrereleaseSdkCheck public class MainActivity extends AppCompatActivity {
 
     private WebView mWebView;
     private final MeadMateData data = new MeadMateData(this);
     private static final int CREATE_CSV_FILE = 1;
     private static final int CREATE_JSON_FILE = 2;
     private static final int CREATE_EVENT = 3;
+
+    private ActivityResultLauncher<Intent> eventActivityResultLauncher = null;
+
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -66,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
         mWebView = findViewById(R.id.activity_main_webview);
 
         // Force links and redirects to open in the WebView instead of in a browser
-        //mWebView.setWebViewClient(new WebViewClient());
         mWebView.setWebChromeClient(new WebChromeClient());
 
         // Enable Javascript
@@ -79,16 +80,29 @@ public class MainActivity extends AppCompatActivity {
 
         // LOCAL RESOURCE
         mWebView.loadUrl(getString(R.string.base_url));
-    }
 
-    // Prevent the back-button from closing the app
-    @Override
-    public void onBackPressed() {
-        if(mWebView.canGoBack()) {
-            mWebView.goBack();
-        } else {
-            super.onBackPressed();
+        // New technique for handling the back button
+        if (BuildCompat.isAtLeastT()) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                    () -> {
+                        if (mWebView.canGoBack()) {
+                            mWebView.goBack();
+                        } else {
+                            this.finish();
+                        }
+                    }
+            );
         }
+
+        // New technique for starting activities
+        this.eventActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Log.d("MainActivity", "Event activity completed with ok result.");
+                    }
+                });
     }
 
     public void requestEvent(EventRequest request)
@@ -105,10 +119,7 @@ public class MainActivity extends AppCompatActivity {
             LocalDateTime endDateTime = endDate.atStartOfDay();
 
             Intent intent = new Intent(Intent.ACTION_INSERT);
-            intent.setType("vnd.android.cursor.dir/event");
-            Log.d("MainActivity", "Attempting to start activity...");
-
-            intent.setData(CalendarContract.Events.CONTENT_URI);
+            intent.setDataAndType(CalendarContract.Events.CONTENT_URI, "vnd.android.cursor.dir/event");
             intent.putExtra(CalendarContract.Events.CALENDAR_ID, 1);
             intent.putExtra(CalendarContract.Events.TITLE, request.getTitle());
             intent.putExtra(CalendarContract.Events.DESCRIPTION, request.getDescription());
@@ -131,7 +142,9 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            startActivityForResult(intent, CREATE_EVENT);
+            Log.d("MainActivity", "Attempting to start activity...");
+
+            this.eventActivityResultLauncher.launch(intent);
         }
         catch(Exception ex)
         {
@@ -153,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         {
             Log.d("MainActivity", "Create Event ResultCode: " + resultCode);
 
-            Uri uri = null;
+            Uri uri;
 
             if (resultData != null) {
 
@@ -177,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
         {
             Log.d("MainActivity", "Create Event ResultCode: " + resultCode);
 
-            Uri uri = null;
+            Uri uri;
 
             if (resultData != null) {
 
@@ -200,27 +213,20 @@ public class MainActivity extends AppCompatActivity {
 
     public void changeTheme(String themeCode)
     {
-        if(themeCode == null)
-        {
-            Log.e("changeTheme", "Null theme code. Ignoring.");
-            return;
-        }
-
         Log.i("changeTheme", "Theme change requested to themeCode: '" + themeCode + "'.");
 
         mWebView = findViewById(R.id.activity_main_webview);
 
-        if(themeCode.equals("a"))
-        {
-            mWebView.post(() -> mWebView.loadUrl(getString(R.string.theme_a_url)));
-            return;
+        switch (themeCode) {
+            case "a":
+                mWebView.loadUrl(getString(R.string.theme_a_url));
+                break;
+            case "b":
+                mWebView.loadUrl(getString(R.string.theme_b_url));
+                break;
         }
 
-        if(themeCode.equals("b"))
-        {
-            mWebView.post(() -> mWebView.loadUrl(getString(R.string.theme_b_url)));
-            return;
-        }
+        mWebView.clearHistory();
     }
 
     public void requestCsvExportFileUri() {
@@ -265,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
             str.append("Tags,");
             str.append("Event Date,");
             str.append("Event Type,");
-            str.append("Event Description / Value" + System.lineSeparator());
+            str.append("Event Description / Value").append(System.lineSeparator());
 
             for (CombinedMeadRecord record : records) {
 
@@ -286,16 +292,16 @@ public class MainActivity extends AppCompatActivity {
                     eventDescription = eventDescription.replaceAll("\\t", " ");
                 }
 
-                str.append(record.getMeadId() + ",");
-                str.append(record.getBatchName() + ",");
-                str.append(record.getStartDate() + ",");
-                str.append(description + ",");
-                str.append(record.getStartingGravity() + ",");
-                str.append(record.getArchived() + ",");
-                str.append(record.getTags() + ",");
-                str.append(record.getEventDate() + ",");
-                str.append(record.getEventType() + ",");
-                str.append(eventDescription + System.lineSeparator());
+                str.append(record.getMeadId()).append(",");
+                str.append(record.getBatchName()).append(",");
+                str.append(record.getStartDate()).append(",");
+                str.append(description).append(",");
+                str.append(record.getStartingGravity()).append(",");
+                str.append(record.getArchived()).append(",");
+                str.append(record.getTags()).append(",");
+                str.append(record.getEventDate()).append(",");
+                str.append(record.getEventType()).append(",");
+                str.append(eventDescription).append(System.lineSeparator());
             }
 
             return str.toString();
@@ -326,20 +332,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void writeExportFile(Uri uri, String content)
-    {
+    private void writeExportFile(Uri uri, String content) throws Exception {
         try
         {
             ParcelFileDescriptor pfd = this.getContentResolver().openFileDescriptor(uri, "w");
-            FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor());
-            fileOutputStream.write(content.getBytes());
-            // Let the document provider know you're done by closing the stream.
-            fileOutputStream.close();
-            pfd.close();
+
+            if(pfd != null)
+            {
+                FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor());
+                fileOutputStream.write(content.getBytes());
+                // Let the document provider know you're done by closing the stream.
+                fileOutputStream.close();
+                pfd.close();
+            }
+            else{
+                throw new Exception("A null ParcelFileDescriptor object was returned.");
+            }
         }
         catch(Exception e)
         {
             Log.e("MainActivity", "Unexpected error in writeExportFile", e);
+            throw e;
         }
     }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="no-js">
+<html class="no-js" lang="en-US">
 <head>
 	<!--
 	This file is part of Mead Mate.
@@ -29,7 +29,7 @@
 	<link rel="stylesheet" href="main.css">
 	<link rel="stylesheet" href="theme-a.css">
 
-	<style type="text/css">
+	<style>
 		.no-js { display: none; }
 	</style>
 </head>
@@ -42,13 +42,13 @@
 	</div>
 	<div id="my-meads-navbar" data-role="navbar">
 		<ul>
-			<li><a id="toggleArchivedMeadsButton" href="#my-meads" class="ui-btn ui-btn-inline ui-mini">Include / Exclude Hidden Meads</a></li>
+			<li><a id="toggle-archived-meads-button" href="#my-meads" class="ui-btn ui-btn-inline ui-mini">Include / Exclude Hidden Meads</a></li>
 		</ul>
 	</div>
 	<div role="main" class="ui-content">
 		<ul id="mead-list" data-role="listview">
 		</ul>
-		<a href="#new-mead" id="newMeadButton" class="add-button">New Batch</a>
+		<a href="#new-mead" id="new-mead-button" class="add-button">New Batch</a>
 	</div>
 	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
 		<ul>
@@ -76,7 +76,7 @@
 	<div role="main" class="ui-content">
 		<ul id="recipe-list" data-role="listview">
 		</ul>
-		<a href="#new-recipe" id="newRecipeButton" class="add-button">New Recipe</a>
+		<a href="#new-recipe" id="new-recipe-button" class="add-button">New Recipe</a>
 	</div>
 	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
 		<ul>
@@ -103,21 +103,21 @@
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">Calculate Alcohol by Volume</h2>
-		<p id="abvFormulaPref"></p>
+		<p id="selected-abv-formula-pref"></p>
 		<form id="abv-form">
 			<p>
-				<span id="abvResult"></span>
+				<span id="abv-result"></span>
 			</p>
-			<ul id="abvMessageList"></ul>
+			<ul id="abv-message-list"></ul>
 			<p>
-				<label for="initialGravity">Initial Specific Gravity:</label>
-				<input type="text" inputmode="numeric" name="initialGravity" value="" id="initialGravity" />
+				<label for="initial-gravity">Initial Specific Gravity:</label>
+				<input type="text" inputmode="numeric" name="initial-gravity" value="" id="initial-gravity" />
 			</p>
 			<p>
-				<label for="newGravity">New Specific Gravity:</label>
-				<input type="text" inputmode="numeric" name="newGravity" value="" id="newGravity" />
+				<label for="new-gravity">New Specific Gravity:</label>
+				<input type="text" inputmode="numeric" name="new-gravity" value="" id="new-gravity" />
 			</p>
-			<input type="button" value="Calculate" name="calcButton" id="calcButton">
+			<input type="button" value="Calculate" name="calculate-abv-button" id="calculate-abv-button">
 			<p>Set your preferred formula under 'Preferences' using the Menu above.</p>
 		</form>
 	</div>
@@ -146,15 +146,15 @@
 	<div role="main" class="ui-content">
 		<h2 id="new-recipe-content-title" class="content-title">Add New Recipe</h2>
 		<form id="new-recipe-form">
-			<ul id="recipeMessageList"></ul>
-			<input type="hidden" name="recipeId" id="recipeId" value="0">
-			<label for="newRecipeName">Recipe Name:</label>
-			<input type="text" name="newRecipeName" id="newRecipeName" value="">
+			<ul id="recipe-message-list"></ul>
+			<input type="hidden" name="recipe-id" id="recipe-id" value="0">
+			<label for="new-recipe-name">Recipe Name:</label>
+			<input type="text" name="new-recipe-name" id="new-recipe-name" value="">
 
-			<label for="newRecipeDescription">Description:</label>
-			<textarea name="newRecipeDescription" id="newRecipeDescription"></textarea>
+			<label for="new-recipe-description">Description:</label>
+			<textarea name="new-recipe-description" id="new-recipe-description"></textarea>
 
-			<input type="button" value="Save" name="saveRecipeButton" id="saveRecipeButton">
+			<input type="button" value="Save" name="save-recipe-button" id="save-recipe-button">
 		</form>
 	</div>
 </div>
@@ -162,7 +162,7 @@
 <div id="events" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed" data-add-back-btn="true">
 		<h1>Mead Mate</h1>
-		<a id="newEventButton" href="#new-event" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+		<a id="new-event-button" href="#new-event" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">Events</h2>
@@ -188,16 +188,16 @@
 	<div role="main" class="ui-content">
 		<h2 class="content-title">Create Calendar Event</h2>
 		<form id="calendar-event-form">
-			<ul id="calendarEventMessageList"></ul>
+			<ul id="calendar-event-message-list"></ul>
 
-			<input type="hidden" name="newCalendarEventMeadId" id="newCalendarEventMeadId" value="">
-			<input type="hidden" name="newCalendarEventMeadName" id="newCalendarEventMeadName" value="">
+			<input type="hidden" name="new-calendar-event-mead-id" id="new-calendar-event-mead-id" value="">
+			<input type="hidden" name="new-calendar-event-mead-name" id="new-calendar-event-mead-name" value="">
 
-			<label for="newCalendarEventTitle">Event Title:</label>
-			<input type="text" name="newCalendarEventTitle" id="newCalendarEventTitle" value="">
+			<label for="new-calendar-event-title">Event Title:</label>
+			<input type="text" name="new-calendar-event-title" id="new-calendar-event-title" value="">
 
-			<label for="newCalendarEventDescription">Event Description:</label>
-			<select id="newCalendarEventDescription">
+			<label for="new-calendar-event-description">Event Description:</label>
+			<select id="new-calendar-event-description">
 				<option>Take A Reading</option>
 				<option>Rack Batch</option>
 				<option>Add Ingredients</option>
@@ -207,13 +207,13 @@
 				<option>Other</option>
 			</select>
 
-			<label for="newCalendarEventDate">Event Date:</label>
-			<input type="date" name="newCalendarEventDate" id="newCalendarEventDate" value="">
+			<label for="new-calendar-event-date">Event Date:</label>
+			<input type="date" name="new-calendar-event-date" id="new-calendar-event-date" value="">
 
-			<label for="newCalendarEventNotes">Additional Notes:</label>
-			<textarea name="newCalendarEventNotes" id="newCalendarEventNotes"></textarea>
+			<label for="new-calendar-event-notes">Additional Notes:</label>
+			<textarea name="new-calendar-event-notes" id="new-calendar-event-notes"></textarea>
 
-			<input type="button" value="Save" name="saveCalendarEventButton" id="saveCalendarEventButton">
+			<input type="button" value="Save" name="save-calendar-event-button" id="save-calendar-event-button">
 
 			<p>This feature helps you create a reminder in your default calendar app. You'll have many more options for this reminder there.</p>
 		</form>
@@ -222,38 +222,38 @@
 
 <div id="new-event" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a id="backToMeadEventsButton" href="#events" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
+		<a id="back-to-mead-events-button" href="#events" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
 		<h2 id="new-event-content-title" class="content-title">New Event</h2>
 		<p id="new-event-savemsg"></p>
 		<form id="new-event-form">
-			<ul id="newEventMessageList"></ul>
-			<input type="hidden" name="eventId" id="eventId" value="">
-			<input type="hidden" name="newEventMeadId" id="newEventMeadId" value="">
+			<ul id="new-event-message-list"></ul>
+			<input type="hidden" name="event-id" id="event-id" value="">
+			<input type="hidden" name="new-event-mead-id" id="new-event-mead-id" value="">
 
-			<label for="newEventDate">Date:</label>
-			<input type="text" name="newEventDate" id="newEventDate" onfocus="blur();" value="">
+			<label for="new-event-date">Date:</label>
+			<input type="text" name="new-event-date" id="new-event-date" onfocus="blur();" value="">
 
-			<label for="newEventType">Type:</label>
-			<select id="newEventType">
+			<label for="new-event-type">Type:</label>
+			<select id="new-event-type">
 
 			</select>
 
-			<label for="newEventDescription">Description:</label>
-			<textarea name="newEventDescription" id="newEventDescription"></textarea>
+			<label for="new-event-description">Description:</label>
+			<textarea name="new-event-description" id="new-event-description"></textarea>
 
-			<input type="button" value="Save" name="saveEventButton" id="saveEventButton">
+			<input type="button" value="Save" name="save-event-button" id="save-event-button">
 		</form>
 	</div>
 </div>
 
 <div id="readings" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a id="backToMeadViewButton" href="#mead-view" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
+		<a id="back-to-mead-view-button" href="#mead-view" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
 		<h1>Mead Mate</h1>
-		<a id="newReadingButton" href="#new-reading" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
+		<a id="new-reading-button" href="#new-reading" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus">New</a>
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">Readings</h2>
@@ -274,23 +274,23 @@
 
 <div id="new-reading" data-role="page" data-theme="a">
 	<div data-role="header" data-position="fixed">
-		<a id="backToMeadReadingsButton" href="#readings" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
+		<a id="back-to-mead-readings-button" href="#readings" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l">Back</a>
 		<h1>Mead Mate</h1>
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">New Reading</h2>
 		<p id="new-reading-savemsg"></p>
 		<form id="new-reading-form">
-			<ul id="newReadingMessageList"></ul>
-			<input type="hidden" name="newReadingMeadId" id="newReadingMeadId" value="">
+			<ul id="new-reading-message-list"></ul>
+			<input type="hidden" name="new-reading-mead-id" id="new-reading-mead-id" value="">
 
-			<label for="newReadingDate">Reading Date:</label>
-			<input type="text" name="newReadingDate" id="newReadingDate" onfocus="blur();" value="">
+			<label for="new-reading-date">Reading Date:</label>
+			<input type="text" name="new-reading-date" id="new-reading-date" onfocus="blur();" value="">
 
-			<label for="newReadingGravity">Specific Gravity:</label>
-			<input type="number" name="newReadingGravity" pattern="[0-1]+\.[0-9]{3}" id="newReadingGravity" value="1.000">
+			<label for="new-reading-gravity">Specific Gravity:</label>
+			<input type="number" name="new-reading-gravity" pattern="[0-1]+\.[0-9]{3}" id="new-reading-gravity" value="1.000">
 
-			<input type="button" value="Save" name="saveReadingButton" id="saveReadingButton">
+			<input type="button" value="Save" name="save-reading-button" id="save-reading-button">
 		</form>
 	</div>
 </div>
@@ -321,14 +321,14 @@
 	</div>
 	<div data-role="panel" id="mead-menu" data-position="right" data-display="overlay">
 		<ul data-role="listview">
-			<li><a id="editMeadButton" href="#new-mead" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
-			<li><a id="eventsButton" href="#events" class="ui-btn ui-icon-calendar ui-btn-icon-left">Events</a></li>
-			<li><a id="readingsButton" href="#readings" class="ui-btn ui-icon-plus ui-btn-icon-left">Readings</a></li>
-			<li><a id="calendarEventButton" href="#calendar-event" class="ui-btn ui-icon-action ui-btn-icon-left">Add Reminder</a></li>
-			<li><a id="tagsButton" href="#mead-view" class="ui-btn ui-icon-tag ui-btn-icon-left">Tags</a></li>
-			<li><a id="splitButton" href="#my-meads" class="ui-btn ui-icon-grid ui-btn-icon-left">Split Batch</a></li>
-			<li><a id="archiveButton" href="#my-meads" class="ui-btn ui-icon-eye ui-btn-icon-left">Show/Hide Mead</a></li>
-			<li><a id="deleteMeadButton" href="#my-meads" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
+			<li><a id="edit-mead-button" href="#new-mead" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
+			<li><a id="events-button" href="#events" class="ui-btn ui-icon-calendar ui-btn-icon-left">Events</a></li>
+			<li><a id="readings-button" href="#readings" class="ui-btn ui-icon-plus ui-btn-icon-left">Readings</a></li>
+			<li><a id="calendar-event-button" href="#calendar-event" class="ui-btn ui-icon-action ui-btn-icon-left">Add Reminder</a></li>
+			<li><a id="tags-button" href="#mead-view" class="ui-btn ui-icon-tag ui-btn-icon-left">Tags</a></li>
+			<li><a id="split-button" href="#my-meads" class="ui-btn ui-icon-grid ui-btn-icon-left">Split Batch</a></li>
+			<li><a id="archive-button" href="#my-meads" class="ui-btn ui-icon-eye ui-btn-icon-left">Show/Hide Mead</a></li>
+			<li><a id="delete-mead-button" href="#my-meads" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
 			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
 	</div>
@@ -349,9 +349,9 @@
 	</div>
 	<div data-role="panel" id="recipe-menu" data-position="right" data-display="overlay">
 		<ul data-role="listview">
-			<li><a id="editRecipeButton" href="#new-recipe" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
-			<li><a id="createBatchButton" href="#my-recipes" class="ui-btn ui-icon-action ui-btn-icon-left">Create Batch</a></li>
-			<li><a id="deleteRecipeButton" href="#my-recipes" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
+			<li><a id="edit-recipe-button" href="#new-recipe" class="ui-btn ui-icon-edit ui-btn-icon-left">Edit</a></li>
+			<li><a id="create-batch-button" href="#my-recipes" class="ui-btn ui-icon-action ui-btn-icon-left">Create Batch</a></li>
+			<li><a id="delete-recipe-button" href="#my-recipes" class="ui-btn ui-icon-delete ui-btn-icon-left">Delete</a></li>
 			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
 	</div>
@@ -364,21 +364,21 @@
 	<div role="main" class="ui-content">
 		<h2 id="new-mead-content-title" class="content-title">Add New Mead</h2>
 		<form id="new-mead-form">
-			<ul id="messageList"></ul>
-			<input type="hidden" name="meadId" id="meadId" value="0">
-			<label for="newMeadName">Mead Name:</label>
-			<input type="text" name="newMeadName" id="newMeadName" value="">
+			<ul id="new-mead-message-list"></ul>
+			<input type="hidden" name="mead-id" id="mead-id" value="0">
+			<label for="new-mead-name">Mead Name:</label>
+			<input type="text" name="new-mead-name" id="new-mead-name" value="">
 
-			<label for="newMeadStartDate">Start Date:</label>
-			<input type="text" name="newMeadStartDate" id="newMeadStartDate" data-theme="b" onfocus="blur();" value="">
+			<label for="new-mead-start-date">Start Date:</label>
+			<input type="text" name="new-mead-start-date" id="new-mead-start-date" data-theme="b" onfocus="blur();" value="">
 
-			<label for="newMeadOriginalGravity">Original Specific Gravity:</label>
-			<input type="number" name="newMeadOriginalGravity" pattern="[0-1]+\.[0-9]{3}" id="newMeadOriginalGravity" value="1.000">
+			<label for="new-mead-original-gravity">Original Specific Gravity:</label>
+			<input type="number" name="new-mead-original-gravity" pattern="[0-1]+\.[0-9]{3}" id="new-mead-original-gravity" value="1.000">
 
-			<label for="newMeadDescription">Description:</label>
-			<textarea name="newMeadDescription" id="newMeadDescription"></textarea>
+			<label for="new-mead-description">Description:</label>
+			<textarea name="new-mead-description" id="new-mead-description"></textarea>
 
-			<input type="button" value="Save" name="saveMeadButton" id="saveMeadButton">
+			<input type="button" value="Save" name="save-mead-button" id="save-mead-button">
 		</form>
 	</div>
 </div>
@@ -441,12 +441,12 @@
 	</div>
 
 	<div role="main" class="ui-content">
-		<h2 class="content-title">Preferences</h2>
+		<h2 class="content-title">Preferences &amp; Utilities</h2>
 		<div data-role="collapsible-set" data-theme="a" data-content-theme="a" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
 			<div data-role="collapsible">
 				<h3>ABV Formula</h3>
 				<p>Mead Mate supports four common Alcohol By Volume (ABV) formulas. The Standard formula is the default.</p>
-				<p><strong>Select Preferred Formula:</strong><br>
+				<p><label for="abv-formula-pref">Select Preferred Formula:</label><br>
 					<select id="abv-formula-pref" name="abv-formula-pref">
 						<option value="std">Standard</option>
 						<option value="highstd">High Standard</option>
@@ -472,7 +472,7 @@
 			<div data-role="collapsible">
 				<h3>Mead List Sorting</h3>
 				<p>Select preferred sorting option for the My Meads list. The Record Id sort is the default.</p>
-				<p><strong>Select Preferred Sort:</strong><br>
+				<p><label for="sort-pref">Select Preferred Sort:</label><br>
 					<select id="sort-pref" name="sort-pref">
 						<option value="byId">Record Id (Oldest First)</option>
 						<option value="byName">Mead Name (A-Z)</option>
@@ -487,10 +487,11 @@
 			<div data-role="collapsible">
 				<h3>Date Format</h3>
 				<p>The internal date format is a short international format due to the database used. However, places where the date is displayed can be reformatted.</p>
-				<p><strong>Select Preferred Date Format:</strong><br>
+				<p><label for="date-format-pref">Select Preferred Date Format:</label><br>
 					<select id="date-format-pref" name="date-format-pref">
 						<option value="ISO">YYYY-MM-DD</option>
 						<option value="US">MM/DD/YYYY</option>
+						<option value="EURODOT">DD.MM.YYYY</option>
 					</select>
 				</p>
 			</div>
@@ -508,10 +509,10 @@
 			</div>
 
 			<div data-role="collapsible">
-				<h3>Export Data (New!)</h3>
+				<h3>Export Data</h3>
 				<p>Get a data file with all your content in it.</p>
-				<button id="exportCsvButton" class="ui-btn ui-btn-a">Export Data as CSV</button>
-				<button id="exportJsonButton" class="ui-btn ui-btn-a">Export Data as JSON</button>
+				<button id="export-csv-button" class="ui-btn ui-btn-a">Export Data as CSV</button>
+				<button id="export-json-button" class="ui-btn ui-btn-a">Export Data as JSON</button>
 			</div>
 
 		</div>
@@ -644,14 +645,21 @@
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">About</h2>
-		<h3>Mead Mate Release 16</h3>
-		<p>Another long-awaited update! I updated the UI to reduce the number of clicks needed to get around. I also added features for exporting batch data in CSV or JSON format. Please let me know what adjustments you might like.</p>
+		<h3>Mead Mate Release 17</h3>
+		<p>For Release 17, various updates were completed that aren't necessarily user-facing related to Android API version, naming conventions, and more. I've tested every view and function thoroughly, but if something seems broken, please let me know.</p>
+		<p>I did sneak in an update for a new date format preference. I started with an ISO format and then the normal format for me in the US. Now, you can use the DD/MM/YEAR format, as well.</p>
+		<p>In the next release, I have a prototype for capturing pictures. That has been the most asked about and daunting feature for me to implement. After that release, I'm going to start work on supporting additional languages.</p>
+		<p>Cheers!</p>
 		<p><strong>What's New</strong></p>
 		<ul>
-			<li>Removed list of buttons from main view</li>
-			<li>Added navbar to bottom of three primary views</li>
-			<li>Added feature to export mead batch data as CSV</li>
-			<li>Added feature to export mead batch data as JSON</li>
+			<li>Removed old caching code and unit tests</li>
+			<li>Fixed some HTML warnings in the IDE</li>
+			<li>Removed commented out code</li>
+			<li>Update supported Android API level</li>
+			<li>Removed some deprecated Android code</li>
+			<li>Added open source license to new files</li>
+			<li>Made HTML IDs more consistent</li>
+			<li>Added DMY date format preference</li>
 		</ul>
 
 		<h3>Open Source Project Information</h3>

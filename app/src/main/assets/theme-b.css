@@ -48,7 +48,7 @@ hr
     background-color: #000;
 }
 
-#toggleArchivedMeadsButton.ui-btn-active {
+#toggle-archived-meads-button.ui-btn-active {
     background-color: #4D4D4D /*{a-bup-background-color}*/;
     border-color: #000 /*{a-bup-border}*/;
     color: #FFF /*{a-bup-color}*/;

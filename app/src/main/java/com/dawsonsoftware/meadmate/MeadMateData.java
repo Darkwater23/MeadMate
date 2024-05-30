@@ -17,6 +17,7 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 package com.dawsonsoftware.meadmate;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -32,12 +33,13 @@ import com.dawsonsoftware.meadmate.models.Recipe;
 import com.dawsonsoftware.meadmate.models.Reading;
 import com.dawsonsoftware.meadmate.models.Tag;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MeadMateData extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 8;
+    private static final int DB_VERSION = 9;
     private static final String DB_NAME = "appdata";
 
     // Meads table fields
@@ -160,6 +162,12 @@ public class MeadMateData extends SQLiteOpenHelper {
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
             "(11,'Cold Crashing')";
 
+    String FIX_BAD_MEADS_DATE_DATA = "UPDATE MEADS SET START_DATE = substr(START_DATE, 7, 4) || '-' || substr(START_DATE, 1, 2) || '-' || substr(START_DATE, 4, 2) WHERE START_DATE LIKE '%/%'";
+
+    String FIX_BAD_EVENTS_DATE_DATA = "UPDATE EVENTS SET \"DATE\" = substr(\"DATE\", 7, 4) || '-' || substr(\"DATE\", 1, 2) || '-' || substr(\"DATE\", 4, 2) WHERE \"DATE\" LIKE '%/%'";
+
+    String FIX_BAD_READINGS_DATE_DATA = "UPDATE READINGS SET \"DATE\" = substr(\"DATE\", 7, 4) || '-' || substr(\"DATE\", 1, 2) || '-' || substr(\"DATE\", 4, 2) WHERE \"DATE\" LIKE '%/%'";
+
     public MeadMateData(Context context){
         super(context,DB_NAME, null, DB_VERSION);
     }
@@ -204,6 +212,10 @@ public class MeadMateData extends SQLiteOpenHelper {
                 db.execSQL(ADD_NEW_EVENT_TYPE_REL8);
             case 7:
                 db.execSQL(ADD_NEW_EVENT_TYPE_REL12);
+            case 8:
+                db.execSQL(FIX_BAD_MEADS_DATE_DATA);
+                db.execSQL(FIX_BAD_EVENTS_DATE_DATA);
+                db.execSQL(FIX_BAD_READINGS_DATE_DATA);
                 break;
             default:
                 //log no update applied
@@ -257,6 +269,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    @SuppressLint("Range")
     List<Recipe> getRecipes()
     {
         List<Recipe> model = new ArrayList<>();
@@ -303,6 +316,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     Recipe getRecipe(int recipeId)
     {
         Recipe model = new Recipe();
@@ -410,7 +424,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
             ContentValues values = new ContentValues();
             values.put(KEY_MEAD_NAME, mead.getName());
-            values.put(KEY_MEAD_START_DATE, mead.getStartDate());
+            values.put(KEY_MEAD_START_DATE, mead.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
             values.put(KEY_MEAD_DESC, mead.getDescription());
             values.put(KEY_MEAD_ORIG_GRAV, mead.getOriginalGravity());
             values.put(KEY_MEAD_ARCHIVED, (mead.getArchived() ? 1 : 0));
@@ -445,11 +459,16 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         try
         {
+            if(mead == null)
+            {
+                throw new IllegalArgumentException("Mead object cannot be null");
+            }
+
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
             values.put(KEY_MEAD_NAME, mead.getName());
-            values.put(KEY_MEAD_START_DATE, mead.getStartDate());
+            values.put(KEY_MEAD_START_DATE, mead.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
             values.put(KEY_MEAD_DESC, mead.getDescription());
             values.put(KEY_MEAD_ORIG_GRAV, mead.getOriginalGravity());
             values.put(KEY_MEAD_ARCHIVED, (mead.getArchived() ? 1 : 0));
@@ -469,11 +488,16 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         try
         {
+            if(reading == null)
+            {
+                throw new IllegalArgumentException("Reading object cannot be null");
+            }
+
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
             values.put(KEY_READINGS_MEADID, reading.getMeadId());
-            values.put(KEY_READINGS_DATE, reading.getDate());
+            values.put(KEY_READINGS_DATE, reading.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
             values.put(KEY_READINGS_GRAV, reading.getSpecificGravity());
 
             db.insert(TABLE_READINGS, null, values);
@@ -488,11 +512,16 @@ public class MeadMateData extends SQLiteOpenHelper {
 
         try
         {
+            if(event == null)
+            {
+                throw new IllegalArgumentException("Event object cannot be null");
+            }
+
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
             values.put(KEY_EVENT_MEADID, event.getMeadId());
-            values.put(KEY_EVENT_DATE, event.getDate());
+            values.put(KEY_EVENT_DATE, event.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
             values.put(KEY_EVENT_TYPEID, event.getTypeId());
             values.put(KEY_EVENT_DESC, event.getDescription());
 
@@ -508,10 +537,15 @@ public class MeadMateData extends SQLiteOpenHelper {
     {
         try
         {
+            if(event == null)
+            {
+                throw new IllegalArgumentException("Event object cannot be null");
+            }
+
             SQLiteDatabase db = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
-            values.put(KEY_EVENT_DATE, event.getDate());
+            values.put(KEY_EVENT_DATE, event.getDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
             values.put(KEY_EVENT_TYPEID, event.getTypeId());
             values.put(KEY_EVENT_DESC, event.getDescription());
 
@@ -635,6 +669,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    @SuppressLint("Range")
     int addTag(String name) {
 
         int tagId;
@@ -690,6 +725,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return tagId;
     }
 
+    @SuppressLint("Range")
     List<Tag> getMeadTags(int meadId)
     {
         List<Tag> model = new ArrayList<>();
@@ -733,6 +769,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     List<Tag> getTags()
     {
         List<Tag> model = new ArrayList<>();
@@ -800,6 +837,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    @SuppressLint("Range")
     public void deleteMeadTag(int meadId, String tagName)
     {
         String[] tableColumns = new String[] {
@@ -841,6 +879,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         }
     }
 
+    @SuppressLint("Range")
     Mead getMead(int meadId)
     {
         Mead model = null;
@@ -880,7 +919,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
                 model.setId(c.getInt(c.getColumnIndex(KEY_MEAD_ID)));
                 model.setName(c.getString(c.getColumnIndex(KEY_MEAD_NAME)));
-                model.setStartDate(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE)));
+                model.setStartDate(Utilities.ConvertDateString(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE))));
                 model.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
                 model.setOriginalGravity(c.getString(c.getColumnIndex(KEY_MEAD_ORIG_GRAV)));
                 model.setArchived(c.getInt(c.getColumnIndex(KEY_MEAD_ARCHIVED)) == 1);
@@ -896,6 +935,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     List<Mead> getMeads(String orderBy, boolean includeArchived)
     {
         List<Mead> model = new ArrayList<>();
@@ -928,7 +968,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
                     mead.setId(c.getInt(c.getColumnIndex(KEY_MEAD_ID)));
                     mead.setName(c.getString(c.getColumnIndex(KEY_MEAD_NAME)));
-                    mead.setStartDate(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE)));
+                    mead.setStartDate(Utilities.ConvertDateString(c.getString(c.getColumnIndex(KEY_MEAD_START_DATE))));
                     mead.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
                     mead.setOriginalGravity(c.getString(c.getColumnIndex(KEY_MEAD_ORIG_GRAV)));
                     mead.setArchived(c.getInt(c.getColumnIndex(KEY_MEAD_ARCHIVED)) == 1);
@@ -948,6 +988,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     List<Reading> getReadings(int meadId)
     {
         List<Reading> model = new ArrayList<>();
@@ -987,7 +1028,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
                     reading.setId(c.getInt(c.getColumnIndex(KEY_READINGS_ID)));
                     reading.setMeadId(c.getInt(c.getColumnIndex(KEY_READINGS_MEADID)));
-                    reading.setDate(c.getString(c.getColumnIndex(KEY_READINGS_DATE)));
+                    reading.setDate(Utilities.ConvertDateString(c.getString(c.getColumnIndex(KEY_READINGS_DATE))));
                     reading.setSpecificGravity(c.getString(c.getColumnIndex(KEY_READINGS_GRAV)));
 
                     model.add(reading);
@@ -1080,6 +1121,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     List<Event> getEvents(int meadId)
     {
         List<Event> model = new ArrayList<>();
@@ -1107,7 +1149,7 @@ public class MeadMateData extends SQLiteOpenHelper {
 
                     event.setId(c.getInt(c.getColumnIndex(KEY_EVENT_ID)));
                     event.setMeadId(c.getInt(c.getColumnIndex(KEY_EVENT_MEADID)));
-                    event.setDate(c.getString(c.getColumnIndex(KEY_EVENT_DATE)));
+                    event.setDate(Utilities.ConvertDateString(c.getString(c.getColumnIndex(KEY_EVENT_DATE))));
                     event.setTypeId(c.getInt(c.getColumnIndex(KEY_EVENT_TYPEID)));
                     event.setDescription(c.getString(c.getColumnIndex(KEY_EVENT_DESC)));
                     event.setTypeName(c.getString(c.getColumnIndex(KEY_EVENT_TYPE_NAME)));
@@ -1127,6 +1169,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     Event getEvent(int eventId)
     {
         Event model = new Event();
@@ -1164,7 +1207,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 model.setTypeId(c.getInt(c.getColumnIndex(KEY_EVENT_TYPEID)));
                 model.setMeadId(c.getInt((c.getColumnIndex(KEY_EVENT_MEADID))));
                 model.setDescription(c.getString(c.getColumnIndex(KEY_EVENT_DESC)));
-                model.setDate(c.getString(c.getColumnIndex(KEY_EVENT_DATE)));
+                model.setDate(Utilities.ConvertDateString(c.getString(c.getColumnIndex(KEY_EVENT_DATE))));
             }
 
             c.close();
@@ -1177,6 +1220,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return model;
     }
 
+    @SuppressLint("Range")
     String getEventDescription(int id)
     {
         String eventDescription = "";
@@ -1220,6 +1264,7 @@ public class MeadMateData extends SQLiteOpenHelper {
         return eventDescription;
     }
 
+    @SuppressLint("Range")
     List<EventType> getEventTypes()
     {
         List<EventType> model = new ArrayList<>();
