@@ -1881,11 +1881,11 @@ function dpUserPrefFormat()
     switch(localStorage.getItem(dateFormatPrefKeyName))
     {
         case 'US':
-            return 'MM/dd/YYYY';
+            return 'MM/DD/YYYY';
         case 'ISO':
-            return 'YYYY-MM-dd';
+            return 'YYYY-MM-DD';
         case 'EURODOT':
-            return 'dd.MM.YYYY';
+            return 'DD.MM.YYYY';
         default:
             // log error
             if(window.Android) window.Android.logInfo('dpUserPrefFormat','User preference was not found; using default.');
