@@ -9,8 +9,8 @@ android {
         applicationId 'com.dawsonsoftware.meadmate'
         minSdkVersion 26
         targetSdk 34
-        versionCode 171
-        versionName '1.17.1'
+        versionCode 172
+        versionName '1.17.2'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
