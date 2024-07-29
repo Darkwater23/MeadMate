@@ -39,7 +39,7 @@ import java.util.List;
 
 public class MeadMateData extends SQLiteOpenHelper {
 
-    private static final int DB_VERSION = 9;
+    private static final int DB_VERSION = 10;
     private static final String DB_NAME = "appdata";
 
     // Meads table fields
@@ -120,7 +120,8 @@ public class MeadMateData extends SQLiteOpenHelper {
             "(8,'Note')," +
             "(9,'Conditioning')," +
             "(10,'Feeding')," +
-            "(11,'Cold Crashing')";
+            "(11,'Cold Crashing')," +
+            "(12,'Stabilized')";
 
     String ADD_NEW_EVENT_TYPES = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
@@ -161,6 +162,10 @@ public class MeadMateData extends SQLiteOpenHelper {
     String ADD_NEW_EVENT_TYPE_REL12 = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
             "(11,'Cold Crashing')";
+
+    String ADD_NEW_EVENT_TYPE_REL17 = "INSERT INTO " + TABLE_EVENT_TYPES + " (" +
+            KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
+            "(12,'Stabilized')";
 
     String FIX_BAD_MEADS_DATE_DATA = "UPDATE MEADS SET START_DATE = substr(START_DATE, 7, 4) || '-' || substr(START_DATE, 1, 2) || '-' || substr(START_DATE, 4, 2) WHERE START_DATE LIKE '%/%'";
 
@@ -216,6 +221,8 @@ public class MeadMateData extends SQLiteOpenHelper {
                 db.execSQL(FIX_BAD_MEADS_DATE_DATA);
                 db.execSQL(FIX_BAD_EVENTS_DATE_DATA);
                 db.execSQL(FIX_BAD_READINGS_DATE_DATA);
+            case 9:
+                db.execSQL(ADD_NEW_EVENT_TYPE_REL17);
                 break;
             default:
                 //log no update applied
