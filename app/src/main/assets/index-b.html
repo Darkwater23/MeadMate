@@ -50,7 +50,7 @@
 		</ul>
 		<a href="#new-mead" id="new-mead-button" class="add-button">New Batch</a>
 	</div>
-	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
+	<div data-role="navbar" class="main-navbar">
 		<ul>
 			<li><a class="navbar-batches" href="#my-meads" style="font-size: 1em;">Batches</a></li>
 			<li><a class="navbar-recipes" href="#my-recipes" style="font-size: 1em;">Recipes</a></li>
@@ -63,6 +63,7 @@
 			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Preferences</a></li>
 			<li><a href="#privacy-policy" class="ui-btn ui-icon-eye ui-btn-icon-left">Privacy Policy</a></li>
 			<li><a href="#about" class="ui-btn ui-icon-info ui-btn-icon-left">About</a></li>
+			<li><a href="#support" class="ui-btn ui-icon-comment ui-btn-icon-left">Support</a></li>
 			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
 	</div>
@@ -91,6 +92,7 @@
 			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Preferences</a></li>
 			<li><a href="#privacy-policy" class="ui-btn ui-icon-eye ui-btn-icon-left">Privacy Policy</a></li>
 			<li><a href="#about" class="ui-btn ui-icon-info ui-btn-icon-left">About</a></li>
+			<li><a href="#support" class="ui-btn ui-icon-comment ui-btn-icon-left">Support</a></li>
 			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
 	</div>
@@ -134,6 +136,7 @@
 			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Preferences</a></li>
 			<li><a href="#privacy-policy" class="ui-btn ui-icon-eye ui-btn-icon-left">Privacy Policy</a></li>
 			<li><a href="#about" class="ui-btn ui-icon-info ui-btn-icon-left">About</a></li>
+			<li><a href="#support" class="ui-btn ui-icon-comment ui-btn-icon-left">Support</a></li>
 			<li><a data-rel="close" class="ui-btn ui-icon-carat-r ui-btn-icon-left">Close panel</a></li>
 		</ul>
 	</div>
@@ -645,22 +648,8 @@
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">About</h2>
-		<h3>Mead Mate Release 17</h3>
-		<p>For Release 17, various updates were completed that aren't necessarily user-facing related to Android API version, naming conventions, and more. I've tested every view and function thoroughly, but if something seems broken, please let me know.</p>
-		<p>I did sneak in an update for a new date format preference. I started with an ISO format and then the normal format for me in the US. Now, you can use the DD/MM/YEAR format, as well.</p>
-		<p>In the next release, I have a prototype for capturing pictures. That has been the most asked about and daunting feature for me to implement. After that release, I'm going to start work on supporting additional languages.</p>
-		<p>Cheers!</p>
-		<p><strong>What's New</strong></p>
-		<ul>
-			<li>Removed old caching code and unit tests</li>
-			<li>Fixed some HTML warnings in the IDE</li>
-			<li>Removed commented out code</li>
-			<li>Update supported Android API level</li>
-			<li>Removed some deprecated Android code</li>
-			<li>Added open source license to new files</li>
-			<li>Made HTML IDs more consistent</li>
-			<li>Added DMY date format preference</li>
-		</ul>
+		<h3>Mead Mate Release 17.3</h3>
+		<p>Updated the UI so that a long list of batches works with the fixed nav bar at the bottom of the screen. Shout out to Invader Tangent for reporting the issue. Please reach out via the Support page on the Main Menu for suggestions or to report an issue.</p>
 
 		<h3>Open Source Project Information</h3>
 		<p>Mead Mate is now an open source project. Please check it out on <a href="https://github.com/Darkwater23/MeadMate">GitHub &raquo;</a>.</p>
@@ -677,6 +666,22 @@
 		</dl>
 	</div>
 </div>
+
+<div id="support" data-role="page" data-theme="b">
+	<div data-role="header" data-position="fixed">
+		<a href="#my-meads" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-home">Home</a>
+		<h1>Mead Mate Support</h1>
+	</div>
+	<div role="main" class="ui-content">
+		<h2 class="content-title">Support</h2>
+		<p style="font-size: 1.25em;"><strong>Thank you for using Mead Mate!</strong></p>
+		<p style="font-size: 1.25em;">Mead Mate was made by a mead maker for mead makers. Let me know if you run into issues or have any suggestions.</p>
+		<p style="font-size: 1.25em;">If you're reporting an issue, please provide a detailed description of the problem. Screenshots and/or steps to reproduce the issue would be very helpful. I'll do my best to resolve your issue quickly.</p>
+		<a href="mailto:doug.dawson@protonmail.com" class="ui-btn ui-icon-mail ui-btn-icon-left">Email</a>
+		<p>&nbsp;</p>
+	</div>
+</div>
+
 <script src="dist/jquery-1.12.4.min.js"></script>
 <script src="dist/jquery.validate.min.js"></script>
 <script src="dist/jquery.mobile-1.4.5.min.js"></script>

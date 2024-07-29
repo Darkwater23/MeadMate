@@ -166,7 +166,7 @@ a.navbar-last
 a.add-button
 {
     display: block;
-    position: absolute;
+    position: fixed;
     background-repeat: no-repeat;
     background-size: cover;
     right: 3%;
@@ -176,4 +176,17 @@ a.add-button
     line-height: 0;
     font-size: 0;
     color: transparent;
+}
+
+.main-navbar
+{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+#mead-list
+{
+    padding: 0 0 2.8em 0;
 }
