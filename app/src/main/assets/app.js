@@ -27,14 +27,9 @@ const exportAsCsv = 1;
 const exportAsJson = 2;
 const tagTipDisplayMilliseconds = 10000;
 const alertNoBridge = {
-          theme: confirmTheme,
+          theme: 'dark',
           title: 'Warning',
           content:'Android Javascript bridge is not available'
-      };
-const alertNewVersion = {
-          theme: confirmTheme,
-          title: 'New Version!',
-          content:'Please check out the About page under the Menu above to see what is new with this release.'
       };
 
 // One-time code executions
@@ -59,6 +54,10 @@ var readingFormDatepicker = new mdDateTimePicker.default({
 });
 
 $(function() {
+
+    // Set theme ASAP so early alert boxes have the right theme
+    var themePref = localStorage.getItem(themeModePrefKeyName);
+    if(themePref == 'b') confirmTheme = 'dark';
 
     // If options list is empty, load values from database
     var count = $('#new-event-type').children('option').length;
@@ -102,7 +101,12 @@ $(function() {
             if(lastAppVersion != versionInfo.versionNumber)
             {
                 localStorage.setItem(appVersionKeyName, versionInfo.versionNumber);
-                $.alert(alertNewVersion);
+
+                $.alert({
+                    theme: confirmTheme,
+                    title: 'New Version!',
+                    content:'Please check out the About page under the Menu above to see what is new with this release.'
+                });
             }
         }
     }
@@ -111,8 +115,7 @@ $(function() {
     $("#new-calendar-event-description").selectmenu();
     $("#theme-pref").selectmenu();
 
-    var themePref = localStorage.getItem(themeModePrefKeyName);
-    if(themePref == 'b') confirmTheme = 'dark';
+
 
     // Datepicker triggers & listeners
     meadFormDatepicker.trigger = document.getElementById('new-mead-start-date');
