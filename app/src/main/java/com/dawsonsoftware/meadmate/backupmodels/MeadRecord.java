@@ -25,7 +25,7 @@ import java.util.UUID;
 
 public class MeadRecord extends Mead {
 
-    private UUID uuid;
+    private final UUID uuid;
     private List<String> tags;
 
     public MeadRecord()

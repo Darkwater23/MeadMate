@@ -22,7 +22,7 @@ import com.dawsonsoftware.meadmate.models.Event;
 import java.util.UUID;
 
 public class EventRecord extends Event {
-    private UUID uuid;
+    private final UUID uuid;
     private UUID meadUuid;
 
     public EventRecord()

@@ -23,7 +23,7 @@ import java.util.UUID;
 
 public class RecipeRecord extends Recipe {
 
-    private UUID uuid;
+    private final UUID uuid;
 
     public RecipeRecord()
     {

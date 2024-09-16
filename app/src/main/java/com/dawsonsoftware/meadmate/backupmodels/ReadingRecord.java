@@ -17,14 +17,12 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 package com.dawsonsoftware.meadmate.backupmodels;
 
-import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.Reading;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 public class ReadingRecord extends Reading {
-    private UUID uuid;
+    private final UUID uuid;
     private UUID meadUuid;
 
     public ReadingRecord()
