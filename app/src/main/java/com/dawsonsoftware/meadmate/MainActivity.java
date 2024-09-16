@@ -38,6 +38,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.os.BuildCompat;
 
+import com.dawsonsoftware.meadmate.backupmodels.MeadMateBackup;
 import com.dawsonsoftware.meadmate.models.CombinedMeadRecord;
 import com.google.gson.Gson;
 
@@ -318,11 +319,13 @@ import java.util.TimeZone;
     {
         try {
 
-            List<CombinedMeadRecord> records = data.getMeadRecords();
+            BackupManager manager = new BackupManager(this);
+
+            MeadMateBackup backup = manager.CreateBackup();
 
             Gson gson = new Gson();
 
-            return gson.toJson(records);
+            return gson.toJson(backup);
 
         } catch (Exception e) {
 
