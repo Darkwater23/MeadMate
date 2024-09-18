@@ -41,6 +41,7 @@ import androidx.core.os.BuildCompat;
 import com.dawsonsoftware.meadmate.backupmodels.MeadMateBackup;
 import com.dawsonsoftware.meadmate.models.CombinedMeadRecord;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.FileOutputStream;
 import java.time.LocalDate;
@@ -323,7 +324,10 @@ import java.util.TimeZone;
 
             MeadMateBackup backup = manager.CreateBackup();
 
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder()
+                    // register custom JsonSerializer for LocalDate
+                    .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                    .create();
 
             return gson.toJson(backup);
 
