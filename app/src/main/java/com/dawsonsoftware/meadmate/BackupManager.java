@@ -9,7 +9,7 @@ import java.util.List;
 public class BackupManager {
 
     //private MeadMateBackup _backupModel;
-    private MeadMateData meadData;
+    private final MeadMateData meadData;
 
     public BackupManager(Context context)
     {
@@ -35,9 +35,7 @@ public class BackupManager {
 
             for(Event eventItem: events)
             {
-                EventRecord eventRecord = new EventRecord(eventItem);
-                eventRecord.setMeadUuid(meadRecord.getUuid());
-                backupModel.getEventRecords().add(eventRecord);
+                meadRecord.getEvents().add(eventItem);
             }
 
             // Fetch reading data
@@ -45,9 +43,7 @@ public class BackupManager {
 
             for(Reading readingItem: readings)
             {
-                ReadingRecord readingRecord = new ReadingRecord(readingItem);
-                readingRecord.setMeadUuid(meadRecord.getUuid());
-                backupModel.getReadingsRecords().add(readingRecord);
+                meadRecord.getReadings().add(readingItem);
             }
 
             List<Tag> tags = meadData.getMeadTags(meadRecord.getId());
@@ -60,7 +56,7 @@ public class BackupManager {
 
         for (Recipe recipeItem: recipes)
         {
-            backupModel.getRecipeRecords().add(new RecipeRecord(recipeItem));
+            backupModel.getRecipes().add(recipeItem);
         }
 
         return backupModel;

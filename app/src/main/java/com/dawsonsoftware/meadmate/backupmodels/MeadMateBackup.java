@@ -17,6 +17,8 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 package com.dawsonsoftware.meadmate.backupmodels;
 
+import com.dawsonsoftware.meadmate.models.Recipe;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,17 +26,13 @@ import java.util.List;
 // Leaving the other models as is to avoid breaking any contracts
 public class MeadMateBackup
 {
-    private List<MeadRecord> meadRecords;
-    private List<RecipeRecord> recipes;
-    private List<EventRecord> eventRecords;
-    private List<ReadingRecord> readingsRecords;
+    private final List<MeadRecord> meadRecords;
+    private final List<Recipe> recipes;
 
     public MeadMateBackup()
     {
         meadRecords = new ArrayList<>();
         recipes = new ArrayList<>();
-        eventRecords = new ArrayList<>();
-        readingsRecords = new ArrayList<>();
     }
 
     public List<MeadRecord> getMeadRecords()
@@ -42,18 +40,5 @@ public class MeadMateBackup
         return meadRecords;
     }
 
-    public List<EventRecord> getEventRecords()
-    {
-        return eventRecords;
-    }
-
-    public List<ReadingRecord> getReadingsRecords()
-    {
-        return readingsRecords;
-    }
-
-    public List<RecipeRecord> getRecipeRecords()
-    {
-        return recipes;
-    }
+    public List<Recipe> getRecipes() { return recipes; }
 }

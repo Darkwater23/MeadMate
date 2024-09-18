@@ -17,40 +17,37 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 package com.dawsonsoftware.meadmate.backupmodels;
 
+import com.dawsonsoftware.meadmate.models.Event;
 import com.dawsonsoftware.meadmate.models.Mead;
+import com.dawsonsoftware.meadmate.models.Reading;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class MeadRecord extends Mead {
 
-    private final UUID uuid;
-    private List<String> tags;
-
-    public MeadRecord()
-    {
-        this.uuid = UUID.randomUUID();
-        this.tags = new ArrayList<>();
-    }
+    private final List<String> tags;
+    private final List<Event> events;
+    private final List<Reading> readings;
 
     public MeadRecord(Mead mead)
     {
-        this.uuid = UUID.randomUUID();
         this.setId(mead.getId());
         this.setArchived(mead.getArchived());
         this.setName(mead.getName());
         this.setDescription(mead.getDescription());
         this.setOriginalGravity(mead.getOriginalGravity());
         this.setStartDate(mead.getStartDate());
-    }
 
-    public UUID getUuid() {
-        return uuid;
+        this.tags = new ArrayList<>();
+        this.events = new ArrayList<>();
+        this.readings = new ArrayList<>();
     }
 
     public List<String> getTags()
     {
         return this.tags;
     }
+    public List<Event> getEvents() { return this.events; }
+    public List<Reading> getReadings() { return this.readings; }
 }
