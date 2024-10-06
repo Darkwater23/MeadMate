@@ -43,11 +43,18 @@ import com.dawsonsoftware.meadmate.models.CombinedMeadRecord;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
 @BuildCompat.PrereleaseSdkCheck public class MainActivity extends AppCompatActivity {
@@ -57,7 +64,7 @@ import java.util.TimeZone;
     private static final int CREATE_CSV_FILE = 1;
     private static final int CREATE_JSON_FILE = 2;
     private static final int CREATE_EVENT = 3;
-
+    private static final int SELECT_JSON_FILE = 4;
     private ActivityResultLauncher<Intent> eventActivityResultLauncher = null;
 
 
@@ -154,6 +161,14 @@ import java.util.TimeZone;
         }
     }
 
+    public void openFilePicker()
+    {
+        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+        chooseFile.setType("*/*");
+        chooseFile = Intent.createChooser(chooseFile, "Select a Mead Mate backup file");
+        startActivityForResult(chooseFile, SELECT_JSON_FILE);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
 
@@ -208,6 +223,46 @@ import java.util.TimeZone;
                 catch(Exception ex)
                 {
                     Log.e("MainActivity", "Unexpected error while exporting batch data to JSON.", ex);
+                }
+            }
+        }
+
+        if (requestCode == SELECT_JSON_FILE && resultCode == Activity.RESULT_OK) {
+
+            BufferedReader reader = null;
+            try {
+                // open the user-picked file for reading:
+                InputStream in = getContentResolver().openInputStream(Objects.requireNonNull(resultData.getData()));
+                // now read the content:
+                reader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                StringBuilder builder = new StringBuilder();
+                while ((line = reader.readLine()) != null){
+                    builder.append(line);
+                }
+                // Do something with the content in
+                Gson gson = new GsonBuilder()
+                        // register custom JsonSerializer for LocalDate
+                        .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                        .create();
+
+                MeadMateBackup meadData = gson.fromJson(builder.toString(), MeadMateBackup.class);
+
+                ImportManager manager = new ImportManager(this);
+
+                manager.ImportMeadData(meadData);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
