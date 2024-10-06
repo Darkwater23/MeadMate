@@ -467,6 +467,19 @@ $("#export-json-button").on("tap", function(event) {
     }
 });
 
+$("#import-button").on("tap", function(event) {
+    event.preventDefault();
+
+    if(window.Android)
+    {
+        window.Android.selectBackupFile();
+    }
+    else
+    {
+        $.alert(alertNoBridge);
+    }
+});
+
 $("#new-mead-button").on("tap", function(event) {
 
     event.preventDefault();
