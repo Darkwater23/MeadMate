@@ -1,14 +1,14 @@
 package com.dawsonsoftware.meadmate;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.dawsonsoftware.meadmate.backupmodels.*;
 import com.dawsonsoftware.meadmate.models.*;
 
 import java.util.List;
 
 public class BackupManager {
-
-    //private MeadMateBackup _backupModel;
     private final MeadMateData meadData;
 
     public BackupManager(Context context)
@@ -20,43 +20,53 @@ public class BackupManager {
     {
         MeadMateBackup backupModel = new MeadMateBackup();
 
-        // Fetch mead & recipe data
-        List<Mead> meads = meadData.getMeads(null, true);
-        List<Recipe> recipes = meadData.getRecipes();
-        
-        // Add mead data and related entities to backup model
-        for (Mead meadItem: meads)
+        try
         {
-            MeadRecord meadRecord = new MeadRecord(meadItem);
-            backupModel.getMeadRecords().add(meadRecord);
+            // Fetch mead & recipe data
+            List<Mead> meads = meadData.getMeads(null, true);
+            List<Recipe> recipes = meadData.getRecipes();
 
-            // Fetch event data
-            List<Event> events = meadData.getEvents(meadRecord.getId());
-
-            for(Event eventItem: events)
+            // Add mead data and related entities to backup model
+            for (Mead meadItem: meads)
             {
-                meadRecord.getEvents().add(eventItem);
+                MeadRecord meadRecord = new MeadRecord(meadItem);
+                backupModel.getMeadRecords().add(meadRecord);
+
+                // Fetch event data
+                List<Event> events = meadData.getEvents(meadRecord.getId());
+
+                for(Event eventItem: events)
+                {
+                    meadRecord.getEvents().add(eventItem);
+                }
+
+                // Fetch reading data
+                List<Reading> readings = meadData.getReadings(meadRecord.getId());
+
+                for(Reading readingItem: readings)
+                {
+                    meadRecord.getReadings().add(readingItem);
+                }
+
+                List<Tag> tags = meadData.getMeadTags(meadRecord.getId());
+
+                for(Tag tagItem: tags)
+                {
+                    meadRecord.getTags().add(tagItem.getName());
+                }
             }
 
-            // Fetch reading data
-            List<Reading> readings = meadData.getReadings(meadRecord.getId());
-
-            for(Reading readingItem: readings)
+            for (Recipe recipeItem: recipes)
             {
-                meadRecord.getReadings().add(readingItem);
-            }
-
-            List<Tag> tags = meadData.getMeadTags(meadRecord.getId());
-
-            for(Tag tagItem: tags)
-            {
-                meadRecord.getTags().add(tagItem.getName());
+                backupModel.getRecipes().add(recipeItem);
             }
         }
-
-        for (Recipe recipeItem: recipes)
+        catch(Exception ex)
         {
-            backupModel.getRecipes().add(recipeItem);
+            Log.e("BackupManager", "An error occurred hydrating the backup data model.", ex);
+
+            // return empty object for now
+            return new MeadMateBackup();
         }
 
         return backupModel;
