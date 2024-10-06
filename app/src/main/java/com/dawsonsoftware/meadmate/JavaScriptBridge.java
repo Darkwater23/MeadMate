@@ -537,6 +537,16 @@ import java.util.List;
     }
 
     @JavascriptInterface
+    public void selectBackupFile()
+    {
+        Log.d("JavascriptBridge", "Opening file picker for user.");
+
+        MainActivity mainActivity = (MainActivity) this.activity;
+
+        mainActivity.openFilePicker();
+    }
+
+    @JavascriptInterface
     public void activateTheme(String code)
     {
         Log.d("JavaScriptBridge", "Activate Theme: " + code);
