@@ -856,7 +856,8 @@ function viewReadings(meadId)
         $("#reading-list tbody").empty();
 
         // Append original gravity reading to list
-        $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(meadData.startDate) + '</td><td>' + meadData.originalGravity + '</td><td>N/A</td><td>&nbsp;</td></tr>');
+        //$("#reading-list tbody").append('<tr><td>' + formatDisplayDate(meadData.startDate) + '</td><td>' + meadData.originalGravity + '</td><td>N/A</td><td>&nbsp;</td></tr>');
+        $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(meadData.startDate) + '</td><td>' + meadData.originalGravity + '</td><td>N/A</td></tr>');
 
         // Holding variable for original or previous gravity
         var og = meadData.originalGravity;
@@ -874,12 +875,14 @@ function viewReadings(meadId)
                 abvDisplayValue = "+" + results[i].specificGravityDifference.toFixed(3);
             }
 
-            $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
+            //$("#reading-list tbody").append('<tr><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
+            $("#reading-list tbody").append('<tr id="' + readingsData[i].id + '"><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td></tr>');
         }
 
         $("#new-reading-button").off("tap"); // clear existing event handlers
         $("#back-to-mead-view-button").off("tap"); // clear existing event handlers
         $("#back-to-mead-readings-button").off("tap"); // clear existing event handlers
+        $("#reading-list tbody tr").off("taphold"); // clear existing event handlers
 
         $("#new-reading-button").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
@@ -907,6 +910,32 @@ function viewReadings(meadId)
             window.Android.logDebug('MainActivity', 'Back To Mead Readings Button pressed. Mead ID: ' + event.data.meadId);
 
             viewReadings(event.data.meadId);
+        });
+
+        $("#reading-list tbody tr").on("taphold", { meadId: meadId }, function(event) {
+
+            var target = $(event.target);
+            var readingId = 0;
+
+            if(target.is('TD'))
+            {
+                // get parent id
+                window.Android.logDebug('MainActivity', 'TD: ' + target.parent().attr('id'));
+                readingId = target.parent().attr('id');
+            }
+
+            if(target.is('TR'))
+            {
+                // Should be rare since user can't clearly click row, but just to be safe
+                window.Android.logDebug('MainActivity', 'TR: 1' + target.attr('id'));
+                readingId = target.attr('id');
+            }
+
+            if(readingId)
+            {
+                window.Android.logDebug('MainActivity', 'Deleting reading: ' + readingId);
+                deleteReading(event.data.meadId,readingId);
+            }
         });
     }
     else
