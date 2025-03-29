@@ -144,14 +144,17 @@ class abvResultSet {
 
 // Datepicker input events
 $("#new-mead-start-date").on("tap", function(event){
+    event.preventDefault();
     meadFormDatepicker.toggle();
 });
 
 $("#new-event-date").on("tap", function(event){
+    event.preventDefault();
     eventFormDatepicker.toggle();
 });
 
 $("#new-reading-date").on("tap", function(event){
+    event.preventDefault();
     readingFormDatepicker.toggle();
 });
 
@@ -465,7 +468,6 @@ $("#export-json-button").on("tap", function(event) {
 });
 
 $("#new-mead-button").on("tap", function(event) {
-
     event.preventDefault();
 
     // Set hidden field value so form switches to correct mode
@@ -474,7 +476,6 @@ $("#new-mead-button").on("tap", function(event) {
 });
 
 $("#new-recipe-button").on("tap", function(event) {
-
     event.preventDefault();
 
     // Set hidden field value so form switches to correct mode
@@ -483,6 +484,7 @@ $("#new-recipe-button").on("tap", function(event) {
 });
 
 $("#toggle-archived-meads-button").on("tap", function(event) {
+    event.preventDefault();
 
     var includeArchivedString = localStorage.getItem(archivePrefKeyName) ?? "false";
     var includeArchived = !(includeArchivedString === "true");
@@ -492,7 +494,6 @@ $("#toggle-archived-meads-button").on("tap", function(event) {
 });
 
 $("#save-mead-button").on("tap", function(event){
-
     event.preventDefault();
 
     if(window.Android)
@@ -534,7 +535,6 @@ $("#save-mead-button").on("tap", function(event){
 });
 
 $("#save-recipe-button").on("tap", function(event){
-
     event.preventDefault();
 
     if(window.Android)
@@ -575,7 +575,6 @@ $("#save-recipe-button").on("tap", function(event){
 });
 
 $("#save-reading-button").on("tap", function(event){
-
     event.preventDefault();
 
     if(window.Android)
@@ -606,49 +605,47 @@ $("#save-reading-button").on("tap", function(event){
 });
 
 $("#save-event-button").on("tap", function(event){
+    event.preventDefault();
 
- event.preventDefault();
+    if(window.Android)
+    {
+        if($("#new-event-form").valid())
+        {
 
- if(window.Android)
- {
-     if($("#new-event-form").valid()){
+            // Grab form inputs
+            var eventId = $("#event-id").val();
+            var meadId = $("#new-event-mead-id").val();
+            var date = $("#new-event-date").val();
+            var typeId = $("#new-event-type").val();
+            var description = $("#new-event-description").val();
 
-         // Grab form inputs
-         var eventId = $("#event-id").val();
-         var meadId = $("#new-event-mead-id").val();
-         var date = $("#new-event-date").val();
-         var typeId = $("#new-event-type").val();
-         var description = $("#new-event-description").val();
+            window.Android.logDebug('MainActivity', 'Event ID: ' + eventId);
+            window.Android.logDebug('MainActivity', 'Event Mead ID: ' + meadId);
+            window.Android.logDebug('MainActivity', 'Event Date: ' + date);
+            window.Android.logDebug('MainActivity', 'Event Type: ' + typeId);
+            window.Android.logDebug('MainActivity', 'Event Description: ' + description);
 
-         window.Android.logDebug('MainActivity', 'Event ID: ' + eventId);
-         window.Android.logDebug('MainActivity', 'Event Mead ID: ' + meadId);
-         window.Android.logDebug('MainActivity', 'Event Date: ' + date);
-         window.Android.logDebug('MainActivity', 'Event Type: ' + typeId);
-         window.Android.logDebug('MainActivity', 'Event Description: ' + description);
+            if(eventId)
+            {
+                window.Android.updateEvent(eventId, meadId, date, typeId, description);
+                window.Android.logInfo('MainActivity', 'Event ' + eventId + ' updated!');
+            }
+            else
+            {
+                window.Android.addEvent(meadId, date, typeId, description);
+                window.Android.logInfo('MainActivity', 'New event saved!');
+            }
 
-         if(eventId)
-         {
-             window.Android.updateEvent(eventId, meadId, date, typeId, description);
-             window.Android.logInfo('MainActivity', 'Event ' + eventId + ' updated!');
-         }
-         else
-         {
-             window.Android.addEvent(meadId, date, typeId, description);
-             window.Android.logInfo('MainActivity', 'New event saved!');
-         }
-
-         viewEvents(meadId);
-     }
- }
- else
- {
-     $.alert(alertNoBridge);
- }
-
+            viewEvents(meadId);
+        }
+    }
+    else
+    {
+        $.alert(alertNoBridge);
+    }
 });
 
-$("#calculate-abv-button").on("tap", function(event) {
-
+$("#calculate-abv-button").on("tap", function(event){
     event.preventDefault();
 
     if($("#abv-form").valid()){
@@ -739,6 +736,7 @@ function loadMyMeadsListView()
 
         // Clear list
         $("#mead-list").empty();
+        $("#mead-list li a").off("taphold"); // clear existing event handlers
 
         // Fetch data from database
         var meadsJson = window.Android.fetchMeads(sortPref, includeArchived);
@@ -756,8 +754,34 @@ function loadMyMeadsListView()
                 meadName = '<span class="archived">' + meadName + '</span>';
             }
 
-            $("#mead-list").append('<li><a href="javascript:viewMead(' + meadsData[i].id + ');" data-ajax="false">' + meadName + '</a></li>');
+            $("#mead-list").append('<li id="' + meadsData[i].id + '"><a href="javascript:viewMead(' + meadsData[i].id + ');" data-ajax="false">' + meadName + '</a></li>');
         }
+
+        $("#mead-list li a").on("taphold", function(event) {
+            event.preventDefault();
+
+            var target = $(event.target);
+            var meadId = 0;
+
+            if(target.is('A'))
+            {
+                // get parent id
+                window.Android.logDebug('MainActivity', 'A: ' + target.parent().attr('id'));
+                meadId = target.parent().attr('id');
+            }
+
+            if(target.is('LI'))
+            {
+                window.Android.logDebug('MainActivity', 'LI: MeadID ' + target.attr('id'));
+                meadId = target.attr('id');
+            }
+
+            if(meadId)
+            {
+                window.Android.logDebug('MainActivity', 'Deleting mead record: ' + meadId);
+                deleteMead(meadId);
+            }
+        });
 
         $("#mead-list").listview("refresh");
 
@@ -913,6 +937,7 @@ function viewReadings(meadId)
         });
 
         $("#reading-list tbody tr").on("taphold", { meadId: meadId }, function(event) {
+            event.preventDefault();
 
             var target = $(event.target);
             var readingId = 0;
@@ -1020,6 +1045,7 @@ function viewEvents(meadId)
         });
 
         $("#events-list tbody tr").on("taphold", { meadId: meadId }, function(event) {
+            event.preventDefault();
 
             var target = $(event.target);
             var eventId = 0;
@@ -1053,6 +1079,29 @@ function viewEvents(meadId)
     $(":mobile-pagecontainer").pagecontainer("change", "#events");
  }
 
+function deleteMead(meadId)
+{
+    window.Android.logDebug('MainActivity', 'Delete Mead Button pressed. Mead ID: ' + meadId);
+
+    $.confirm({
+        theme: confirmTheme,
+        title: 'Delete Mead Entry',
+        content: 'Are you sure?',
+        animation: 'top',
+        closeAnimation: 'top',
+        buttons: {
+            confirm: function () {
+                window.Android.deleteMead(meadId);
+                $.mobile.navigate("#my-meads");
+                loadMyMeadsListView();
+            },
+            cancel: function () {
+                // do nothing
+            }
+        }
+    });
+}
+
 function deleteReading(meadId, readingId)
 {
     window.Android.logDebug('MainActivity', 'Delete Reading Button pressed. Mead ID: ' + meadId);
@@ -1082,9 +1131,6 @@ function deleteReading(meadId, readingId)
     {
         $.alert(alertNoBridge);
     }
-
-    // Keep link from doing anything
-    return false;
  }
 
 function deleteEvent(meadId, eventId)
@@ -1116,9 +1162,6 @@ function deleteEvent(meadId, eventId)
      {
          $.alert(alertNoBridge);
      }
-
-     // Keep link from doing anything
-     return false;
   }
 
 function viewMead(id)
@@ -1195,25 +1238,7 @@ function viewMead(id)
         $("#delete-mead-button").on("tap", { value: id }, function(event) {
             event.preventDefault();
 
-            var id = event.data.value;
-
-            $.confirm({
-                theme: confirmTheme,
-                title: 'Delete Mead Entry',
-                content: 'Are you sure?',
-                animation: 'top',
-                closeAnimation: 'top',
-                buttons: {
-                    confirm: function () {
-                        window.Android.deleteMead(id);
-
-                        $.mobile.navigate("#my-meads");
-                    },
-                    cancel: function () {
-                        // do nothing
-                    }
-                }
-            });
+            deleteMead(event.data.value);
         });
         $("#readings-button").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity }, function(event) {
             event.preventDefault();
@@ -1226,7 +1251,6 @@ function viewMead(id)
             viewEvents(event.data.meadId);
         });
         $("#edit-mead-button").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity, meadDescription: meadData.description }, function(event) {
-
             event.preventDefault();
 
             // Populate data
@@ -1258,7 +1282,6 @@ function viewMead(id)
             $(":mobile-pagecontainer").pagecontainer("change", "#calendar-event");
         });
         $("#tags-button").on("tap", { meadId: meadData.id }, function(event) {
-
             event.preventDefault();
 
             $.confirm({
@@ -1424,6 +1447,7 @@ function viewRecipe(id)
         });
 
         $("#edit-recipe-button").on("tap", { recipeId: recipeData.id, recipeName: recipeData.name, recipeDescription: recipeData.description }, function(event) {
+            event.preventDefault();
 
             // Populate data
             $("#recipe-id").val(event.data.recipeId);
