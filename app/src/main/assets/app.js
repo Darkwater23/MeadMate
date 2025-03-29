@@ -1016,13 +1016,13 @@ function viewEvents(meadId)
             // Append data to list
             $("#events-list tbody").append('<tr id="' + eventsData[i].id + '"><td style="white-space: nowrap; text-align: center;">' + formatDisplayDate(eventsData[i].date) + '<br>' + daysAgoOutput + '</td><td>' + eventsData[i].typeName + '</td><td style="white-space: nowrap; text-align: center;">' +
                 '<a href="javascript:showEventDescription(' + eventsData[i].id + ',\'' + formatDisplayDate(eventsData[i].date) + '\');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
-                '<a href="javascript:editEvent(' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-edit ui-btn-icon-notext">Edit</a>' +
                 '</td></tr>');
         }
 
         $("#new-event-button").off("tap"); // clear existing event handlers
         $("#back-to-mead-events-button").off("tap"); // clear existing event handlers
         $("#events-list tbody tr").off("taphold"); // clear existing event handlers
+        $("#events-list tbody tr").off("tap"); // clear existing event handlers
 
         $("#new-event-button").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
@@ -1068,6 +1068,50 @@ function viewEvents(meadId)
             {
                 window.Android.logDebug('MainActivity', 'Deleting event: ' + eventId);
                 deleteEvent(event.data.meadId,eventId);
+            }
+        });
+
+        $("#events-list tbody tr").on("tap", function(event) {
+            event.preventDefault();
+
+            var target = $(event.target);
+            var eventId = 0;
+
+            if(target.is('A'))
+            {
+                window.Android.logDebug('MainActivity', 'A: ' + target.parent().parent().attr('id'));
+                eventId = target.parent().parent().attr('id');
+
+                if(eventId)
+                {
+                    showEventDescription(eventId,'MM/DD/YYY');
+                }
+            }
+
+            if(target.is('TD'))
+            {
+                // get parent id
+                window.Android.logDebug('MainActivity', 'TD: ' + target.parent().attr('id'));
+                eventId = target.parent().attr('id');
+
+                if(eventId)
+                {
+                    window.Android.logDebug('MainActivity', 'Editing event: ' + eventId);
+                    editEvent(eventId);
+                }
+            }
+
+            if(target.is('TR'))
+            {
+                // Should be rare since user can't clearly click row, but just to be safe
+                window.Android.logDebug('MainActivity', 'TR: 1' + target.attr('id'));
+                eventId = target.attr('id');
+
+                if(eventId)
+                {
+                    window.Android.logDebug('MainActivity', 'Editing event: ' + eventId);
+                    editEvent(eventId);
+                }
             }
         });
     }
