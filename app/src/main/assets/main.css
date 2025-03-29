@@ -190,3 +190,21 @@ a.add-button
 {
     padding: 0 0 2.8em 0;
 }
+
+#events-list tbody tr td:first-child
+{
+    width: 1%;
+    white-space: nowrap;
+}
+
+#events-list tbody tr td:last-child
+{
+    width: 1%;
+    white-space: nowrap;
+}
+
+#reading-list tbody tr td:first-child
+{
+    width: 1%;
+    white-space: nowrap;
+}
