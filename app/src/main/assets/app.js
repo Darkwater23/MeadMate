@@ -1015,7 +1015,7 @@ function viewEvents(meadId)
 
             // Append data to list
             $("#events-list tbody").append('<tr id="' + eventsData[i].id + '"><td style="white-space: nowrap; text-align: center;">' + formatDisplayDate(eventsData[i].date) + '<br>' + daysAgoOutput + '</td><td>' + eventsData[i].typeName + '</td><td style="white-space: nowrap; text-align: center;">' +
-                '<a href="javascript:showEventDescription(' + eventsData[i].id + ',\'' + formatDisplayDate(eventsData[i].date) + '\');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
+                '<a href="#" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
                 '</td></tr>');
         }
 
@@ -1084,7 +1084,7 @@ function viewEvents(meadId)
 
                 if(eventId)
                 {
-                    showEventDescription(eventId,'MM/DD/YYY');
+                    showEventDescription(eventId);
                 }
             }
 
@@ -1793,21 +1793,20 @@ function calculateAbvWine(initialGravity, subsequentGravity)
     }
 }
 
-function showEventDescription(id, dateString)
+function showEventDescription(eventId)
 {
-    if(window.Android && id > 0)
+    if(window.Android && eventId)
     {
-        window.Android.logInfo('MainActivity', 'Fetching event for Event ' + id);
+        window.Android.logInfo('MainActivity', 'Fetching event for Event ' + eventId);
 
         // Fetch data from database
-        var description = window.Android.fetchEventDescription(id);
-
-        window.Android.logDebug('MainActivity', description);
+        var eventJson = window.Android.fetchEvent(eventId);
+        var eventData = JSON.parse(eventJson);
 
         $.alert({
             theme: confirmTheme,
-            title: dateString,
-            content: '<span class="description">' + description + '</span>',
+            title: formatDisplayDate(eventData.date),
+            content: '<span class="description">' + eventData.description + '</span>',
             animation: 'top',
             closeAnimation: 'top',
             buttons: {
@@ -1821,9 +1820,6 @@ function showEventDescription(id, dateString)
     {
         $.alert(alertNoBridge);
     }
-
-    // Tell browser not to activate link
-    return false;
 }
 
 function daysSince(strDate)
