@@ -60,6 +60,8 @@ var readingFormDatepicker = new mdDateTimePicker.default({
 
 $(function() {
 
+    $.event.special.tap.emitTapOnTaphold = false;
+
     // If options list is empty, load values from database
     var count = $('#new-event-type').children('option').length;
 
