@@ -188,7 +188,12 @@ a.add-button
 
 #mead-list
 {
-    padding: 0 0 2.8em 0;
+    padding: 0 0 2.8rem 0;
+}
+
+#recipe-list
+{
+    padding: 0 0 2.8rem 0;
 }
 
 #events-list tbody tr td:first-child
