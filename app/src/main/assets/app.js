@@ -25,7 +25,8 @@ const createBatchTriggerValue = 'FROM_RECIPE';
 const appVersionKeyName = 'APP_VERSION';
 const exportAsCsv = 1;
 const exportAsJson = 2;
-const tagTipDisplayMilliseconds = 10000;
+const tipDisplayMilliseconds = 10000;
+const tipDisplayLimit = 1; //Show readings and events tip x times while app is running and then stop
 const alertNoBridge = {
           theme: confirmTheme,
           title: 'Warning',
@@ -41,6 +42,8 @@ const alertNewVersion = {
 var tagList;
 var confirmTheme = 'light'; // default value
 moment.locale('en');
+var eventsTipDisplayCount = 0; // Used to track number of times tip span was displayed to user
+var readingsTipDisplayCount = 0; // Used to track number of times tip span was displayed to user
 
 // Datepickers
 var meadFormDatepicker = new mdDateTimePicker.default({
@@ -59,6 +62,8 @@ var readingFormDatepicker = new mdDateTimePicker.default({
 });
 
 $(function() {
+
+    $.event.special.tap.emitTapOnTaphold = false;
 
     // If options list is empty, load values from database
     var count = $('#new-event-type').children('option').length;
@@ -144,14 +149,17 @@ class abvResultSet {
 
 // Datepicker input events
 $("#new-mead-start-date").on("tap", function(event){
+    event.preventDefault();
     meadFormDatepicker.toggle();
 });
 
 $("#new-event-date").on("tap", function(event){
+    event.preventDefault();
     eventFormDatepicker.toggle();
 });
 
 $("#new-reading-date").on("tap", function(event){
+    event.preventDefault();
     readingFormDatepicker.toggle();
 });
 
@@ -465,7 +473,6 @@ $("#export-json-button").on("tap", function(event) {
 });
 
 $("#new-mead-button").on("tap", function(event) {
-
     event.preventDefault();
 
     // Set hidden field value so form switches to correct mode
@@ -474,7 +481,6 @@ $("#new-mead-button").on("tap", function(event) {
 });
 
 $("#new-recipe-button").on("tap", function(event) {
-
     event.preventDefault();
 
     // Set hidden field value so form switches to correct mode
@@ -483,6 +489,7 @@ $("#new-recipe-button").on("tap", function(event) {
 });
 
 $("#toggle-archived-meads-button").on("tap", function(event) {
+    event.preventDefault();
 
     var includeArchivedString = localStorage.getItem(archivePrefKeyName) ?? "false";
     var includeArchived = !(includeArchivedString === "true");
@@ -492,7 +499,6 @@ $("#toggle-archived-meads-button").on("tap", function(event) {
 });
 
 $("#save-mead-button").on("tap", function(event){
-
     event.preventDefault();
 
     if(window.Android)
@@ -534,7 +540,6 @@ $("#save-mead-button").on("tap", function(event){
 });
 
 $("#save-recipe-button").on("tap", function(event){
-
     event.preventDefault();
 
     if(window.Android)
@@ -575,7 +580,6 @@ $("#save-recipe-button").on("tap", function(event){
 });
 
 $("#save-reading-button").on("tap", function(event){
-
     event.preventDefault();
 
     if(window.Android)
@@ -606,49 +610,47 @@ $("#save-reading-button").on("tap", function(event){
 });
 
 $("#save-event-button").on("tap", function(event){
+    event.preventDefault();
 
- event.preventDefault();
+    if(window.Android)
+    {
+        if($("#new-event-form").valid())
+        {
 
- if(window.Android)
- {
-     if($("#new-event-form").valid()){
+            // Grab form inputs
+            var eventId = $("#event-id").val();
+            var meadId = $("#new-event-mead-id").val();
+            var date = $("#new-event-date").val();
+            var typeId = $("#new-event-type").val();
+            var description = $("#new-event-description").val();
 
-         // Grab form inputs
-         var eventId = $("#event-id").val();
-         var meadId = $("#new-event-mead-id").val();
-         var date = $("#new-event-date").val();
-         var typeId = $("#new-event-type").val();
-         var description = $("#new-event-description").val();
+            window.Android.logDebug('MainActivity', 'Event ID: ' + eventId);
+            window.Android.logDebug('MainActivity', 'Event Mead ID: ' + meadId);
+            window.Android.logDebug('MainActivity', 'Event Date: ' + date);
+            window.Android.logDebug('MainActivity', 'Event Type: ' + typeId);
+            window.Android.logDebug('MainActivity', 'Event Description: ' + description);
 
-         window.Android.logDebug('MainActivity', 'Event ID: ' + eventId);
-         window.Android.logDebug('MainActivity', 'Event Mead ID: ' + meadId);
-         window.Android.logDebug('MainActivity', 'Event Date: ' + date);
-         window.Android.logDebug('MainActivity', 'Event Type: ' + typeId);
-         window.Android.logDebug('MainActivity', 'Event Description: ' + description);
+            if(eventId)
+            {
+                window.Android.updateEvent(eventId, meadId, date, typeId, description);
+                window.Android.logInfo('MainActivity', 'Event ' + eventId + ' updated!');
+            }
+            else
+            {
+                window.Android.addEvent(meadId, date, typeId, description);
+                window.Android.logInfo('MainActivity', 'New event saved!');
+            }
 
-         if(eventId)
-         {
-             window.Android.updateEvent(eventId, meadId, date, typeId, description);
-             window.Android.logInfo('MainActivity', 'Event ' + eventId + ' updated!');
-         }
-         else
-         {
-             window.Android.addEvent(meadId, date, typeId, description);
-             window.Android.logInfo('MainActivity', 'New event saved!');
-         }
-
-         viewEvents(meadId);
-     }
- }
- else
- {
-     $.alert(alertNoBridge);
- }
-
+            viewEvents(meadId);
+        }
+    }
+    else
+    {
+        $.alert(alertNoBridge);
+    }
 });
 
-$("#calculate-abv-button").on("tap", function(event) {
-
+$("#calculate-abv-button").on("tap", function(event){
     event.preventDefault();
 
     if($("#abv-form").valid()){
@@ -739,6 +741,7 @@ function loadMyMeadsListView()
 
         // Clear list
         $("#mead-list").empty();
+        $("#mead-list li a").off("taphold"); // clear existing event handlers
 
         // Fetch data from database
         var meadsJson = window.Android.fetchMeads(sortPref, includeArchived);
@@ -756,8 +759,34 @@ function loadMyMeadsListView()
                 meadName = '<span class="archived">' + meadName + '</span>';
             }
 
-            $("#mead-list").append('<li><a href="javascript:viewMead(' + meadsData[i].id + ');" data-ajax="false">' + meadName + '</a></li>');
+            $("#mead-list").append('<li id="' + meadsData[i].id + '"><a href="javascript:viewMead(' + meadsData[i].id + ');" data-ajax="false">' + meadName + '</a></li>');
         }
+
+        $("#mead-list li a").on("taphold", function(event) {
+            event.preventDefault();
+
+            var target = $(event.target);
+            var meadId = 0;
+
+            if(target.is('A'))
+            {
+                // get parent id
+                window.Android.logDebug('MainActivity', 'A: ' + target.parent().attr('id'));
+                meadId = target.parent().attr('id');
+            }
+
+            if(target.is('LI'))
+            {
+                window.Android.logDebug('MainActivity', 'LI: MeadID ' + target.attr('id'));
+                meadId = target.attr('id');
+            }
+
+            if(meadId)
+            {
+                window.Android.logDebug('MainActivity', 'Deleting mead record: ' + meadId);
+                deleteMead(meadId);
+            }
+        });
 
         $("#mead-list").listview("refresh");
 
@@ -856,7 +885,7 @@ function viewReadings(meadId)
         $("#reading-list tbody").empty();
 
         // Append original gravity reading to list
-        $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(meadData.startDate) + '</td><td>' + meadData.originalGravity + '</td><td>N/A</td><td>&nbsp;</td></tr>');
+        $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(meadData.startDate) + '</td><td>' + meadData.originalGravity + '</td><td>N/A</td></tr>');
 
         // Holding variable for original or previous gravity
         var og = meadData.originalGravity;
@@ -874,12 +903,14 @@ function viewReadings(meadId)
                 abvDisplayValue = "+" + results[i].specificGravityDifference.toFixed(3);
             }
 
-            $("#reading-list tbody").append('<tr><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
+            //$("#reading-list tbody").append('<tr><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
+            $("#reading-list tbody").append('<tr id="' + readingsData[i].id + '"><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td></tr>');
         }
 
         $("#new-reading-button").off("tap"); // clear existing event handlers
         $("#back-to-mead-view-button").off("tap"); // clear existing event handlers
         $("#back-to-mead-readings-button").off("tap"); // clear existing event handlers
+        $("#reading-list tbody tr").off("taphold"); // clear existing event handlers
 
         $("#new-reading-button").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
@@ -908,6 +939,35 @@ function viewReadings(meadId)
 
             viewReadings(event.data.meadId);
         });
+
+        $("#reading-list tbody tr").on("taphold", { meadId: meadId }, function(event) {
+            event.preventDefault();
+
+            var target = $(event.target);
+            var readingId = 0;
+
+            if(target.is('TD'))
+            {
+                // get parent id
+                window.Android.logDebug('MainActivity', 'TD: ' + target.parent().attr('id'));
+                readingId = target.parent().attr('id');
+            }
+
+            if(target.is('TR'))
+            {
+                // Should be rare since user can't clearly click row, but just to be safe
+                window.Android.logDebug('MainActivity', 'TR: 1' + target.attr('id'));
+                readingId = target.attr('id');
+            }
+
+            if(readingId)
+            {
+                window.Android.logDebug('MainActivity', 'Deleting reading: ' + readingId);
+                deleteReading(event.data.meadId,readingId);
+            }
+        });
+
+        displayReadingsTip();
     }
     else
     {
@@ -960,15 +1020,15 @@ function viewEvents(meadId)
             }
 
             // Append data to list
-            $("#events-list tbody").append('<tr><td style="white-space: nowrap; text-align: center;">' + formatDisplayDate(eventsData[i].date) + '<br>' + daysAgoOutput + '</td><td>' + eventsData[i].typeName + '</td><td style="white-space: nowrap; text-align: center;">' +
-                '<a href="javascript:showEventDescription(' + eventsData[i].id + ',\'' + formatDisplayDate(eventsData[i].date) + '\');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
-                '<a href="javascript:editEvent(' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-edit ui-btn-icon-notext">Edit</a>' +
-                '<a href="javascript:deleteEvent(' + meadId + ',' + eventsData[i].id + ');" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a>' +
+            $("#events-list tbody").append('<tr id="' + eventsData[i].id + '"><td>' + formatDisplayDate(eventsData[i].date) + '<br>' + daysAgoOutput + '</td><td>' + eventsData[i].typeName + '</td><td>' +
+                '<a href="#" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
                 '</td></tr>');
         }
 
         $("#new-event-button").off("tap"); // clear existing event handlers
         $("#back-to-mead-events-button").off("tap"); // clear existing event handlers
+        $("#events-list tbody tr").off("taphold"); // clear existing event handlers
+        $("#events-list tbody tr").off("tap"); // clear existing event handlers
 
         $("#new-event-button").on("tap", { meadId: meadId }, function(event) {
             event.preventDefault();
@@ -989,6 +1049,79 @@ function viewEvents(meadId)
 
             viewEvents(event.data.meadId);
         });
+
+        $("#events-list tbody tr").on("taphold", { meadId: meadId }, function(event) {
+            event.preventDefault();
+
+            var target = $(event.target);
+            var eventId = 0;
+
+            if(target.is('TD'))
+            {
+                // get parent id
+                window.Android.logDebug('MainActivity', 'TD: ' + target.parent().attr('id'));
+                eventId = target.parent().attr('id');
+            }
+
+            if(target.is('TR'))
+            {
+                // Should be rare since user can't clearly click row, but just to be safe
+                window.Android.logDebug('MainActivity', 'TR: 1' + target.attr('id'));
+                eventId = target.attr('id');
+            }
+
+            if(eventId)
+            {
+                window.Android.logDebug('MainActivity', 'Deleting event: ' + eventId);
+                deleteEvent(event.data.meadId,eventId);
+            }
+        });
+
+        $("#events-list tbody tr").on("tap", function(event) {
+            event.preventDefault();
+
+            var target = $(event.target);
+            var eventId = 0;
+
+            if(target.is('A'))
+            {
+                window.Android.logDebug('MainActivity', 'A: ' + target.parent().parent().attr('id'));
+                eventId = target.parent().parent().attr('id');
+
+                if(eventId)
+                {
+                    showEventDescription(eventId);
+                }
+            }
+
+            if(target.is('TD'))
+            {
+                // get parent id
+                window.Android.logDebug('MainActivity', 'TD: ' + target.parent().attr('id'));
+                eventId = target.parent().attr('id');
+
+                if(eventId)
+                {
+                    window.Android.logDebug('MainActivity', 'Editing event: ' + eventId);
+                    editEvent(eventId);
+                }
+            }
+
+            if(target.is('TR'))
+            {
+                // Should be rare since user can't clearly click row, but just to be safe
+                window.Android.logDebug('MainActivity', 'TR: 1' + target.attr('id'));
+                eventId = target.attr('id');
+
+                if(eventId)
+                {
+                    window.Android.logDebug('MainActivity', 'Editing event: ' + eventId);
+                    editEvent(eventId);
+                }
+            }
+        });
+
+        displayEventsTip();
     }
     else
     {
@@ -997,6 +1130,29 @@ function viewEvents(meadId)
 
     $(":mobile-pagecontainer").pagecontainer("change", "#events");
  }
+
+function deleteMead(meadId)
+{
+    window.Android.logDebug('MainActivity', 'Delete Mead Button pressed. Mead ID: ' + meadId);
+
+    $.confirm({
+        theme: confirmTheme,
+        title: 'Delete Mead Entry',
+        content: 'Are you sure?',
+        animation: 'top',
+        closeAnimation: 'top',
+        buttons: {
+            confirm: function () {
+                window.Android.deleteMead(meadId);
+                $.mobile.navigate("#my-meads");
+                loadMyMeadsListView();
+            },
+            cancel: function () {
+                // do nothing
+            }
+        }
+    });
+}
 
 function deleteReading(meadId, readingId)
 {
@@ -1027,9 +1183,6 @@ function deleteReading(meadId, readingId)
     {
         $.alert(alertNoBridge);
     }
-
-    // Keep link from doing anything
-    return false;
  }
 
 function deleteEvent(meadId, eventId)
@@ -1061,9 +1214,6 @@ function deleteEvent(meadId, eventId)
      {
          $.alert(alertNoBridge);
      }
-
-     // Keep link from doing anything
-     return false;
   }
 
 function viewMead(id)
@@ -1140,25 +1290,7 @@ function viewMead(id)
         $("#delete-mead-button").on("tap", { value: id }, function(event) {
             event.preventDefault();
 
-            var id = event.data.value;
-
-            $.confirm({
-                theme: confirmTheme,
-                title: 'Delete Mead Entry',
-                content: 'Are you sure?',
-                animation: 'top',
-                closeAnimation: 'top',
-                buttons: {
-                    confirm: function () {
-                        window.Android.deleteMead(id);
-
-                        $.mobile.navigate("#my-meads");
-                    },
-                    cancel: function () {
-                        // do nothing
-                    }
-                }
-            });
+            deleteMead(event.data.value);
         });
         $("#readings-button").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity }, function(event) {
             event.preventDefault();
@@ -1171,7 +1303,6 @@ function viewMead(id)
             viewEvents(event.data.meadId);
         });
         $("#edit-mead-button").on("tap", { meadId: meadData.id, meadName: meadData.name, meadStartDate: meadData.startDate, meadOriginalGravity: meadData.originalGravity, meadDescription: meadData.description }, function(event) {
-
             event.preventDefault();
 
             // Populate data
@@ -1203,7 +1334,6 @@ function viewMead(id)
             $(":mobile-pagecontainer").pagecontainer("change", "#calendar-event");
         });
         $("#tags-button").on("tap", { meadId: meadData.id }, function(event) {
-
             event.preventDefault();
 
             $.confirm({
@@ -1369,6 +1499,7 @@ function viewRecipe(id)
         });
 
         $("#edit-recipe-button").on("tap", { recipeId: recipeData.id, recipeName: recipeData.name, recipeDescription: recipeData.description }, function(event) {
+            event.preventDefault();
 
             // Populate data
             $("#recipe-id").val(event.data.recipeId);
@@ -1670,21 +1801,20 @@ function calculateAbvWine(initialGravity, subsequentGravity)
     }
 }
 
-function showEventDescription(id, dateString)
+function showEventDescription(eventId)
 {
-    if(window.Android && id > 0)
+    if(window.Android && eventId)
     {
-        window.Android.logInfo('MainActivity', 'Fetching event for Event ' + id);
+        window.Android.logInfo('MainActivity', 'Fetching event for Event ' + eventId);
 
         // Fetch data from database
-        var description = window.Android.fetchEventDescription(id);
-
-        window.Android.logDebug('MainActivity', description);
+        var eventJson = window.Android.fetchEvent(eventId);
+        var eventData = JSON.parse(eventJson);
 
         $.alert({
             theme: confirmTheme,
-            title: dateString,
-            content: '<span class="description">' + description + '</span>',
+            title: formatDisplayDate(eventData.date),
+            content: '<span class="description">' + eventData.description + '</span>',
             animation: 'top',
             closeAnimation: 'top',
             buttons: {
@@ -1698,9 +1828,6 @@ function showEventDescription(id, dateString)
     {
         $.alert(alertNoBridge);
     }
-
-    // Tell browser not to activate link
-    return false;
 }
 
 function daysSince(strDate)
@@ -1768,7 +1895,25 @@ function displayMeadTags(tagData)
 
 function displayTagTip()
 {
-    $("#tag-tip").show().delay(tagTipDisplayMilliseconds).fadeOut();
+    $("#tag-tip").show().delay(tipDisplayMilliseconds).fadeOut();
+}
+
+function displayEventsTip()
+{
+    if(eventsTipDisplayCount < tipDisplayLimit)
+    {
+        $("#events-tip").show().delay(tipDisplayMilliseconds).fadeOut();
+        eventsTipDisplayCount++;
+    }
+}
+
+function displayReadingsTip()
+{
+    if(readingsTipDisplayCount < tipDisplayLimit)
+    {
+        $("#readings-tip").show().delay(tipDisplayMilliseconds).fadeOut();
+        readingsTipDisplayCount++;
+    }
 }
 
 function getPreferredAbvValue(result)
