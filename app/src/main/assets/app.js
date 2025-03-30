@@ -25,7 +25,8 @@ const createBatchTriggerValue = 'FROM_RECIPE';
 const appVersionKeyName = 'APP_VERSION';
 const exportAsCsv = 1;
 const exportAsJson = 2;
-const tagTipDisplayMilliseconds = 10000;
+const tipDisplayMilliseconds = 10000;
+const tipDisplayLimit = 1; //Show readings and events tip x times while app is running and then stop
 const alertNoBridge = {
           theme: confirmTheme,
           title: 'Warning',
@@ -41,6 +42,8 @@ const alertNewVersion = {
 var tagList;
 var confirmTheme = 'light'; // default value
 moment.locale('en');
+var eventsTipDisplayCount = 0; // Used to track number of times tip span was displayed to user
+var readingsTipDisplayCount = 0; // Used to track number of times tip span was displayed to user
 
 // Datepickers
 var meadFormDatepicker = new mdDateTimePicker.default({
@@ -964,6 +967,8 @@ function viewReadings(meadId)
                 deleteReading(event.data.meadId,readingId);
             }
         });
+
+        displayReadingsTip();
     }
     else
     {
@@ -1116,6 +1121,8 @@ function viewEvents(meadId)
                 }
             }
         });
+
+        displayEventsTip();
     }
     else
     {
@@ -1889,7 +1896,25 @@ function displayMeadTags(tagData)
 
 function displayTagTip()
 {
-    $("#tag-tip").show().delay(tagTipDisplayMilliseconds).fadeOut();
+    $("#tag-tip").show().delay(tipDisplayMilliseconds).fadeOut();
+}
+
+function displayEventsTip()
+{
+    if(eventsTipDisplayCount < tipDisplayLimit)
+    {
+        $("#events-tip").show().delay(tipDisplayMilliseconds).fadeOut();
+        eventsTipDisplayCount++;
+    }
+}
+
+function displayReadingsTip()
+{
+    if(readingsTipDisplayCount < tipDisplayLimit)
+    {
+        $("#readings-tip").show().delay(tipDisplayMilliseconds).fadeOut();
+        readingsTipDisplayCount++;
+    }
 }
 
 function getPreferredAbvValue(result)

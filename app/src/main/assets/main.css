@@ -131,7 +131,7 @@ span.archived
     font-style: italic;
 }
 
-#tag-tip
+#tag-tip, #events-tip, #readings-tip
 {
     display: none;
 }
