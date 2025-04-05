@@ -8,9 +8,9 @@ android {
     defaultConfig {
         applicationId 'com.dawsonsoftware.meadmate'
         minSdkVersion 26
-        targetSdk 34
-        versionCode 174
-        versionName '1.17.4'
+        targetSdk 35
+        versionCode 180
+        versionName '1.18.0'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
