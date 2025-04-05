@@ -10,4 +10,5 @@
     <color name="secondaryTextColor">#000000</color>
     <color name="onPrimaryColor">#000000</color>
     <color name="onSecondaryColor">#000000</color>
+    <color name="layoutBackgroundColor">#000000</color>
 </resources>
