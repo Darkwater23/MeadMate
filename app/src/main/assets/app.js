@@ -782,6 +782,13 @@ function loadMyMeadsListView()
             var target = $(event.target);
             var meadId = 0;
 
+            if(target.is('SPAN')) // Only seen when archived mead batches are visible
+            {
+                // get parent id
+                window.Android.logDebug('MainActivity', 'SPAN: ' + target.parent().parent().attr('id'));
+                meadId = target.parent().parent().attr('id');
+            }
+
             if(target.is('A'))
             {
                 // get parent id
@@ -799,6 +806,10 @@ function loadMyMeadsListView()
             {
                 window.Android.logDebug('MainActivity', 'Deleting mead record: ' + meadId);
                 deleteMead(meadId);
+            }
+            else
+            {
+                window.Android.logDebug('MainActivity', 'Mead list taphold fell through: ' + target.prop('tagName'));
             }
         });
 
