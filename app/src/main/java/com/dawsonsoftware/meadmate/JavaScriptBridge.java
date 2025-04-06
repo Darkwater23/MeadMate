@@ -537,13 +537,13 @@ import java.util.List;
     }
 
     @JavascriptInterface
-    public void selectBackupFile()
+    public void startDataImport()
     {
         Log.d("JavascriptBridge", "Opening file picker for user.");
 
         MainActivity mainActivity = (MainActivity) this.activity;
 
-        mainActivity.openFilePicker();
+        mainActivity.openFilePicker(); // After picking file, the code contines in the MainActivity onActivityResult
     }
 
     @JavascriptInterface
