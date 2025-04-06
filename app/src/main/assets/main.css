@@ -213,3 +213,8 @@ a.add-button
     width: 1%;
     white-space: nowrap;
 }
+
+.largeFont
+{
+    font-size: 1.25rem;
+}
