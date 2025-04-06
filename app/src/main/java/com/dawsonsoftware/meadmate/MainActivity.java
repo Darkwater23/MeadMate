@@ -195,10 +195,15 @@ import java.util.TimeZone;
                 {
                     String content = generateCsvExportFile();
                     writeExportFile(uri, content);
+
+                    Toast toast = Toast.makeText(getApplicationContext(), "CSV Export complete!", Toast.LENGTH_SHORT);
+                    toast.show();
                 }
                 catch(Exception ex)
                 {
                     Log.e("MainActivity", "Unexpected error while exporting batch data to CSV.", ex);
+                    Toast toast = Toast.makeText(getApplicationContext(), "CSV Export failed!", Toast.LENGTH_SHORT);
+                    toast.show();
                 }
             }
         }
@@ -219,10 +224,16 @@ import java.util.TimeZone;
                 {
                     String content = generateJsonExportFile();
                     writeExportFile(uri, content);
+
+                    Toast toast = Toast.makeText(getApplicationContext(), "JSON Export complete!", Toast.LENGTH_SHORT);
+                    toast.show();
                 }
                 catch(Exception ex)
                 {
                     Log.e("MainActivity", "Unexpected error while exporting batch data to JSON.", ex);
+
+                    Toast toast = Toast.makeText(getApplicationContext(), "JSON Export failed!", Toast.LENGTH_SHORT);
+                    toast.show();
                 }
             }
         }
@@ -252,16 +263,21 @@ import java.util.TimeZone;
 
                 manager.ImportMeadData(meadData);
 
+                Toast toast = Toast.makeText(getApplicationContext(), "Import complete!", Toast.LENGTH_SHORT);
+                toast.show();
+
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                Toast toast = Toast.makeText(getApplicationContext(), "File not found!", Toast.LENGTH_SHORT);
+                toast.show();
             } catch (IOException e) {
-                e.printStackTrace();
+                Toast toast = Toast.makeText(getApplicationContext(), "Import failed due to IO Exception", Toast.LENGTH_SHORT);
+                toast.show();
             } finally {
                 if (reader != null) {
                     try {
                         reader.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        // Well, crap...
                     }
                 }
             }
