@@ -478,7 +478,7 @@ $("#import-button").on("tap", function(event) {
 
     if(window.Android)
     {
-        window.Android.selectBackupFile();
+        window.Android.startDataImport();
     }
     else
     {
