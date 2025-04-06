@@ -60,7 +60,7 @@
 	<div data-role="panel" id="main-menu-batches" data-position="right" data-display="overlay">
 		<ul data-role="listview">
 			<li><a href="#mead-types" class="ui-btn ui-icon-info ui-btn-icon-left">Types of Mead</a></li>
-			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Preferences</a></li>
+			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Settings &amp; Tools</a></li>
 			<li><a href="#privacy-policy" class="ui-btn ui-icon-eye ui-btn-icon-left">Privacy Policy</a></li>
 			<li><a href="#about" class="ui-btn ui-icon-info ui-btn-icon-left">About</a></li>
 			<li><a href="#support" class="ui-btn ui-icon-comment ui-btn-icon-left">Support</a></li>
@@ -89,7 +89,7 @@
 	<div data-role="panel" id="main-menu-recipes" data-position="right" data-display="overlay">
 		<ul data-role="listview">
 			<li><a href="#mead-types" class="ui-btn ui-icon-info ui-btn-icon-left">Types of Mead</a></li>
-			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Preferences</a></li>
+			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Settings &amp; Tools</a></li>
 			<li><a href="#privacy-policy" class="ui-btn ui-icon-eye ui-btn-icon-left">Privacy Policy</a></li>
 			<li><a href="#about" class="ui-btn ui-icon-info ui-btn-icon-left">About</a></li>
 			<li><a href="#support" class="ui-btn ui-icon-comment ui-btn-icon-left">Support</a></li>
@@ -120,7 +120,7 @@
 				<input type="text" inputmode="numeric" name="new-gravity" value="" id="new-gravity" />
 			</p>
 			<input type="button" value="Calculate" name="calculate-abv-button" id="calculate-abv-button">
-			<p>Set your preferred formula under 'Preferences' using the Menu above.</p>
+			<p>Set your preferred formula under 'Settings &amp; Tools' using the Menu above.</p>
 		</form>
 	</div>
 	<div data-role="navbar" style="position: absolute; bottom: 0; left: 0; right: 0;">
@@ -133,7 +133,7 @@
 	<div data-role="panel" id="main-menu-abv" data-position="right" data-display="overlay">
 		<ul data-role="listview">
 			<li><a href="#mead-types" class="ui-btn ui-icon-info ui-btn-icon-left">Types of Mead</a></li>
-			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Preferences</a></li>
+			<li><a href="#preferences" class="ui-btn ui-icon-gear ui-btn-icon-left">Settings &amp; Tools</a></li>
 			<li><a href="#privacy-policy" class="ui-btn ui-icon-eye ui-btn-icon-left">Privacy Policy</a></li>
 			<li><a href="#about" class="ui-btn ui-icon-info ui-btn-icon-left">About</a></li>
 			<li><a href="#support" class="ui-btn ui-icon-comment ui-btn-icon-left">Support</a></li>
@@ -444,7 +444,7 @@
 	</div>
 
 	<div role="main" class="ui-content">
-		<h2 class="content-title">Preferences &amp; Utilities</h2>
+		<h2 class="content-title">Settings &amp; Tools</h2>
 		<div data-role="collapsible-set" data-theme="a" data-content-theme="a" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d">
 			<div data-role="collapsible">
 				<h3>ABV Formula</h3>
@@ -513,9 +513,17 @@
 
 			<div data-role="collapsible">
 				<h3>Export Data</h3>
-				<p>Get a data file with all your content in it.</p>
+				<p>Generate a data file with all your content in it.</p>
+				<p>NOTE: The JSON file can be imported; the CSV file cannot.</p>
 				<button id="export-csv-button" class="ui-btn ui-btn-a">Export Data as CSV</button>
 				<button id="export-json-button" class="ui-btn ui-btn-a">Export Data as JSON</button>
+			</div>
+
+			<div data-role="collapsible">
+				<h3>Import Data</h3>
+				<p>Select a Mead Mate backup file and import it into the app.</p>
+				<p>Note: for safety, this will not overwrite or update any existing batches, events, readings, tags, or recipes.</p>
+				<button id="import-button" class="ui-btn ui-btn-a">Import Mead Mate Data</button>
 			</div>
 
 		</div>
@@ -648,12 +656,39 @@
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">About</h2>
-		<h3>Mead Mate Release 17.4</h3>
-		<p>Added 'Stabilized' to the Event Types list. Thanks to TravisEvashkevich for the suggestion!</p>
-		<p>Cheers!</p>
-
+		<h3>Mead Mate Release 18.0</h3>
+		<p class="largeFont">Big release! Thanks to feedback and bugs reports from users, there are some exciting new features and fixes for Mead Mate 18.</p>
+		<ul class="largeFont">
+			<li>Fixed scrolling issue with Recipes</li>
+			<li>Removed "web-like" action buttons</li>
+			<li>Added tap and tap-hold events</li>
+			<li>Updated JSON Export feature</li>
+			<li>Added JSON Import feature</li>
+		</ul>
+		<p class="largeFont">A user reported an issue with a missing delete button for a Reading record.
+			The user had the UI zoomed in (trying to make it easier to read) and it cut the buttons off on the right side of the screen.
+		</p>
+		<p class="largeFont">
+			To fix this issue (and make the app less "web-like"), most of the action buttons in the right-most table cells have been removed.
+			Tap and TapHold events are now setup for editing &amp; deleting batches, recipes, events, and readings. The Event Description still has a button (for now).
+		</p>
+		<p class="largeFont"><strong>Instructions for Import Feature</strong><br/>
+			The number one request lately has been for an Export/Import feature, especially for users switching phones.
+			Under 'Settings &amp; Tools', the JSON data model has been updated to include batches, recipes, events, readings, and tags in a complete set that can be saved to your device's filesystem and backed up however you like.
+		</p>
+		<p class="largeFont">
+			The import feature reads the new JSON file format created by the export feature and recreates all records.
+		</p>
+		<p class="largeFont">
+			<strong>Important!</strong> In the case when a user attempts to restore older data (like to rollback batch changes), duplicate batch records will appear.
+			This is by design.
+			To prevent any data loss, the import process creates new records only; no existing records are updated or overwritten.
+		</p>
+		<p class="largeFont">Right now, the backup process in manual, but the next step is to automate the backups and, optionally, integrate with cloud storage.</p>
+		<p class="largeFont">Cheers!</p>
+		<hr/>
 		<h3>Open Source Project Information</h3>
-		<p>Mead Mate is now an open source project. Please check it out on <a href="https://github.com/Darkwater23/MeadMate">GitHub &raquo;</a>.</p>
+		<p>Mead Mate is an open source project. Please check it out on <a href="https://github.com/Darkwater23/MeadMate">GitHub &raquo;</a>.</p>
 		<h3>Version Info</h3>
 		<dl>
 			<dt>App Version Name</dt>
@@ -675,9 +710,9 @@
 	</div>
 	<div role="main" class="ui-content">
 		<h2 class="content-title">Support</h2>
-		<p style="font-size: 1.25em;"><strong>Thank you for using Mead Mate!</strong></p>
-		<p style="font-size: 1.25em;">Mead Mate was made by a mead maker for mead makers. Let me know if you run into issues or have any suggestions.</p>
-		<p style="font-size: 1.25em;">If you're reporting an issue, please provide a detailed description of the problem. Screenshots and/or steps to reproduce the issue would be very helpful. I'll do my best to resolve your issue quickly.</p>
+		<p class="largeFont"><strong>Thank you for using Mead Mate!</strong></p>
+		<p class="largeFont">Mead Mate was made by a mead maker for mead makers.</p>
+		<p class="largeFont">When reporting an issue, please provide a detailed description of the problem. Screenshots and/or steps to reproduce the issue would be very helpful in resolving any issues quickly.</p>
 		<a href="mailto:doug.dawson@protonmail.com" class="ui-btn ui-icon-mail ui-btn-icon-left">Email</a>
 		<p>&nbsp;</p>
 	</div>

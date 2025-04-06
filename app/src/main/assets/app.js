@@ -65,6 +65,10 @@ $(function() {
 
     $.event.special.tap.emitTapOnTaphold = false;
 
+    // Set theme ASAP so early alert boxes have the right theme
+    var themePref = localStorage.getItem(themeModePrefKeyName);
+    if(themePref == 'b') confirmTheme = 'dark';
+
     // If options list is empty, load values from database
     var count = $('#new-event-type').children('option').length;
 
@@ -115,9 +119,6 @@ $(function() {
     $("#new-event-type").selectmenu();
     $("#new-calendar-event-description").selectmenu();
     $("#theme-pref").selectmenu();
-
-    var themePref = localStorage.getItem(themeModePrefKeyName);
-    if(themePref == 'b') confirmTheme = 'dark';
 
     // Datepicker triggers & listeners
     meadFormDatepicker.trigger = document.getElementById('new-mead-start-date');
@@ -472,6 +473,19 @@ $("#export-json-button").on("tap", function(event) {
     }
 });
 
+$("#import-button").on("tap", function(event) {
+    event.preventDefault();
+
+    if(window.Android)
+    {
+        window.Android.startDataImport();
+    }
+    else
+    {
+        $.alert(alertNoBridge);
+    }
+});
+
 $("#new-mead-button").on("tap", function(event) {
     event.preventDefault();
 
@@ -768,6 +782,13 @@ function loadMyMeadsListView()
             var target = $(event.target);
             var meadId = 0;
 
+            if(target.is('SPAN')) // Only seen when archived mead batches are visible
+            {
+                // get parent id
+                window.Android.logDebug('MainActivity', 'SPAN: ' + target.parent().parent().attr('id'));
+                meadId = target.parent().parent().attr('id');
+            }
+
             if(target.is('A'))
             {
                 // get parent id
@@ -785,6 +806,10 @@ function loadMyMeadsListView()
             {
                 window.Android.logDebug('MainActivity', 'Deleting mead record: ' + meadId);
                 deleteMead(meadId);
+            }
+            else
+            {
+                window.Android.logDebug('MainActivity', 'Mead list taphold fell through: ' + target.prop('tagName'));
             }
         });
 
@@ -832,6 +857,7 @@ function loadMyRecipesListView()
 
         // Clear list
         $("#recipe-list").empty();
+        $("#recipe-list li a").off("taphold"); // clear existing event handlers
 
         // Fetch data from database
         var recipesJson = window.Android.fetchRecipes();
@@ -844,8 +870,34 @@ function loadMyRecipesListView()
 
             var recipeName = recipesData[i].name;
 
-            $("#recipe-list").append('<li><a href="javascript:viewRecipe(' + recipesData[i].id + ');" data-ajax="false">' + recipeName + '</a></li>');
+            $("#recipe-list").append('<li id="' + recipesData[i].id + '"><a href="javascript:viewRecipe(' + recipesData[i].id + ');" data-ajax="false">' + recipeName + '</a></li>');
         }
+
+        $("#recipe-list li a").on("taphold", function(event) {
+            event.preventDefault();
+
+            var target = $(event.target);
+            var recipeId = 0;
+
+            if(target.is('A'))
+            {
+                // get parent id
+                window.Android.logDebug('MainActivity', 'A: ' + target.parent().attr('id'));
+                recipeId = target.parent().attr('id');
+            }
+
+            if(target.is('LI'))
+            {
+                window.Android.logDebug('MainActivity', 'LI: MeadID ' + target.attr('id'));
+                recipeId = target.attr('id');
+            }
+
+            if(recipeId)
+            {
+                window.Android.logDebug('MainActivity', 'Deleting recipe record: ' + recipeId);
+                deleteRecipe(recipeId);
+            }
+        });
 
         $("#recipe-list").listview("refresh");
 
@@ -1146,6 +1198,29 @@ function deleteMead(meadId)
                 window.Android.deleteMead(meadId);
                 $.mobile.navigate("#my-meads");
                 loadMyMeadsListView();
+            },
+            cancel: function () {
+                // do nothing
+            }
+        }
+    });
+}
+
+function deleteRecipe(recipeId)
+{
+    window.Android.logDebug('MainActivity', 'Delete Recipe Button pressed. Recipe ID: ' + recipeId);
+
+    $.confirm({
+        theme: confirmTheme,
+        title: 'Delete Recipe Entry',
+        content: 'Are you sure?',
+        animation: 'top',
+        closeAnimation: 'top',
+        buttons: {
+            confirm: function () {
+                window.Android.deleteRecipe(recipeId);
+                $.mobile.navigate("#my-recipes");
+                loadMyRecipesListView();
             },
             cancel: function () {
                 // do nothing
@@ -1477,25 +1552,7 @@ function viewRecipe(id)
         $("#delete-recipe-button").on("tap", { value: id }, function(event) {
             event.preventDefault();
 
-            var id = event.data.value;
-
-            $.confirm({
-                theme: confirmTheme,
-                title: 'Delete Recipe Entry',
-                content: 'Are you sure?',
-                animation: 'top',
-                closeAnimation: 'top',
-                buttons: {
-                    confirm: function () {
-                        window.Android.deleteRecipe(id);
-
-                        $.mobile.navigate("#my-recipes");
-                    },
-                    cancel: function () {
-                        // do nothing
-                    }
-                }
-            });
+            deleteRecipe(event.data.value);
         });
 
         $("#edit-recipe-button").on("tap", { recipeId: recipeData.id, recipeName: recipeData.name, recipeDescription: recipeData.description }, function(event) {

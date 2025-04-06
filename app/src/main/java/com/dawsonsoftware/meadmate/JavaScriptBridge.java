@@ -537,6 +537,16 @@ import java.util.List;
     }
 
     @JavascriptInterface
+    public void startDataImport()
+    {
+        Log.d("JavascriptBridge", "Opening file picker for user.");
+
+        MainActivity mainActivity = (MainActivity) this.activity;
+
+        mainActivity.openFilePicker(); // After picking file, the code contines in the MainActivity onActivityResult
+    }
+
+    @JavascriptInterface
     public void activateTheme(String code)
     {
         Log.d("JavaScriptBridge", "Activate Theme: " + code);
