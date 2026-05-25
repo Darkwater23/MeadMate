@@ -304,9 +304,9 @@ public class MeadMateData extends SQLiteOpenHelper {
 
                     Recipe recipe = new Recipe();
 
-                    recipe.setId(c.getInt(c.getColumnIndex(KEY_MEAD_ID)));
-                    recipe.setName(c.getString(c.getColumnIndex(KEY_MEAD_NAME)));
-                    recipe.setDescription(c.getString(c.getColumnIndex(KEY_MEAD_DESC)));
+                    recipe.setId(c.getInt(c.getColumnIndex(KEY_RECIPE_ID)));
+                    recipe.setName(c.getString(c.getColumnIndex(KEY_RECIPE_NAME)));
+                    recipe.setDescription(c.getString(c.getColumnIndex(KEY_RECIPE_DESC)));
 
                     model.add(recipe);
 
