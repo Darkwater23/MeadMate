@@ -339,6 +339,12 @@ import java.util.List;
 
         Mead mead = data.getMead(parseInt(meadId));
 
+        if(mead == null)
+        {
+            Log.w("JavaScriptBridge", "Cannot toggle archive flag; mead not found for id: " + meadId);
+            return;
+        }
+
         data.setMeadArchiveFlag(mead.getId(), !mead.getArchived());
     }
 

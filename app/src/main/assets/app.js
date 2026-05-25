@@ -25,6 +25,21 @@ const createBatchTriggerValue = 'FROM_RECIPE';
 const appVersionKeyName = 'APP_VERSION';
 const exportAsCsv = 1;
 const exportAsJson = 2;
+
+function escapeHtml(text)
+{
+    if(text == null)
+    {
+        return '';
+    }
+
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 const tipDisplayMilliseconds = 10000;
 const tipDisplayLimit = 1; //Show readings and events tip x times while app is running and then stop
 const alertNoBridge = {
@@ -766,14 +781,20 @@ function loadMyMeadsListView()
         // Append to list
         for (var i = 0; i < meadsData.length; i++) {
 
-            var meadName = meadsData[i].name;
+            var $link = $('<a>')
+                .attr('href', 'javascript:viewMead(' + meadsData[i].id + ');')
+                .attr('data-ajax', 'false');
 
             if(meadsData[i].archived)
             {
-                meadName = '<span class="archived">' + meadName + '</span>';
+                $link.append($('<span class="archived">').text(meadsData[i].name));
+            }
+            else
+            {
+                $link.text(meadsData[i].name);
             }
 
-            $("#mead-list").append('<li id="' + meadsData[i].id + '"><a href="javascript:viewMead(' + meadsData[i].id + ');" data-ajax="false">' + meadName + '</a></li>');
+            $("#mead-list").append($('<li>').attr('id', meadsData[i].id).append($link));
         }
 
         $("#mead-list li a").on("taphold", function(event) {
@@ -868,9 +889,12 @@ function loadMyRecipesListView()
         // Append to list
         for (var i = 0; i < recipesData.length; i++) {
 
-            var recipeName = recipesData[i].name;
+            var $link = $('<a>')
+                .attr('href', 'javascript:viewRecipe(' + recipesData[i].id + ');')
+                .attr('data-ajax', 'false')
+                .text(recipesData[i].name);
 
-            $("#recipe-list").append('<li id="' + recipesData[i].id + '"><a href="javascript:viewRecipe(' + recipesData[i].id + ');" data-ajax="false">' + recipeName + '</a></li>');
+            $("#recipe-list").append($('<li>').attr('id', recipesData[i].id).append($link));
         }
 
         $("#recipe-list li a").on("taphold", function(event) {
@@ -956,7 +980,7 @@ function viewReadings(meadId)
             }
 
             //$("#reading-list tbody").append('<tr><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td><td><a href="javascript:deleteReading(' + meadId + ',' + readingsData[i].id + ');" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext">Delete</a></td></tr>');
-            $("#reading-list tbody").append('<tr id="' + readingsData[i].id + '"><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + readingsData[i].specificGravity + '</td><td>' + abvDisplayValue + '</td></tr>');
+            $("#reading-list tbody").append('<tr id="' + readingsData[i].id + '"><td>' + formatDisplayDate(readingsData[i].date) + '</td><td>' + escapeHtml(readingsData[i].specificGravity) + '</td><td>' + abvDisplayValue + '</td></tr>');
         }
 
         $("#new-reading-button").off("tap"); // clear existing event handlers
@@ -1072,7 +1096,7 @@ function viewEvents(meadId)
             }
 
             // Append data to list
-            $("#events-list tbody").append('<tr id="' + eventsData[i].id + '"><td>' + formatDisplayDate(eventsData[i].date) + '<br>' + daysAgoOutput + '</td><td>' + eventsData[i].typeName + '</td><td>' +
+            $("#events-list tbody").append('<tr id="' + eventsData[i].id + '"><td>' + formatDisplayDate(eventsData[i].date) + '<br>' + daysAgoOutput + '</td><td>' + escapeHtml(eventsData[i].typeName) + '</td><td>' +
                 '<a href="#" class="ui-btn ui-mini ui-btn-inline ui-shadow ui-corner-all ui-icon-comment ui-btn-icon-notext ' + disableButtonFlag + '">Show</a>' +
                 '</td></tr>');
         }
@@ -1500,7 +1524,7 @@ function viewMead(id)
 
                 $.confirm({
                     theme: confirmTheme,
-                    title: "Remove Tag '" + tagName + "'",
+                    title: "Remove Tag '" + escapeHtml(tagName) + "'",
                     content: 'Are you sure?',
                     animation: 'top',
                     closeAnimation: 'top',
@@ -1871,7 +1895,7 @@ function showEventDescription(eventId)
         $.alert({
             theme: confirmTheme,
             title: formatDisplayDate(eventData.date),
-            content: '<span class="description">' + eventData.description + '</span>',
+            content: '<span class="description">' + escapeHtml(eventData.description) + '</span>',
             animation: 'top',
             closeAnimation: 'top',
             buttons: {
@@ -1920,11 +1944,15 @@ function displayTag(tag)
 {
     if(tag)
     {
-        $("#mead-tags span:contains(" + tag + ")").length;
+        var trimmedTag = $.trim(tag);
 
-        if(length === 0)
+        var existingCount = $("#mead-tags span").filter(function() {
+            return $(this).text() === trimmedTag;
+        }).length;
+
+        if(existingCount === 0)
         {
-            $("#mead-tags").append("<span>" + $.trim(tag) + "</span>");
+            $("#mead-tags").append($("<span>").text(trimmedTag));
 
             /* Just in case the tags part of the UI is hidden, show it upon adding */
             $("#mead-tags-label").show();
