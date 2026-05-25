@@ -326,7 +326,7 @@ public class MeadMateData extends SQLiteOpenHelper {
     @SuppressLint("Range")
     Recipe getRecipe(int recipeId)
     {
-        Recipe model = new Recipe();
+        Recipe model = null;
 
         String[] tableColumns = new String[] {
                 KEY_RECIPE_ID,
@@ -351,6 +351,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             {
                 c.moveToFirst();
 
+                model = new Recipe();
                 model.setId(recipeId);
                 model.setName(c.getString(c.getColumnIndex(KEY_RECIPE_NAME)));
                 model.setDescription(c.getString(c.getColumnIndex(KEY_RECIPE_DESC)));
@@ -1187,7 +1188,7 @@ public class MeadMateData extends SQLiteOpenHelper {
     @SuppressLint("Range")
     Event getEvent(int eventId)
     {
-        Event model = new Event();
+        Event model = null;
 
         String[] tableColumns = new String[] {
                 KEY_EVENT_MEADID,
@@ -1218,6 +1219,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             {
                 c.moveToFirst();
 
+                model = new Event();
                 model.setId(eventId);
                 model.setTypeId(c.getInt(c.getColumnIndex(KEY_EVENT_TYPEID)));
                 model.setMeadId(c.getInt((c.getColumnIndex(KEY_EVENT_MEADID))));

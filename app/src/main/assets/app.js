@@ -1564,6 +1564,12 @@ function viewRecipe(id)
 
         window.Android.logDebug('MainActivity', recipeJson);
 
+        if(!recipeData)
+        {
+            window.Android.logError('MainActivity', 'Recipe not found for id: ' + id);
+            return;
+        }
+
         // Populate fields
         $("#recipe-name").text(recipeData.name);
         $("#recipe-description").text(recipeData.description);
@@ -1632,6 +1638,12 @@ function editEvent(eventId)
         var eventData = JSON.parse(eventJson);
 
         window.Android.logDebug('MainActivity', eventJson);
+
+        if(!eventData)
+        {
+            window.Android.logError('MainActivity', 'Event not found for id: ' + eventId);
+            return;
+        }
 
         // set form fields on event form
         $("#event-id").val(eventId);
@@ -1891,6 +1903,12 @@ function showEventDescription(eventId)
         // Fetch data from database
         var eventJson = window.Android.fetchEvent(eventId);
         var eventData = JSON.parse(eventJson);
+
+        if(!eventData)
+        {
+            window.Android.logError('MainActivity', 'Event not found for id: ' + eventId);
+            return;
+        }
 
         $.alert({
             theme: confirmTheme,

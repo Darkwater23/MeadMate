@@ -17,8 +17,6 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 package com.dawsonsoftware.meadmate;
 
-import java.util.Date;
-
 public class EventRequest
 {
     private String title;
