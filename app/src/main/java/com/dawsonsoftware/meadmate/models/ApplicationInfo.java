@@ -17,10 +17,6 @@ along with Mead Mate.  If not, see <https://www.gnu.org/licenses/>.
 
 package com.dawsonsoftware.meadmate.models;
 
-import com.dawsonsoftware.meadmate.MeadMateData;
-
-import java.time.LocalDate;
-
 public class ApplicationInfo {
 
     private int versionNumber;

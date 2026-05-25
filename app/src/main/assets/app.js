@@ -40,6 +40,58 @@ function escapeHtml(text)
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
 }
+
+function parseBridgeJson(json, context)
+{
+    if(json == null || json === '')
+    {
+        if(window.Android)
+        {
+            window.Android.logError(context, 'Empty JSON from Android bridge');
+        }
+
+        return null;
+    }
+
+    try
+    {
+        return JSON.parse(json);
+    }
+    catch(error)
+    {
+        if(window.Android)
+        {
+            window.Android.logError(context, 'JSON parse failed: ' + error);
+        }
+
+        return null;
+    }
+}
+
+function logBridgeSummary(tag, label, json)
+{
+    if(!window.Android)
+    {
+        return;
+    }
+
+    var parsed = parseBridgeJson(json, tag + '.' + label);
+
+    if(parsed == null)
+    {
+        window.Android.logDebug(tag, label + ': unavailable');
+        return;
+    }
+
+    if(Array.isArray(parsed))
+    {
+        window.Android.logDebug(tag, label + ': ' + parsed.length + ' record(s)');
+    }
+    else
+    {
+        window.Android.logDebug(tag, label + ': 1 record');
+    }
+}
 const tipDisplayMilliseconds = 10000;
 const tipDisplayLimit = 1; //Show readings and events tip x times while app is running and then stop
 const alertNoBridge = {
@@ -98,7 +150,7 @@ $(function() {
         if(window.Android)
         {
             var eventTypesJson = window.Android.fetchEventTypes();
-            var eventTypes = JSON.parse(eventTypesJson);
+            var eventTypes = parseBridgeJson(eventTypesJson, 'onPageLoad.eventTypes') || [];
 
             $.each(eventTypes, function (i, item) {
                 $('#new-event-type').append($('<option>', {
@@ -108,25 +160,31 @@ $(function() {
             });
 
             var tagJson = window.Android.fetchTags();
-            tagList = JSON.parse(tagJson);
+            tagList = parseBridgeJson(tagJson, 'onPageLoad.tags') || [];
 
             var versionInfoJson = window.Android.versionInfo();
-            var versionInfo = JSON.parse(versionInfoJson);
-            $("#app-version-name").text(versionInfo.versionName);
-            $("#app-version-number").text(versionInfo.versionNumber);
-            $("#database-version-number").text(versionInfo.databaseVersion);
-            $("#update-date").text(formatDisplayDate(versionInfo.dateUpdated));
+            var versionInfo = parseBridgeJson(versionInfoJson, 'onPageLoad.versionInfo');
 
-            // Alert user to check out About page when new version detected
-            var lastAppVersion = localStorage.getItem(appVersionKeyName) ?? 0;
-
-            Android.logDebug("ONPAGELOAD", "LastAppVersion: " + lastAppVersion);
-            Android.logDebug("ONPAGELOAD", "AndroidVersionNumber: " + versionInfo.versionNumber);
-
-            if(lastAppVersion != versionInfo.versionNumber)
+            if(versionInfo)
             {
-                localStorage.setItem(appVersionKeyName, versionInfo.versionNumber);
-                $.alert(alertNewVersion);
+                $("#app-version-name").text(versionInfo.versionName);
+                $("#app-version-number").text(versionInfo.versionNumber);
+                $("#database-version-number").text(versionInfo.databaseVersion);
+                $("#update-date").text(formatDisplayDate(versionInfo.dateUpdated));
+                $("#about-release-title").text("Mead Mate " + versionInfo.versionName);
+
+                // Alert user to check out About page when new version detected
+                var lastAppVersion = Number(localStorage.getItem(appVersionKeyName) || 0);
+                var currentAppVersion = Number(versionInfo.versionNumber);
+
+                Android.logDebug("ONPAGELOAD", "LastAppVersion: " + lastAppVersion);
+                Android.logDebug("ONPAGELOAD", "AndroidVersionNumber: " + currentAppVersion);
+
+                if(lastAppVersion !== currentAppVersion)
+                {
+                    localStorage.setItem(appVersionKeyName, String(currentAppVersion));
+                    $.alert(alertNewVersion);
+                }
             }
         }
     }
@@ -536,6 +594,12 @@ $("#save-mead-button").on("tap", function(event){
 
             // Grab form inputs
             var mId = $("#mead-id").val();
+
+            if(mId === createBatchTriggerValue)
+            {
+                mId = '';
+            }
+
             var mName = $("#new-mead-name").val();
             var mDate = $("#new-mead-start-date").val();
             var mGravity = $("#new-mead-original-gravity").val();
@@ -774,9 +838,9 @@ function loadMyMeadsListView()
 
         // Fetch data from database
         var meadsJson = window.Android.fetchMeads(sortPref, includeArchived);
-        var meadsData = JSON.parse(meadsJson);
+        var meadsData = parseBridgeJson(meadsJson, 'loadMyMeadsListView') || [];
 
-        window.Android.logDebug('MainActivity', 'Fetched JSON: ' + meadsJson);
+        logBridgeSummary('MainActivity', 'meads', meadsJson);
 
         // Append to list
         for (var i = 0; i < meadsData.length; i++) {
@@ -882,9 +946,9 @@ function loadMyRecipesListView()
 
         // Fetch data from database
         var recipesJson = window.Android.fetchRecipes();
-        var recipesData = JSON.parse(recipesJson);
+        var recipesData = parseBridgeJson(recipesJson, 'loadMyRecipesListView') || [];
 
-        window.Android.logDebug('MainActivity', 'Fetched JSON: ' + recipesJson);
+        logBridgeSummary('MainActivity', 'recipes', recipesJson);
 
         // Append to list
         for (var i = 0; i < recipesData.length; i++) {
@@ -945,13 +1009,19 @@ function viewReadings(meadId)
 
         // Fetch data from database
         var meadJson = window.Android.fetchMead(meadId);
-        var meadData = JSON.parse(meadJson);
+        var meadData = parseBridgeJson(meadJson, 'viewReadings.mead');
+
+        if(!meadData)
+        {
+            window.Android.logError('MainActivity', 'Mead not found for id: ' + meadId);
+            return;
+        }
 
         var readingsJson = window.Android.fetchReadings(meadId);
-        var readingsData = JSON.parse(readingsJson);
+        var readingsData = parseBridgeJson(readingsJson, 'viewReadings.readings') || [];
 
-        window.Android.logDebug('MainActivity', meadJson);
-        window.Android.logDebug('MainActivity', readingsJson);
+        logBridgeSummary('MainActivity', 'mead', meadJson);
+        logBridgeSummary('MainActivity', 'readings', readingsJson);
 
         // Set mead name on page
         $("#readings-mead-name").text(meadData.name);
@@ -1061,13 +1131,19 @@ function viewEvents(meadId)
 
         // Fetch data from database
         var meadJson = window.Android.fetchMead(meadId);
-        var meadData = JSON.parse(meadJson);
+        var meadData = parseBridgeJson(meadJson, 'viewEvents.mead');
+
+        if(!meadData)
+        {
+            window.Android.logError('MainActivity', 'Mead not found for id: ' + meadId);
+            return;
+        }
 
         var eventsJson = window.Android.fetchEvents(meadId);
-        var eventsData = JSON.parse(eventsJson);
+        var eventsData = parseBridgeJson(eventsJson, 'viewEvents.events') || [];
 
-        window.Android.logDebug('MainActivity', meadJson);
-        window.Android.logDebug('MainActivity', eventsJson);
+        logBridgeSummary('MainActivity', 'mead', meadJson);
+        logBridgeSummary('MainActivity', 'events', eventsJson);
 
         // Set mead name on page
         $("#events-mead-name").text(meadData.name);
@@ -1323,21 +1399,27 @@ function viewMead(id)
 
         // Fetch data from database
         var meadJson = window.Android.fetchMead(id);
-        var meadData = JSON.parse(meadJson);
+        var meadData = parseBridgeJson(meadJson, 'viewMead.mead');
+
+        if(!meadData)
+        {
+            window.Android.logError('MainActivity', 'Mead not found for id: ' + id);
+            return;
+        }
 
         var tagsJson = window.Android.fetchMeadTags(id);
-        var tagsData = JSON.parse(tagsJson);
+        var tagsData = parseBridgeJson(tagsJson, 'viewMead.tags') || [];
 
         var readingsJson = window.Android.fetchReadings(id);
-        var readingsData = JSON.parse(readingsJson);
+        var readingsData = parseBridgeJson(readingsJson, 'viewMead.readings') || [];
 
         var eventsJson = window.Android.fetchEvents(id);
-        var eventsData = JSON.parse(eventsJson);
+        var eventsData = parseBridgeJson(eventsJson, 'viewMead.events') || [];
 
-        window.Android.logDebug('MainActivity', meadJson);
-        window.Android.logDebug('MainActivity', tagsJson);
-        window.Android.logDebug('MainActivity', readingsJson);
-        window.Android.logDebug('MainActivity', eventsJson);
+        logBridgeSummary('MainActivity', 'mead', meadJson);
+        logBridgeSummary('MainActivity', 'tags', tagsJson);
+        logBridgeSummary('MainActivity', 'readings', readingsJson);
+        logBridgeSummary('MainActivity', 'events', eventsJson);
 
         var lastReadingDisplayValue = "N/A";
         var lastEventDisplayValue = "N/A";
@@ -1560,9 +1642,9 @@ function viewRecipe(id)
 
         // Fetch data from database
         var recipeJson = window.Android.fetchRecipe(id);
-        var recipeData = JSON.parse(recipeJson);
+        var recipeData = parseBridgeJson(recipeJson, 'viewRecipe');
 
-        window.Android.logDebug('MainActivity', recipeJson);
+        logBridgeSummary('MainActivity', 'recipe', recipeJson);
 
         if(!recipeData)
         {
@@ -1635,9 +1717,9 @@ function editEvent(eventId)
 
         // Fetch data from database
         var eventJson = window.Android.fetchEvent(eventId);
-        var eventData = JSON.parse(eventJson);
+        var eventData = parseBridgeJson(eventJson, 'editEvent');
 
-        window.Android.logDebug('MainActivity', eventJson);
+        logBridgeSummary('MainActivity', 'event', eventJson);
 
         if(!eventData)
         {
@@ -1902,7 +1984,7 @@ function showEventDescription(eventId)
 
         // Fetch data from database
         var eventJson = window.Android.fetchEvent(eventId);
-        var eventData = JSON.parse(eventJson);
+        var eventData = parseBridgeJson(eventJson, 'showEventDescription');
 
         if(!eventData)
         {

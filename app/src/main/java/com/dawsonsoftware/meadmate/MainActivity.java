@@ -54,6 +54,7 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -381,88 +382,70 @@ import java.util.TimeZone;
         startActivityForResult(intent, CREATE_JSON_FILE);
     }
 
-    private String generateCsvExportFile() {
+    private String generateCsvExportFile() throws Exception {
 
-        try {
+        List<CombinedMeadRecord> records = data.getMeadRecords();
 
-            List<CombinedMeadRecord> records = data.getMeadRecords();
+        StringBuilder str = new StringBuilder();
 
-            StringBuilder str = new StringBuilder();
+        // header
+        str.append("MeadId,");
+        str.append("BatchName,");
+        str.append("Start Date,");
+        str.append("Description,");
+        str.append("Starting Gravity,");
+        str.append("Archived,");
+        str.append("Tags,");
+        str.append("Event Date,");
+        str.append("Event Type,");
+        str.append("Event Description / Value").append(System.lineSeparator());
 
-            // header
-            str.append("MeadId,");
-            str.append("BatchName,");
-            str.append("Start Date,");
-            str.append("Description,");
-            str.append("Starting Gravity,");
-            str.append("Archived,");
-            str.append("Tags,");
-            str.append("Event Date,");
-            str.append("Event Type,");
-            str.append("Event Description / Value").append(System.lineSeparator());
+        for (CombinedMeadRecord record : records) {
 
-            for (CombinedMeadRecord record : records) {
+            // Remove \r \n \t from Description and Event Description
 
-                // Remove \r \n \t from Description and Event Description
+            String description = record.getDescription();
+            String eventDescription = record.getEventDescription();
 
-                String description = record.getDescription();
-                String eventDescription = record.getEventDescription();
-
-                if(description != null) {
-                    description = description.replaceAll("\\r", " ");
-                    description = description.replaceAll("\\n", " ");
-                    description = description.replaceAll("\\t", " ");
-                }
-
-                if(eventDescription != null){
-                    eventDescription = eventDescription.replaceAll("\\r", " ");
-                    eventDescription = eventDescription.replaceAll("\\n", " ");
-                    eventDescription = eventDescription.replaceAll("\\t", " ");
-                }
-
-                str.append(record.getMeadId()).append(",");
-                str.append(record.getBatchName()).append(",");
-                str.append(record.getStartDate()).append(",");
-                str.append(description).append(",");
-                str.append(record.getStartingGravity()).append(",");
-                str.append(record.getArchived()).append(",");
-                str.append(record.getTags()).append(",");
-                str.append(record.getEventDate()).append(",");
-                str.append(record.getEventType()).append(",");
-                str.append(eventDescription).append(System.lineSeparator());
+            if(description != null) {
+                description = description.replaceAll("\\r", " ");
+                description = description.replaceAll("\\n", " ");
+                description = description.replaceAll("\\t", " ");
             }
 
-            return str.toString();
+            if(eventDescription != null){
+                eventDescription = eventDescription.replaceAll("\\r", " ");
+                eventDescription = eventDescription.replaceAll("\\n", " ");
+                eventDescription = eventDescription.replaceAll("\\t", " ");
+            }
 
-        } catch (Exception e) {
-
-            Log.e("MainActivity", "Unexpected error in generateCsvExportFile", e);
-
-            return "Unexpected error while trying to export data.";
+            str.append(record.getMeadId()).append(",");
+            str.append(record.getBatchName()).append(",");
+            str.append(record.getStartDate()).append(",");
+            str.append(description).append(",");
+            str.append(record.getStartingGravity()).append(",");
+            str.append(record.getArchived()).append(",");
+            str.append(record.getTags()).append(",");
+            str.append(record.getEventDate()).append(",");
+            str.append(record.getEventType()).append(",");
+            str.append(eventDescription).append(System.lineSeparator());
         }
+
+        return str.toString();
     }
 
-    private String generateJsonExportFile()
+    private String generateJsonExportFile() throws Exception
     {
-        try {
+        BackupManager manager = new BackupManager(this);
 
-            BackupManager manager = new BackupManager(this);
+        MeadMateBackup backup = manager.CreateBackup();
 
-            MeadMateBackup backup = manager.CreateBackup();
+        Gson gson = new GsonBuilder()
+                // register custom JsonSerializer for LocalDate
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+                .create();
 
-            Gson gson = new GsonBuilder()
-                    // register custom JsonSerializer for LocalDate
-                    .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-                    .create();
-
-            return gson.toJson(backup);
-
-        } catch (Exception e) {
-
-            Log.e("MainActivity", "Unexpected error in generateJsonExportFile", e);
-
-            return "Unexpected error while trying to export data.";
-        }
+        return gson.toJson(backup);
     }
 
     private void writeExportFile(Uri uri, String content) throws Exception {
@@ -473,7 +456,7 @@ import java.util.TimeZone;
             if(pfd != null)
             {
                 FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor());
-                fileOutputStream.write(content.getBytes());
+                fileOutputStream.write(content.getBytes(StandardCharsets.UTF_8));
                 // Let the document provider know you're done by closing the stream.
                 fileOutputStream.close();
                 pfd.close();

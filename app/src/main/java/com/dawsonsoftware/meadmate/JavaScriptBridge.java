@@ -21,6 +21,7 @@ import static java.lang.Integer.parseInt;
 
 import android.app.Activity;
 import android.content.pm.PackageInfo;
+import android.os.Build;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
@@ -180,23 +181,21 @@ import java.util.List;
     }
 
     @JavascriptInterface
-    public String fetchEventDescription(String id)
-    {
-        Log.i("JavaScriptBridge", "Fetching event description data for event id " + id + ".");
-
-        return data.getEventDescription(parseInt(id));
-    }
-
-    @JavascriptInterface
     public String fetchMead(String id)
     {
         Log.i("JavaScriptBridge", "Fetching mead data by ID: " + id);
 
         Mead mead = data.getMead(parseInt(id));
 
+        if(mead == null)
+        {
+            Log.w("JavaScriptBridge", "Mead not found for id: " + id);
+            return "null";
+        }
+
         String json = gson.toJson(mead);
 
-        Log.d("JavaScriptBridge", json);
+        Log.d("JavaScriptBridge", "Fetched mead id: " + mead.getId());
 
         return json;
     }
@@ -506,7 +505,14 @@ import java.util.List;
 
             model.setDatabaseVersion(MeadMateData.getDbVersion());
             model.setVersionName(pinfo.versionName);
-            model.setVersionNumber(pinfo.versionCode);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+            {
+                model.setVersionNumber((int) pinfo.getLongVersionCode());
+            }
+            else
+            {
+                model.setVersionNumber(pinfo.versionCode);
+            }
             model.setDateUpdated(updateDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
 
             String json = gson.toJson(model);

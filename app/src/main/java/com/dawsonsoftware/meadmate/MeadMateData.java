@@ -235,6 +235,13 @@ public class MeadMateData extends SQLiteOpenHelper {
     }
 
     // **** CRUD (Create, Read, Update, Delete) Operations ***** //
+
+    private int insertRowId(SQLiteDatabase db, String table, ContentValues values)
+    {
+        long rowId = db.insert(table, null, values);
+        return rowId == -1L ? 0 : (int) rowId;
+    }
+
     int addRecipe(Recipe recipe)
     {
         try
@@ -250,23 +257,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_RECIPE_NAME, recipe.getName());
             values.put(KEY_RECIPE_DESC, recipe.getDescription());
 
-            // Inserting Row
-            db.insert(TABLE_RECIPES, null, values);
-
-            // Query for new mead ID
-            int recipeId = 0;
-            Cursor c = db.rawQuery ("SELECT LAST_INSERT_ROWID()", null);
-
-            if(c.getCount() > 0)
-            {
-                c.moveToFirst();
-
-                recipeId = c.getInt(0);
-            }
-
-            c.close();
-
-            return recipeId;
+            return insertRowId(db, TABLE_RECIPES, values);
         }
         catch(Exception ex)
         {
@@ -437,23 +428,7 @@ public class MeadMateData extends SQLiteOpenHelper {
             values.put(KEY_MEAD_ORIG_GRAV, mead.getOriginalGravity());
             values.put(KEY_MEAD_ARCHIVED, (mead.getArchived() ? 1 : 0));
 
-            // Inserting Row
-            db.insert(TABLE_MEADS, null, values);
-
-            // Query for new mead ID
-            int meadId = 0;
-            Cursor c = db.rawQuery ("SELECT LAST_INSERT_ROWID()", null);
-
-            if(c.getCount() > 0)
-            {
-                c.moveToFirst();
-
-                meadId = c.getInt(0);
-            }
-
-            c.close();
-
-            return meadId;
+            return insertRowId(db, TABLE_MEADS, values);
         }
         catch(Exception ex)
         {
@@ -688,7 +663,7 @@ public class MeadMateData extends SQLiteOpenHelper {
     @SuppressLint("Range")
     int addTag(String name) {
 
-        int tagId;
+        int tagId = 0;
 
         try
         {
@@ -725,8 +700,7 @@ public class MeadMateData extends SQLiteOpenHelper {
                 ContentValues values = new ContentValues();
                 values.put(KEY_TAGS_NAME, name);
 
-                // Inserting Row
-                tagId = (int)db.insert(TABLE_TAGS, null, values);
+                tagId = insertRowId(db, TABLE_TAGS, values);
             }
 
             c.close();
