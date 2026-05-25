@@ -28,8 +28,10 @@ import android.os.ParcelFileDescriptor;
 import android.provider.CalendarContract;
 import android.util.Log;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 import android.window.OnBackInvokedDispatcher;
 
@@ -76,8 +78,19 @@ import java.util.TimeZone;
 
         mWebView = findViewById(R.id.activity_main_webview);
 
-        // Force links and redirects to open in the WebView instead of in a browser
         mWebView.setWebChromeClient(new WebChromeClient());
+        mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return !shouldLoadUrlInWebView(request.getUrl().toString());
+            }
+
+            @SuppressWarnings("deprecation")
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return !shouldLoadUrlInWebView(url);
+            }
+        });
 
         // Enable Javascript
         WebSettings webSettings = mWebView.getSettings();
@@ -112,6 +125,48 @@ import java.util.TimeZone;
                         Log.d("MainActivity", "Event activity completed with ok result.");
                     }
                 });
+    }
+
+    /**
+     * Keep local app assets (and in-page javascript/about URLs) in the WebView so the
+     * JavascriptInterface stays off untrusted origins. Open http(s), mailto, etc. externally.
+     */
+    private boolean shouldLoadUrlInWebView(String url) {
+        if (url == null || url.isEmpty()) {
+            return true;
+        }
+
+        Uri uri = Uri.parse(url);
+        String scheme = uri.getScheme();
+
+        if (scheme == null) {
+            return true;
+        }
+
+        if ("file".equalsIgnoreCase(scheme)) {
+            return url.startsWith("file:///android_asset/");
+        }
+
+        if ("javascript".equalsIgnoreCase(scheme) || "about".equalsIgnoreCase(scheme)) {
+            return true;
+        }
+
+        openExternalUrl(uri);
+        return false;
+    }
+
+    private void openExternalUrl(Uri uri) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Toast.makeText(
+                    getApplicationContext(),
+                    "No app found to open this link",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
     }
 
     public void requestEvent(EventRequest request)

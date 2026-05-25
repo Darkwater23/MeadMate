@@ -89,7 +89,7 @@ public class MeadMateData extends SQLiteOpenHelper {
     private static final String KEY_RECIPE_DESC = "DESCRIPTION";
 
     // Table creation strings
-    String CREATE_MEAD_TABLE = "CREATE TABLE " + TABLE_MEADS + " (" +
+    String CREATE_MEAD_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_MEADS + " (" +
             KEY_MEAD_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
             KEY_MEAD_NAME + " TEXT NOT NULL," +
             KEY_MEAD_START_DATE + " TEXT NOT NULL," +
@@ -97,14 +97,14 @@ public class MeadMateData extends SQLiteOpenHelper {
             KEY_MEAD_ORIG_GRAV + " TEXT NOT NULL DEFAULT '0.0'," +
             KEY_MEAD_ARCHIVED + " INTEGER NOT NULL DEFAULT 0)";
 
-    String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + " (" +
+    String CREATE_EVENTS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_EVENTS + " (" +
             KEY_EVENT_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
             KEY_EVENT_MEADID + " INTEGER NOT NULL," +
             KEY_EVENT_DATE + " TEXT NOT NULL, " +
             KEY_EVENT_TYPEID + " INTEGER NOT NULL, " +
             KEY_EVENT_DESC + " TEXT NOT NULL)";
 
-    String CREATE_EVENT_TYPES_TABLE = "CREATE TABLE " + TABLE_EVENT_TYPES + " (" +
+    String CREATE_EVENT_TYPES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_EVENT_TYPES + " (" +
             KEY_EVENT_TYPE_ID + " INTEGER NOT NULL PRIMARY KEY UNIQUE," +
             KEY_EVENT_TYPE_NAME + " TEXT NOT NULL)";
 
@@ -132,17 +132,17 @@ public class MeadMateData extends SQLiteOpenHelper {
             KEY_EVENT_TYPE_ID + "," + KEY_EVENT_TYPE_NAME + ") VALUES " +
             "(9,'Conditioning')";
 
-    String CREATE_READINGS_TABLE = "CREATE TABLE " + TABLE_READINGS + " (" +
+    String CREATE_READINGS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_READINGS + " (" +
             KEY_READINGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
             KEY_READINGS_MEADID + " INTEGER NOT NULL," +
             KEY_READINGS_DATE + " TEXT NOT NULL," +
             KEY_READINGS_GRAV + " TEXT NOT NULL)";
 
-    String CREATE_TAGS_TABLE = "CREATE TABLE " + TABLE_TAGS + " (" +
+    String CREATE_TAGS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_TAGS + " (" +
             KEY_TAGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
             KEY_TAGS_NAME + " TEXT NOT NULL)";
 
-    String CREATE_MEAD_TAGS_TABLE = "CREATE TABLE " + TABLE_MEAD_TAGS + " (" +
+    String CREATE_MEAD_TAGS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_MEAD_TAGS + " (" +
             KEY_MEAD_TAGS_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
             KEY_MEAD_TAGS_MEAD_ID + " INTEGER NOT NULL," +
             KEY_MEAD_TAGS_TAG_ID + " INTEGER NOT NULL)";
@@ -150,7 +150,7 @@ public class MeadMateData extends SQLiteOpenHelper {
     String ALTER_MEAD_TABLE = "ALTER TABLE " + TABLE_MEADS +
             " ADD COLUMN " + KEY_MEAD_ARCHIVED + " INTEGER NOT NULL DEFAULT 0";
 
-    String CREATE_RECIPES_TABLE = "CREATE TABLE " + TABLE_RECIPES + " (" +
+    String CREATE_RECIPES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_RECIPES + " (" +
             KEY_RECIPE_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE," +
             KEY_RECIPE_NAME + " TEXT NOT NULL," +
             KEY_RECIPE_DESC + " TEXT NOT NULL)";
@@ -609,7 +609,9 @@ public class MeadMateData extends SQLiteOpenHelper {
 
     void deleteMead(int meadId)
     {
-        String whereClause = KEY_MEAD_ID + "=?";
+        String meadWhereClause = KEY_MEAD_ID + "=?";
+        String eventsWhereClause = KEY_EVENT_MEADID + "=?";
+        String readingsWhereClause = KEY_READINGS_MEADID + "=?";
         String meadTagsWhereClause = KEY_MEAD_TAGS_MEAD_ID + "=?";
         String[] whereArgs = new String[] { String.valueOf(meadId) };
 
@@ -621,11 +623,17 @@ public class MeadMateData extends SQLiteOpenHelper {
 
             db.beginTransaction();
 
-            Log.i(MeadMateData.class.getTypeName(),"Deleting mead record " + meadId);
-            db.delete(TABLE_MEADS, whereClause, whereArgs);
+            Log.i(MeadMateData.class.getTypeName(), "Deleting event records for mead ID " + meadId);
+            db.delete(TABLE_EVENTS, eventsWhereClause, whereArgs);
 
-            Log.i(MeadMateData.class.getTypeName(),"Deleting mead tag records for mead ID " + meadId);
+            Log.i(MeadMateData.class.getTypeName(), "Deleting reading records for mead ID " + meadId);
+            db.delete(TABLE_READINGS, readingsWhereClause, whereArgs);
+
+            Log.i(MeadMateData.class.getTypeName(), "Deleting mead tag records for mead ID " + meadId);
             db.delete(TABLE_MEAD_TAGS, meadTagsWhereClause, whereArgs);
+
+            Log.i(MeadMateData.class.getTypeName(), "Deleting mead record " + meadId);
+            db.delete(TABLE_MEADS, meadWhereClause, whereArgs);
 
             db.setTransactionSuccessful();
         }
