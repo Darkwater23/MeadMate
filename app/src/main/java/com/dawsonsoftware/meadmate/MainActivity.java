@@ -86,12 +86,6 @@ import java.util.TimeZone;
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return !shouldLoadUrlInWebView(request.getUrl().toString());
             }
-
-            @SuppressWarnings("deprecation")
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return !shouldLoadUrlInWebView(url);
-            }
         });
 
         // Enable Javascript

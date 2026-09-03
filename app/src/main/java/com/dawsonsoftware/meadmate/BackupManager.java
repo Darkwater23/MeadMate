@@ -15,7 +15,7 @@ public class BackupManager {
         //_backupModel = new MeadMateBackup();
         meadData = new MeadMateData(context);
     }
-    public MeadMateBackup CreateBackup() throws Exception
+    public MeadMateBackup CreateBackup()
     {
         MeadMateBackup backupModel = new MeadMateBackup();
 

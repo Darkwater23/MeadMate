@@ -68,14 +68,12 @@ function parseBridgeJson(json, context)
     }
 }
 
-function logBridgeSummary(tag, label, json)
+function logBridgeSummary(tag, label, parsed)
 {
     if(!window.Android)
     {
         return;
     }
-
-    var parsed = parseBridgeJson(json, tag + '.' + label);
 
     if(parsed == null)
     {
@@ -840,7 +838,7 @@ function loadMyMeadsListView()
         var meadsJson = window.Android.fetchMeads(sortPref, includeArchived);
         var meadsData = parseBridgeJson(meadsJson, 'loadMyMeadsListView') || [];
 
-        logBridgeSummary('MainActivity', 'meads', meadsJson);
+        logBridgeSummary('MainActivity', 'meads', meadsData);
 
         // Append to list
         for (var i = 0; i < meadsData.length; i++) {
@@ -948,7 +946,7 @@ function loadMyRecipesListView()
         var recipesJson = window.Android.fetchRecipes();
         var recipesData = parseBridgeJson(recipesJson, 'loadMyRecipesListView') || [];
 
-        logBridgeSummary('MainActivity', 'recipes', recipesJson);
+        logBridgeSummary('MainActivity', 'recipes', recipesData);
 
         // Append to list
         for (var i = 0; i < recipesData.length; i++) {
@@ -1020,8 +1018,8 @@ function viewReadings(meadId)
         var readingsJson = window.Android.fetchReadings(meadId);
         var readingsData = parseBridgeJson(readingsJson, 'viewReadings.readings') || [];
 
-        logBridgeSummary('MainActivity', 'mead', meadJson);
-        logBridgeSummary('MainActivity', 'readings', readingsJson);
+        logBridgeSummary('MainActivity', 'mead', meadData);
+        logBridgeSummary('MainActivity', 'readings', readingsData);
 
         // Set mead name on page
         $("#readings-mead-name").text(meadData.name);
@@ -1142,8 +1140,8 @@ function viewEvents(meadId)
         var eventsJson = window.Android.fetchEvents(meadId);
         var eventsData = parseBridgeJson(eventsJson, 'viewEvents.events') || [];
 
-        logBridgeSummary('MainActivity', 'mead', meadJson);
-        logBridgeSummary('MainActivity', 'events', eventsJson);
+        logBridgeSummary('MainActivity', 'mead', meadData);
+        logBridgeSummary('MainActivity', 'events', eventsData);
 
         // Set mead name on page
         $("#events-mead-name").text(meadData.name);
@@ -1416,10 +1414,10 @@ function viewMead(id)
         var eventsJson = window.Android.fetchEvents(id);
         var eventsData = parseBridgeJson(eventsJson, 'viewMead.events') || [];
 
-        logBridgeSummary('MainActivity', 'mead', meadJson);
-        logBridgeSummary('MainActivity', 'tags', tagsJson);
-        logBridgeSummary('MainActivity', 'readings', readingsJson);
-        logBridgeSummary('MainActivity', 'events', eventsJson);
+        logBridgeSummary('MainActivity', 'mead', meadData);
+        logBridgeSummary('MainActivity', 'tags', tagsData);
+        logBridgeSummary('MainActivity', 'readings', readingsData);
+        logBridgeSummary('MainActivity', 'events', eventsData);
 
         var lastReadingDisplayValue = "N/A";
         var lastEventDisplayValue = "N/A";
@@ -1644,7 +1642,7 @@ function viewRecipe(id)
         var recipeJson = window.Android.fetchRecipe(id);
         var recipeData = parseBridgeJson(recipeJson, 'viewRecipe');
 
-        logBridgeSummary('MainActivity', 'recipe', recipeJson);
+        logBridgeSummary('MainActivity', 'recipe', recipeData);
 
         if(!recipeData)
         {
@@ -1719,7 +1717,7 @@ function editEvent(eventId)
         var eventJson = window.Android.fetchEvent(eventId);
         var eventData = parseBridgeJson(eventJson, 'editEvent');
 
-        logBridgeSummary('MainActivity', 'event', eventJson);
+        logBridgeSummary('MainActivity', 'event', eventData);
 
         if(!eventData)
         {
