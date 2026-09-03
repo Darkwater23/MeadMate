@@ -19,6 +19,7 @@ package com.dawsonsoftware.meadmate;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -36,6 +37,7 @@ import android.widget.Toast;
 import android.window.OnBackInvokedDispatcher;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.os.BuildCompat;
@@ -70,6 +72,9 @@ import java.util.TimeZone;
     private static final int CREATE_EVENT = 3;
     private static final int SELECT_JSON_FILE = 4;
     private ActivityResultLauncher<Intent> eventActivityResultLauncher = null;
+    private ActivityResultLauncher<IntentSenderRequest> driveAuthorizationLauncher = null;
+    private final DriveBackupManager driveBackupManager = new DriveBackupManager(this);
+    private String pendingDriveBackupJson = null;
 
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -119,6 +124,17 @@ import java.util.TimeZone;
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Log.d("MainActivity", "Event activity completed with ok result.");
+                    }
+                });
+
+        this.driveAuthorizationLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartIntentSenderForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        driveBackupManager.handleAuthorizationResult(result.getData(), driveAuthorizationCallback);
+                    } else {
+                        pendingDriveBackupJson = null;
+                        showToast("Google Drive authorization was cancelled.");
                     }
                 });
     }
@@ -370,6 +386,61 @@ import java.util.TimeZone;
         intent.putExtra(Intent.EXTRA_TITLE, "mead-mate-data.csv");
 
         startActivityForResult(intent, CREATE_CSV_FILE);
+    }
+
+    private final DriveBackupManager.AuthorizationCallback driveAuthorizationCallback = new DriveBackupManager.AuthorizationCallback() {
+        @Override
+        public void onAuthorized(String accessToken) {
+            String json = pendingDriveBackupJson;
+            pendingDriveBackupJson = null;
+
+            if (json == null) {
+                return;
+            }
+
+            driveBackupManager.uploadBackup(accessToken, json, driveUploadCallback);
+        }
+
+        @Override
+        public void onResolutionRequired(PendingIntent pendingIntent) {
+            driveAuthorizationLauncher.launch(
+                    new IntentSenderRequest.Builder(pendingIntent.getIntentSender()).build());
+        }
+
+        @Override
+        public void onFailure(Exception exception) {
+            pendingDriveBackupJson = null;
+            Log.e("MainActivity", "Drive authorization failed", exception);
+            showToast("Google Drive authorization failed.");
+        }
+    };
+
+    private final DriveBackupManager.UploadCallback driveUploadCallback = new DriveBackupManager.UploadCallback() {
+        @Override
+        public void onSuccess(String fileName) {
+            showToast("Backup uploaded to Google Drive: " + fileName);
+        }
+
+        @Override
+        public void onFailure(String message) {
+            showToast("Google Drive backup failed: " + message);
+        }
+    };
+
+    public void requestDriveBackup() {
+        Log.i("DataExport", "Starting mead data backup to Google Drive.");
+
+        try {
+            pendingDriveBackupJson = generateJsonExportFile();
+            driveBackupManager.authorize(driveAuthorizationCallback);
+        } catch (Exception ex) {
+            Log.e("MainActivity", "Unexpected error while preparing Google Drive backup.", ex);
+            showToast("Google Drive backup failed!");
+        }
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     public void requestJsonExportFileUri() {

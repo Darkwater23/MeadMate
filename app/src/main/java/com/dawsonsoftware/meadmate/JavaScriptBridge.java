@@ -569,6 +569,16 @@ import java.util.List;
     }
 
     @JavascriptInterface
+    public void backupToDrive()
+    {
+        Log.d("JavaScriptBridge", "Starting Google Drive backup.");
+
+        MainActivity mainActivity = (MainActivity) this.activity;
+
+        mainActivity.requestDriveBackup();
+    }
+
+    @JavascriptInterface
     public void exportData(int exportType)
     {
         Log.d("JavaScriptBridge", "Start export using type: " + exportType);

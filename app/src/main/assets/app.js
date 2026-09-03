@@ -544,6 +544,19 @@ $("#export-json-button").on("tap", function(event) {
     }
 });
 
+$("#backup-drive-button").on("tap", function(event) {
+    event.preventDefault();
+
+    if(window.Android)
+    {
+        window.Android.backupToDrive();
+    }
+    else
+    {
+        $.alert(alertNoBridge);
+    }
+});
+
 $("#import-button").on("tap", function(event) {
     event.preventDefault();
 
